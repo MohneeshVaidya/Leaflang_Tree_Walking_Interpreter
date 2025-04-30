@@ -33,6 +33,9 @@ std::ostream& operator << (std::ostream& stream, TokenType type) {
         case TokenType::k_var:
             stream << "var";
             break;
+        case TokenType::k_const:
+            stream << "const";
+            break;
         case TokenType::k_function:
             stream << "function";
             break;

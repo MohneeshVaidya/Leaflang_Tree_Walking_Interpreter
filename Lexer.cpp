@@ -168,6 +168,8 @@ void Lexer::add_identifier_token(std::string_view identifier, uint32_t line) {
         token.type = TokenType::k_print;
     } else if (identifier == "var") {
         token.type = TokenType::k_var;
+    } else if (identifier == "const") {
+        token.type = TokenType::k_const;
     } else if (identifier == "if") {
         token.type = TokenType::k_if;
     } else if (identifier == "elseif") {

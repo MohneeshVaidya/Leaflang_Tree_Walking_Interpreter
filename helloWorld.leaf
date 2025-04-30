@@ -1,8 +1,8 @@
-var fullName = "Mohneesh Vaidya";
-var userName = "Warrior_Vegito";
-var email    = "warrior.vegito.007@gmail.com";
-var password = "warrior_vegito_is_great";
-var age      = 26;
+const fullName = "Mohneesh Vaidya";
+const userName = "Warrior_Vegito";
+const email    = "warrior.vegito.007@gmail.com";
+const password = "warrior_vegito_is_great";
+const age      = 26;
 
 print fullName;
 print userName;

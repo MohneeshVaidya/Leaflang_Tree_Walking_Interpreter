@@ -6,6 +6,7 @@ enum class TokenType {
     // Keywords
     k_print,
     k_var,
+    k_const,
     k_if,
     k_elseif,
     k_else,
