@@ -1,0 +1,13 @@
+var fullName = "Mohneesh Vaidya";
+var userName = "Warrior_Vegito";
+var email    = "warrior.vegito.007@gmail.com";
+var password = "warrior_vegito_is_great";
+var age      = 26;
+
+print fullName;
+print userName;
+print email;
+print password;
+print age;
+
+print "Hello world, this is leaf programming language";
