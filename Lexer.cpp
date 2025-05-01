@@ -67,7 +67,7 @@ std::string Lexer::get_string() {
         Error::get_instance()->add_error(tokens.back(), "String can not traverse multiple lines."s);
         line++;
     } else if (character == '\0') {
-        Error::get_instance()->add_error(tokens.back(), "String starts but never ends.");
+        Error::get_instance()->add_error(tokens.back(), "String starts but never ends."s);
     }
 
     current = idx;
@@ -98,7 +98,7 @@ void Lexer::gen_next_token(char next_char) {
     case '*':
         if (peek_char() == '*') {
             move_current_right();
-            tokens.emplace_back(k_star_star, "**", line);
+            tokens.emplace_back(k_star_star, "**"s, line);
         } else {
             tokens.emplace_back(k_star, Tools::to_string(next_char), line);
         }
@@ -115,16 +115,36 @@ void Lexer::gen_next_token(char next_char) {
         tokens.emplace_back(k_percent, Tools::to_string(next_char), line);
         break;
     case '=':
-        tokens.emplace_back(k_equal, Tools::to_string(next_char), line);
+        if (peek_char() == '=') {
+            move_current_right();
+            tokens.emplace_back(k_equal_equal, "=="s, line);
+        } else {
+            tokens.emplace_back(k_equal, Tools::to_string(next_char), line);
+        }
         break;
     case '<':
-        tokens.emplace_back(k_lesser, Tools::to_string(next_char), line);
+        if (peek_char() == '=') {
+            move_current_right();
+            tokens.emplace_back(k_lesser_equal, "<="s, line);
+        } else {
+            tokens.emplace_back(k_lesser, Tools::to_string(next_char), line);
+        }
         break;
     case '>':
-        tokens.emplace_back(k_greater, Tools::to_string(next_char), line);
+        if (peek_char() == '=') {
+            move_current_right();
+            tokens.emplace_back(k_greater_equal, ">="s, line);
+        } else {
+            tokens.emplace_back(k_greater, Tools::to_string(next_char), line);
+        }
         break;
     case '!':
-        tokens.emplace_back(k_bang, Tools::to_string(next_char), line);
+        if (peek_char() == '=') {
+            move_current_right();
+            tokens.emplace_back(k_bang_equal, "!="s, line);
+        } else {
+            tokens.emplace_back(k_bang, Tools::to_string(next_char), line);
+        }
         break;
     case '(':
         tokens.emplace_back(k_left_paren, Tools::to_string(next_char), line);
@@ -143,6 +163,12 @@ void Lexer::gen_next_token(char next_char) {
         break;
     case ',':
         tokens.emplace_back(k_comma, Tools::to_string(next_char), line);
+        break;
+    case '?':
+        tokens.emplace_back(k_question, Tools::to_string(next_char), line);
+        break;
+    case ':':
+        tokens.emplace_back(k_colon, Tools::to_string(next_char), line);
         break;
     case '\0':
         tokens.emplace_back(k_eof, Tools::to_string(next_char), line);
@@ -224,12 +250,22 @@ void Lexer::add_identifier_token(std::string_view identifier, uint32_t line) {
         token.type = k_class;
     } else if (identifier == "extends") {
         token.type = k_extends;
+    } else if (identifier == "this") {
+        token.type = k_this;
+    } else if (identifier == "super") {
+        token.type = k_super;
+    } else if (identifier == "true") {
+        token.type = k_true;
+    } else if (identifier == "false") {
+        token.type = k_false;
     } else if (identifier == "and") {
         token.type = k_and;
     } else if (identifier == "or") {
         token.type = k_or;
     } else if (identifier == "xor") {
         token.type = k_xor;
+    } else if (identifier == "null") {
+        token.type = k_null;
     } else {
         token.literal = identifier;
     }

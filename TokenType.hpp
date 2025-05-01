@@ -16,6 +16,10 @@ enum class TokenType {
     k_function,
     k_class,
     k_extends,
+    k_this,
+    k_super,
+    k_true,
+    k_false,
     k_and,
     k_or,
     k_xor,
@@ -23,6 +27,7 @@ enum class TokenType {
     k_number,
     k_string,
     k_identifier,
+    k_null,
 
     // Binary operators
     k_plus,
@@ -49,6 +54,8 @@ enum class TokenType {
     k_right_brace,
     k_semicolon,
     k_comma,
+    k_question,
+    k_colon,
 };
 
 std::ostream& operator << (std::ostream& stream, TokenType type);

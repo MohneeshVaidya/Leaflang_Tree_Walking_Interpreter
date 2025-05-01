@@ -4,9 +4,14 @@
 #include "TokenType.hpp"
 
 #include <cstdint>
+#include <memory>
 #include <ostream>
 #include <string>
 #include <string_view>
+
+class Token;
+
+using TokenPtr = std::shared_ptr<Token>;
 
 class Token {
 public:

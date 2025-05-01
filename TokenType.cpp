@@ -47,8 +47,20 @@ std::ostream& operator << (std::ostream& stream, TokenType type) {
         case k_extends:
             stream << "extends";
             break;
+        case k_this:
+            stream << "this";
+            break;
+        case k_super:
+            stream << "super";
+            break;
         case k_eof:
             stream << "eof";
+            break;
+        case k_true:
+            stream << "true";
+            break;
+        case k_false:
+            stream << "false";
             break;
         case k_and:
             stream << "and";
@@ -95,6 +107,12 @@ std::ostream& operator << (std::ostream& stream, TokenType type) {
         case k_comma:
             stream << "comma";
             break;
+        case k_question:
+            stream << "question";
+            break;
+        case k_colon:
+            stream << "colon";
+            break;
         case k_number:
             stream << "number";
             break;
@@ -103,6 +121,9 @@ std::ostream& operator << (std::ostream& stream, TokenType type) {
             break;
         case k_identifier:
             stream << "identifier";
+            break;
+        case k_null:
+            stream << "null";
             break;
         case k_if:
             stream << "if";
