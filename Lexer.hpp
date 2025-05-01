@@ -21,9 +21,11 @@ private:
     // Private methods
     char get_char();
     char get_char(uint32_t idx);
+    char peek_char();
     std::string get_number();
     std::string get_string();
     std::string get_identifier();
+    void remove_comment();
     void gen_next_token(char next_char);
     void move_current_left();
     void move_current_right();

@@ -1,120 +1,125 @@
 #include "TokenType.hpp"
 #include <ostream>
 
+using enum TokenType;
+
 std::ostream& operator << (std::ostream& stream, TokenType type) {
     switch (type) {
-        case TokenType::k_bang:
+        case k_bang:
             stream << "bang";
             break;
-        case TokenType::k_bang_equal:
+        case k_bang_equal:
             stream << "bang_equal";
             break;
-        case TokenType::k_equal:
+        case k_equal:
             stream << "equal";
             break;
-        case TokenType::k_equal_equal:
+        case k_equal_equal:
             stream << "equal_equal";
             break;
-        case TokenType::k_greater_equal:
+        case k_greater_equal:
             stream << "greater_equal";
             break;
-        case TokenType::k_greater:
+        case k_greater:
             stream << "greater";
             break;
-        case TokenType::k_lesser:
+        case k_lesser:
             stream << "lesser";
             break;
-        case TokenType::k_lesser_equal:
+        case k_lesser_equal:
             stream << "lesser_equal";
             break;
-        case TokenType::k_print:
+        case k_print:
             stream << "print";
             break;
-        case TokenType::k_var:
+        case k_var:
             stream << "var";
             break;
-        case TokenType::k_const:
+        case k_const:
             stream << "const";
             break;
-        case TokenType::k_function:
+        case k_function:
             stream << "function";
             break;
-        case TokenType::k_class:
+        case k_class:
             stream << "class";
             break;
-        case TokenType::k_extends:
+        case k_extends:
             stream << "extends";
             break;
-        case TokenType::k_eof:
+        case k_eof:
             stream << "eof";
             break;
-        case TokenType::k_and:
+        case k_and:
             stream << "and";
             break;
-        case TokenType::k_or:
+        case k_or:
             stream << "or";
             break;
-        case TokenType::k_xor:
+        case k_xor:
             stream << "xor";
             break;
-        case TokenType::k_plus:
+        case k_plus:
             stream << "plus";
             break;
-        case TokenType::k_minus:
+        case k_minus:
             stream << "minus";
             break;
-        case TokenType::k_slash:
+        case k_slash:
             stream << "slash";
             break;
-        case TokenType::k_star:
+        case k_star:
             stream << "star";
             break;
-        case TokenType::k_star_star:
+        case k_star_star:
             stream << "star_star";
             break;
-        case TokenType::k_percent:
+        case k_percent:
             stream << "percent";
             break;
-        case TokenType::k_left_paren:
+        case k_left_paren:
             stream << "left_paren";
             break;
-        case TokenType::k_right_paren:
+        case k_right_paren:
             stream << "right_paren";
             break;
-        case TokenType::k_left_brace:
+        case k_left_brace:
             stream << "left_brace";
             break;
-        case TokenType::k_right_brace:
+        case k_right_brace:
             stream << "right_brace";
             break;
-        case TokenType::k_semicolon:
+        case k_semicolon:
             stream << "semicolon";
             break;
-        case TokenType::k_number:
+        case k_comma:
+            stream << "comma";
+            break;
+        case k_number:
             stream << "number";
             break;
-        case TokenType::k_string:
+        case k_string:
             stream << "string";
             break;
-        case TokenType::k_identifier:
+        case k_identifier:
             stream << "identifier";
             break;
-        case TokenType::k_if:
+        case k_if:
             stream << "if";
             break;
-        case TokenType::k_elseif:
+        case k_elseif:
             stream << "elseif";
             break;
-        case TokenType::k_else:
+        case k_else:
             stream << "else";
             break;
-        case TokenType::k_while:
+        case k_while:
             stream << "while";
             break;
-        case TokenType::k_do:
+        case k_do:
             stream << "do";
             break;
-        case TokenType::k_for:
+        case k_for:
             stream << "for";
             break;
     }

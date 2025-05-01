@@ -1,4 +1,5 @@
 #include "Lexer.hpp"
+#include "Error.hpp"
 #include "Token.hpp"
 #include "TokenType.hpp"
 #include "tools/Tools.hpp"
@@ -9,9 +10,13 @@
 #include <string_view>
 #include <vector>
 
+using namespace std::string_literals;
+using enum TokenType;
+
+
 // Constructors
-Lexer::Lexer(std::string_view source_code):
-    source_code { source_code }
+Lexer::Lexer(std::string_view source_code) :
+    source_code{source_code}
     {
     }
 
@@ -30,10 +35,14 @@ char Lexer::get_char(uint32_t idx) {
     return '\0';
 }
 
-std::string Lexer::get_number() {
-    uint32_t idx   { current + 1 };
+char Lexer::peek_char() {
+    return get_char(current);
+}
 
-    std::string number { get_char(current) };
+std::string Lexer::get_number() {
+    uint32_t idx{current + 1};
+
+    std::string number{get_char(current)};
 
     while (std::isdigit(get_char(idx))) {
         number.push_back(source_code.at(idx++));
@@ -44,18 +53,20 @@ std::string Lexer::get_number() {
 }
 
 std::string Lexer::get_string() {
-    uint32_t idx { current };
+    uint32_t idx{current};
 
-    std::string str { };
+    std::string str{};
 
-    char character { get_char(idx++) };
+    char character{get_char(idx++)};
     while (character != '\n' && character != '\0' && character != '"') {
         str.push_back(character);
         character = get_char(idx++);
     }
 
-    if (character == '\n' || character == '\0') {
-        // Error: string doesn't have trailing '"'.
+    if (character == '\n') {
+        Error::get_instance()->add_error(tokens.back(), "String can not traverse multiple lines."s);
+    } else if (character == '\0') {
+        Error::get_instance()->add_error(tokens.back(), "String starts but never ends.");
     }
 
     current = idx;
@@ -63,9 +74,9 @@ std::string Lexer::get_string() {
 }
 
 std::string Lexer::get_identifier() {
-    uint32_t idx { current + 1 };
+    uint32_t idx{current + 1};
 
-    std::string identifier { get_char(current) };
+    std::string identifier{get_char(current)};
 
     while (Tools::is_alphanumeric(get_char(idx))) {
         identifier.push_back(source_code.at(idx++));
@@ -77,76 +88,100 @@ std::string Lexer::get_identifier() {
 
 void Lexer::gen_next_token(char next_char) {
     switch (next_char) {
-        case '+':
-            tokens.emplace_back(TokenType::k_plus, Tools::to_string(next_char), line);
-            break;
-        case '-':
-            tokens.emplace_back(TokenType::k_minus, Tools::to_string(next_char), line);
-            break;
-        case '*':
-            tokens.emplace_back(TokenType::k_star, Tools::to_string(next_char), line);
-            break;
-        case '/':
-            tokens.emplace_back(TokenType::k_slash, Tools::to_string(next_char), line);
-            break;
-        case '%':
-            tokens.emplace_back(TokenType::k_percent, Tools::to_string(next_char), line);
-            break;
-        case '=':
-            tokens.emplace_back(TokenType::k_equal, Tools::to_string(next_char), line);
-            break;
-        case '<':
-            tokens.emplace_back(TokenType::k_lesser, Tools::to_string(next_char), line);
-            break;
-        case '>':
-            tokens.emplace_back(TokenType::k_greater, Tools::to_string(next_char), line);
-            break;
-        case '!':
-            tokens.emplace_back(TokenType::k_bang, Tools::to_string(next_char), line);
-            break;
-        case '(':
-            tokens.emplace_back(TokenType::k_left_paren, Tools::to_string(next_char), line);
-            break;
-        case ')':
-            tokens.emplace_back(TokenType::k_right_paren, Tools::to_string(next_char), line);
-            break;
-        case '{':
-            tokens.emplace_back(TokenType::k_left_brace, Tools::to_string(next_char), line);
-            break;
-        case '}':
-            tokens.emplace_back(TokenType::k_right_brace, Tools::to_string(next_char), line);
-            break;
-        case ';':
-            tokens.emplace_back(TokenType::k_semicolon, Tools::to_string(next_char), line);
-            break;
-        case '\0':
-            tokens.emplace_back(TokenType::k_eof, Tools::to_string(next_char), line);
-            break;
-        case '\n':
-            line++;
-            [[fallthrough]];
-        case ' ':
-            [[fallthrough]];
-        case '\t':
-            [[fallthrough]];
-        case '\r':
-            break;
-        default:
-            if (std::isdigit(next_char)) {
-                move_current_left();
-                std::string number { get_number() };
-                tokens.emplace_back(TokenType::k_number, number, number, line);
+    case '+':
+        tokens.emplace_back(k_plus, Tools::to_string(next_char), line);
+        break;
+    case '-':
+        tokens.emplace_back(k_minus, Tools::to_string(next_char), line);
+        break;
+    case '*':
+        if (peek_char() == '*') {
+            move_current_right();
+            tokens.emplace_back(k_star_star, "**", line);
+        } else {
+            tokens.emplace_back(k_star, Tools::to_string(next_char), line);
+        }
+        break;
+    case '/':
+        if (peek_char() == '/') {
+            move_current_right();
+            remove_comment();
+        } else {
+            tokens.emplace_back(k_slash, Tools::to_string(next_char), line);
+        }
+        break;
+    case '%':
+        tokens.emplace_back(k_percent, Tools::to_string(next_char), line);
+        break;
+    case '=':
+        tokens.emplace_back(k_equal, Tools::to_string(next_char), line);
+        break;
+    case '<':
+        tokens.emplace_back(k_lesser, Tools::to_string(next_char), line);
+        break;
+    case '>':
+        tokens.emplace_back(k_greater, Tools::to_string(next_char), line);
+        break;
+    case '!':
+        tokens.emplace_back(k_bang, Tools::to_string(next_char), line);
+        break;
+    case '(':
+        tokens.emplace_back(k_left_paren, Tools::to_string(next_char), line);
+        break;
+    case ')':
+        tokens.emplace_back(k_right_paren, Tools::to_string(next_char), line);
+        break;
+    case '{':
+        tokens.emplace_back(k_left_brace, Tools::to_string(next_char), line);
+        break;
+    case '}':
+        tokens.emplace_back(k_right_brace, Tools::to_string(next_char), line);
+        break;
+    case ';':
+        tokens.emplace_back(k_semicolon, Tools::to_string(next_char), line);
+        break;
+    case ',':
+        tokens.emplace_back(k_comma, Tools::to_string(next_char), line);
+        break;
+    case '\0':
+        tokens.emplace_back(k_eof, Tools::to_string(next_char), line);
+        break;
+    case '\n':
+        line++;
+        [[fallthrough]];
+    case ' ':
+        [[fallthrough]];
+    case '\t':
+        [[fallthrough]];
+    case '\r':
+        break;
+    default:
+        if (std::isdigit(next_char)) {
+            move_current_left();
+            std::string number{get_number()};
+            tokens.emplace_back(k_number, number, number, line);
 
-            } else if (next_char == '"') {
-                std::string str { get_string() };
-                tokens.emplace_back(TokenType::k_string, str, str, line);
-            } else if (Tools::is_alphabetical(next_char)) {
-                move_current_left();
-                std::string identifier { get_identifier() };
-                add_identifier_token(identifier, line);
-            }
-            break;
+        } else if (next_char == '"') {
+            std::string str{get_string()};
+            tokens.emplace_back(k_string, str, str, line);
+
+        } else if (Tools::is_alphabetical(next_char)) {
+            move_current_left();
+            std::string identifier{get_identifier()};
+            add_identifier_token(identifier, line);
+        }
+        break;
     }
+}
+
+void Lexer::remove_comment() {
+    uint32_t idx{current};
+    char character{get_char(idx++)};
+    while (character != '\n') {
+        character = get_char(idx++);
+    }
+    current = idx;
+    line++;
 }
 
 void Lexer::move_current_left() {
@@ -162,38 +197,38 @@ void Lexer::move_current_right() {
 }
 
 void Lexer::add_identifier_token(std::string_view identifier, uint32_t line) {
-    Token token { TokenType::k_identifier, identifier, line };
+    Token token{k_identifier, identifier, line};
 
     if (identifier == "print") {
-        token.type = TokenType::k_print;
+        token.type = k_print;
     } else if (identifier == "var") {
-        token.type = TokenType::k_var;
+        token.type = k_var;
     } else if (identifier == "const") {
-        token.type = TokenType::k_const;
+        token.type = k_const;
     } else if (identifier == "if") {
-        token.type = TokenType::k_if;
+        token.type = k_if;
     } else if (identifier == "elseif") {
-        token.type = TokenType::k_elseif;
+        token.type = k_elseif;
     } else if (identifier == "else") {
-        token.type = TokenType::k_else;
+        token.type = k_else;
     } else if (identifier == "while") {
-        token.type = TokenType::k_while;
+        token.type = k_while;
     } else if (identifier == "do") {
-        token.type = TokenType::k_do;
+        token.type = k_do;
     } else if (identifier == "for") {
-        token.type = TokenType::k_for;
+        token.type = k_for;
     } else if (identifier == "function") {
-        token.type = TokenType::k_function;
+        token.type = k_function;
     } else if (identifier == "class") {
-        token.type = TokenType::k_class;
+        token.type = k_class;
     } else if (identifier == "extends") {
-        token.type = TokenType::k_extends;
+        token.type = k_extends;
     } else if (identifier == "and") {
-        token.type = TokenType::k_and;
+        token.type = k_and;
     } else if (identifier == "or") {
-        token.type = TokenType::k_or;
+        token.type = k_or;
     } else if (identifier == "xor") {
-        token.type = TokenType::k_xor;
+        token.type = k_xor;
     } else {
         token.literal = identifier;
     }
@@ -201,8 +236,8 @@ void Lexer::add_identifier_token(std::string_view identifier, uint32_t line) {
 }
 
 // Public methods
-const std::vector<Token>& Lexer::get_tokens() {
-    char next_char { get_char() };
+const std::vector<Token> &Lexer::get_tokens() {
+    char next_char{get_char()};
     while (next_char != '\0') {
         gen_next_token(next_char);
         next_char = get_char();

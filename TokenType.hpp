@@ -48,6 +48,7 @@ enum class TokenType {
     k_left_brace,
     k_right_brace,
     k_semicolon,
+    k_comma,
 };
 
 std::ostream& operator << (std::ostream& stream, TokenType type);

@@ -1,3 +1,4 @@
+#include "Error.hpp"
 #include "Lexer.hpp"
 #include "Token.hpp"
 
@@ -70,6 +71,14 @@ void run_file(std::string_view file_path) {
 void run(std::string_view source_code) {
     Lexer lexer { source_code };
     std::vector<Token> tokens { lexer.get_tokens() };
+
+    if (Error::get_instance()->has_errors) {
+        for (auto error : Error::get_instance()->errors) {
+            std::cerr << error << "\n";
+        }
+        return;
+    }
+
     for (Token token : tokens) {
         std::cout << token << "\n";
     }

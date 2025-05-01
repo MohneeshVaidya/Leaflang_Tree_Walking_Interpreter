@@ -1,13 +1,29 @@
-const fullName = "Mohneesh Vaidya";
-const userName = "Warrior_Vegito";
-const email    = "warrior.vegito.007@gmail.com";
-const password = "warrior_vegito_is_great";
-const age      = 26;
+const printMessage = function (myMessage) {
+    print myMessage;
+};
 
-print fullName;
-print userName;
-print email;
-print password;
-print age;
+printMessage("Hello world, this is leaf language.\n");
 
-print "Hello world, this is leaf programming language";
+const User = class {
+    var fullname;
+    var username;
+    var email;
+    var password;
+    var age;
+
+    __construct = function (fullname, username, email, password, age) {
+        this.fullname = fullname;
+        this.username = username;
+        this.email    = email;
+        this.password = password;
+        this.age      = age;
+    }
+};
+
+const user = User(
+    "Mohneesh Vaidya",
+    "warriorVegito",
+    "warrior.vegito.007@gmail.com",
+    "warriorVegitoIsGreat",
+    26,
+);
