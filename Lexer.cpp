@@ -65,6 +65,7 @@ std::string Lexer::get_string() {
 
     if (character == '\n') {
         Error::get_instance()->add_error(tokens.back(), "String can not traverse multiple lines."s);
+        line++;
     } else if (character == '\0') {
         Error::get_instance()->add_error(tokens.back(), "String starts but never ends.");
     }
