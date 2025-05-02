@@ -40,8 +40,8 @@ void gen_ast_classes(const std::string& file_name, std::vector<std::string>&& sc
         std::abort();
     }
 
-    file_hpp << "#ifndef EXPRESSION_HPP\n";
-    file_hpp << "#define EXPRESSION_HPP\n\n";
+    file_hpp << "#ifndef " << Tools::string_toupper(file_name) << "_HPP\n";
+    file_hpp << "#define " << Tools::string_toupper(file_name) << "_HPP\n\n";
 
     file_hpp << "#include \"Token.hpp\"\n\n";
 

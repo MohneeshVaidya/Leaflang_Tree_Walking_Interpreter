@@ -45,4 +45,20 @@ namespace Tools {
 
         return parts;
     }
+
+    std::string string_toupper(std::string_view source) {
+        int32_t diff { 'a' - 'A' };
+
+        std::string result { };
+
+        for (char character : source) {
+            if ('a' <= character && character <= 'z') {
+                result.push_back(static_cast<char>(character - diff));
+            } else {
+                result.push_back(character);
+            }
+        }
+
+        return result;
+    }
 }
