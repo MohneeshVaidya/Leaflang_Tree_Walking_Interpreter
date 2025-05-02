@@ -10,7 +10,7 @@
 class Lexer {
 public:
     std::string_view source_code { };
-    std::vector<Token> tokens { };
+    std::vector<TokenPtr> tokens { };
     uint32_t current { 0 };
     uint32_t line { 1 };
 
@@ -30,11 +30,13 @@ private:
     void move_current_left();
     void move_current_right();
     void add_identifier_token(std::string_view identifier, uint32_t line);
+    void add_token(TokenType type, std::string_view lexeme, uint32_t line);
+    void add_token(TokenType type, std::string_view lexeme, std::string_view literal, uint32_t line);
 
 
 public:
     // Public methdos
-    const std::vector<Token>& get_tokens();
+    const std::vector<TokenPtr>& get_tokens();
 };
 
 #endif

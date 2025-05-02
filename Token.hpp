@@ -4,6 +4,7 @@
 #include "TokenType.hpp"
 
 #include <cstdint>
+#include <iostream>
 #include <memory>
 #include <ostream>
 #include <string>

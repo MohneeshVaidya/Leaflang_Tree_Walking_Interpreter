@@ -70,7 +70,7 @@ void run_file(std::string_view file_path) {
 
 void run(std::string_view source_code) {
     Lexer lexer { source_code };
-    std::vector<Token> tokens { lexer.get_tokens() };
+    std::vector<TokenPtr> tokens { lexer.get_tokens() };
 
     if (Error::get_instance()->has_errors) {
         for (auto error : Error::get_instance()->errors) {
@@ -79,7 +79,7 @@ void run(std::string_view source_code) {
         return;
     }
 
-    for (Token token : tokens) {
-        std::cout << token << "\n";
+    for (TokenPtr token : tokens) {
+        std::cout << *token << "\n";
     }
 }

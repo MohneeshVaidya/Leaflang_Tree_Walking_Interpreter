@@ -4,7 +4,6 @@
 #include "Token.hpp"
 
 #include <memory>
-#include <string_view>
 
 class Expression;
 
@@ -21,74 +20,73 @@ public:
     ExpressionPtr first;
     ExpressionPtr second;
 
-    TernaryExpr(const ExpressionPtr condition, const ExpressionPtr first, const ExpressionPtr second);
+    TernaryExpr(ExpressionPtr condition, ExpressionPtr first, ExpressionPtr second);
 };
 
 class EqualityExpr : public Expression {
 public:
-    Token oper;
+    TokenPtr oper;
     ExpressionPtr left;
     ExpressionPtr right;
 
-    EqualityExpr(const Token& oper, const ExpressionPtr left, const ExpressionPtr right);
+    EqualityExpr(TokenPtr oper, ExpressionPtr left, ExpressionPtr right);
 };
 
 class ComparisionExpr : public Expression {
 public:
-    Token oper;
+    TokenPtr oper;
     ExpressionPtr left;
     ExpressionPtr right;
 
-    ComparisionExpr(const Token& oper, const ExpressionPtr left, const ExpressionPtr right);
+    ComparisionExpr(TokenPtr oper, ExpressionPtr left, ExpressionPtr right);
 };
 
 class TermExpr : public Expression {
 public:
-    Token oper;
+    TokenPtr oper;
     ExpressionPtr left;
     ExpressionPtr right;
 
-    TermExpr(const Token& oper, const ExpressionPtr left, const ExpressionPtr right);
+    TermExpr(TokenPtr oper, ExpressionPtr left, ExpressionPtr right);
 };
 
 class FactorExpr : public Expression {
 public:
-    Token oper;
+    TokenPtr oper;
     ExpressionPtr left;
     ExpressionPtr right;
 
-    FactorExpr(const Token& oper, const ExpressionPtr left, const ExpressionPtr right);
+    FactorExpr(TokenPtr oper, ExpressionPtr left, ExpressionPtr right);
 };
 
 class UnaryExpr : public Expression {
 public:
-    Token oper;
+    TokenPtr oper;
     ExpressionPtr expr;
 
-    UnaryExpr(const Token& oper, const ExpressionPtr expr);
+    UnaryExpr(TokenPtr oper, ExpressionPtr expr);
 };
 
 class ExponentExpr : public Expression {
 public:
-    ExpressionPtr first;
-    ExpressionPtr second;
+    ExpressionPtr left;
+    ExpressionPtr right;
 
-    ExponentExpr(const ExpressionPtr first, const ExpressionPtr second);
+    ExponentExpr(ExpressionPtr left, ExpressionPtr right);
 };
 
 class GroupExpr : public Expression {
 public:
     ExpressionPtr expr;
 
-    GroupExpr(const ExpressionPtr expr);
+    GroupExpr(ExpressionPtr expr);
 };
 
 class PrimaryExpr : public Expression {
 public:
-    Token token;
-    std::string lexeme;
+    TokenPtr token;
 
-    PrimaryExpr(const Token& oper, std::string_view lexeme);
+    PrimaryExpr(TokenPtr token);
 };
 
 #endif
