@@ -47,13 +47,29 @@ namespace Tools {
     }
 
     std::string string_toupper(std::string_view source) {
-        int32_t diff { 'a' - 'A' };
-
         std::string result { };
 
         for (char character : source) {
-            if ('a' <= character && character <= 'z') {
-                result.push_back(static_cast<char>(character - diff));
+            result.push_back(static_cast<char>(std::toupper(character)));
+        }
+
+        return result;
+    }
+
+    std::string string_camel_to_snake(std::string_view source) {
+        if (source.empty()) {
+            return std::string { };
+        }
+
+        std::string result { };
+
+        result.push_back(static_cast<char>(std::tolower(source.at(0))));
+        source.remove_prefix(1);
+
+        for (char character : source) {
+            if (std::isupper(character)) {
+                result.push_back('_');
+                result.push_back(static_cast<char>(std::tolower(character)));
             } else {
                 result.push_back(character);
             }

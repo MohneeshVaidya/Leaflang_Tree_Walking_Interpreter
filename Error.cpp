@@ -20,6 +20,6 @@ Error* Error::get_instance() {
 void Error::add_error(const Token& token, std::string_view message) {
     has_errors = true;
     errors.push_back(
-        std::format("Error: [line {}] after '{}' - {}", token.line, token.lexeme, message)
+        std::format("Error: [Near line {}] after '{}' - {}", token.line, token.lexeme, message)
     );
 }

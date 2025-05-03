@@ -11,6 +11,7 @@ namespace Tools {
     bool is_alphabetical(char character);
     std::vector<std::string> string_split(std::string_view source, std::string_view delims);
     std::string string_toupper(std::string_view source);
+    std::string string_camel_to_snake(std::string_view source);
 };
 
 #endif

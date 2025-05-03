@@ -1,3 +1,4 @@
 leaf
 .cache
 .Lexer.cpp.kate-swp
+.vscode

@@ -1,5 +1,7 @@
 #include "Error.hpp"
+#include "Expr.hpp"
 #include "Lexer.hpp"
+#include "Parser.hpp"
 #include "Token.hpp"
 
 #include <fstream>
@@ -14,6 +16,8 @@ void run_repl();
 void run_file(std::string_view file_path);
 void run(std::string_view source_code);
 
+void print_tokens(const std::vector<TokenPtr>& tokens);
+
 int main(int argc, char* argv[]) {
     if (argc >= 3 || (argc == 2 && std::strcmp(argv[1], "--help") == 0)) {
         std::cout << "Usage 1: ./leaf <fileName> (To interpret source file).\n";
@@ -25,7 +29,7 @@ int main(int argc, char* argv[]) {
         run_repl();
         std::exit(0);
     }
-
+    
     run_file(argv[1]);
 
     return 0;
@@ -79,6 +83,17 @@ void run(std::string_view source_code) {
         return;
     }
 
+    print_tokens(tokens);
+
+    // Parser parser { tokens };
+
+    // [[maybe_unused]]
+    // const std::vector<ExprPtr>& expressions { parser.parse() };
+
+    // std::cout << expressions.size() << "\n";
+}
+
+void print_tokens(const std::vector<TokenPtr>& tokens) {
     for (TokenPtr token : tokens) {
         std::cout << *token << "\n";
     }

@@ -133,10 +133,30 @@
       "-Wsign-conversion",
       "-o",
       "leaf",
-      "Expression.cpp"
+      "Expr.cpp"
     ],
     "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter",
-    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter/Expression.cpp",
+    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter/Expr.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter/leaf"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-c",
+      "-std=c++23",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Weffc++",
+      "-Werror",
+      "-Wconversion",
+      "-Wsign-conversion",
+      "-o",
+      "leaf",
+      "Parser.cpp"
+    ],
+    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter/Parser.cpp",
     "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter/leaf"
   }
 ]
