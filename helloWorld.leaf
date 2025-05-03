@@ -27,3 +27,7 @@ const user = User(
     "warriorVegitoIsGreat",
     26,
 );
+
+print (123 - 98) % 2 ** 10;
+
+const two_pow_10 = 2 ** 10;
