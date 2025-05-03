@@ -1,0 +1,122 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Weffc++",
+      "-Werror",
+      "-Wconversion",
+      "-Wsign-conversion",
+      "-o",
+      "leaf",
+      "main.cpp"
+    ],
+    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain",
+    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/main.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Weffc++",
+      "-Werror",
+      "-Wconversion",
+      "-Wsign-conversion",
+      "-o",
+      "leaf",
+      "token_type.cpp"
+    ],
+    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain",
+    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/token_type.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Weffc++",
+      "-Werror",
+      "-Wconversion",
+      "-Wsign-conversion",
+      "-o",
+      "leaf",
+      "token.cpp"
+    ],
+    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain",
+    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/token.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Weffc++",
+      "-Werror",
+      "-Wconversion",
+      "-Wsign-conversion",
+      "-o",
+      "leaf",
+      "tokenizer.cpp"
+    ],
+    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain",
+    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/tokenizer.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Weffc++",
+      "-Werror",
+      "-Wconversion",
+      "-Wsign-conversion",
+      "-o",
+      "leaf",
+      "tools/leaf_tools.cpp"
+    ],
+    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain",
+    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/tools/leaf_tools.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Weffc++",
+      "-Werror",
+      "-Wconversion",
+      "-Wsign-conversion",
+      "-o",
+      "leaf",
+      "leaf_error.cpp"
+    ],
+    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain",
+    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf_error.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf"
+  }
+]
