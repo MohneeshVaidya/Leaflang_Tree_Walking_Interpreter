@@ -303,6 +303,7 @@ auto Tokenizer::tokenize() -> Tokenizer& {
         gen_token(character);
         character = get_character();
     }
+    gen_token(character);
 
     return *this;
 }
