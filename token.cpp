@@ -2,6 +2,7 @@
 #include "token_type.hpp"
 
 #include <cstdint>
+#include <iostream>
 
 Token::Token(TokenType type, const std::string& lexeme, uint32_t line) :
     m_type { type },
@@ -14,8 +15,13 @@ auto Token::create_object(TokenType type, const std::string& lexeme, uint32_t li
     return new Token { type, lexeme, line };
 }
 
+auto Token::create_object(const Token& source) -> Token* {
+    return create_object(source.type(), source.lexeme(), source.line());
+}
+
 auto Token::delete_object(const Token* object) -> void {
     delete object;
+    object = nullptr;
 }
 
 // Getters

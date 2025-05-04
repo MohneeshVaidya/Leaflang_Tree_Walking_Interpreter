@@ -17,6 +17,7 @@ public:
     Token(TokenType type, const std::string& lexeme, uint32_t line);
 
     static auto create_object(TokenType type, const std::string& lexeme, uint32_t line) -> Token*;
+    static auto create_object(const Token& source) -> Token*;
     static auto delete_object(const Token* object) -> void;
 
     // Getters

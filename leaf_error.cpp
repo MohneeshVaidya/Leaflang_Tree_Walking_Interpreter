@@ -1,5 +1,6 @@
 #include "leaf_error.hpp"
 
+#include <cstdint>
 #include <format>
 
 LeafError* LeafError::m_instance { nullptr };
@@ -16,6 +17,14 @@ auto LeafError::destroy_instance() -> void {
     m_instance = nullptr;
 }
 
+auto LeafError::has_errors() const -> bool {
+    return m_has_errors;
+}
+
+auto LeafError::messages() const -> const std::vector<std::string>& {
+    return m_messages;
+}
+
 auto LeafError::add_error(const Token& token, const uint32_t line, const std::string& message) -> void {
     m_has_errors = true;
     m_messages.push_back(
@@ -23,10 +32,9 @@ auto LeafError::add_error(const Token& token, const uint32_t line, const std::st
     );
 }
 
-auto LeafError::has_errors() const -> bool {
-    return m_has_errors;
-}
-
-auto LeafError::messages() const -> const std::vector<std::string>& {
-    return m_messages;
+auto LeafError::add_parse_error(const uint32_t line, const std::string& message) -> void {
+    m_has_errors = true;
+    m_messages.push_back(
+        std::format("ParseError: [Near line {}] - {}", line, message)
+    );
 }

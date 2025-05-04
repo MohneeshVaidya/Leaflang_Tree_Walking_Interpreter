@@ -1,4 +1,8 @@
+#include "expr.hpp"
 #include "leaf_error.hpp"
+// #include "mathexpr_printer.hpp"
+#include "mathexpr_printer.hpp"
+#include "parser.hpp"
 #include "tokenizer.hpp"
 #include "token.hpp"
 
@@ -14,6 +18,7 @@ auto run_repl() -> void;
 auto run_file(const std::string& filepath) -> void;
 auto run(const std::string& source) -> void;
 
+auto print_errors() -> void;
 auto print_tokens(const std::vector<const Token*>& tokens) -> void;
 
 int main(int argc, char* argv[]) {
@@ -73,16 +78,27 @@ auto run(const std::string& source) -> void {
     Tokenizer tokenizer { source };
     std::vector<const Token*> tokens { tokenizer.tokenize().tokens() };
 
+    print_errors();
+
+    Parser parser { tokens };
+    const std::vector<const Expr*> expressions { parser.parse().expressions() };
+
+    print_errors();
+
+    MathExprPrinter printer { };
+    printer.print(expressions);
+
+    LeafError::destroy_instance();
+}
+
+auto print_errors() -> void {
     if (LeafError::instance()->has_errors()) {
         for (const std::string& message : LeafError::instance()->messages()) {
-            std::cout << message << "\n";
+            std::cerr << message << "\n";
         }
         LeafError::destroy_instance();
-        std::exit(0);
+        std::exit(1);
     }
-
-    print_tokens(tokens);
-    LeafError::destroy_instance();
 }
 
 auto print_tokens(const std::vector<const Token*>& tokens) -> void {
