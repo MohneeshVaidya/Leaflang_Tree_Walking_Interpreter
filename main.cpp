@@ -1,10 +1,10 @@
 #include "expr.hpp"
+#include "expr_evaluator.hpp"
 #include "leaf_error.hpp"
-// #include "mathexpr_printer.hpp"
-#include "mathexpr_printer.hpp"
 #include "parser.hpp"
 #include "tokenizer.hpp"
 #include "token.hpp"
+#include "tools/binary_operations.hpp"
 
 #include <cstdlib>
 #include <cstring>
@@ -85,10 +85,15 @@ auto run(const std::string& source) -> void {
 
     print_errors();
 
-    MathExprPrinter printer { };
-    printer.print(expressions);
+    try {
+        ExprEvaluator evaluator { };
+        evaluator.execute(expressions);
+    } catch (std::string& runtime_error) {
+        std::cerr << runtime_error << "\n";
+    }
 
-    LeafError::destroy_instance();
+    LeafError::delete_instance();
+    BinaryOperations::delete_instance();
 }
 
 auto print_errors() -> void {
@@ -96,7 +101,8 @@ auto print_errors() -> void {
         for (const std::string& message : LeafError::instance()->messages()) {
             std::cerr << message << "\n";
         }
-        LeafError::destroy_instance();
+        LeafError::delete_instance();
+        BinaryOperations::delete_instance();
         std::exit(1);
     }
 }

@@ -133,6 +133,26 @@
       "-Wsign-conversion",
       "-o",
       "leaf",
+      "leaf_object.cpp"
+    ],
+    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain",
+    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf_object.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Weffc++",
+      "-Werror",
+      "-Wconversion",
+      "-Wsign-conversion",
+      "-o",
+      "leaf",
       "expr.cpp"
     ],
     "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain",
@@ -173,10 +193,50 @@
       "-Wsign-conversion",
       "-o",
       "leaf",
-      "mathexpr_printer.cpp"
+      "expr_printer.cpp"
     ],
     "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain",
-    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/mathexpr_printer.cpp",
+    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/expr_printer.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Weffc++",
+      "-Werror",
+      "-Wconversion",
+      "-Wsign-conversion",
+      "-o",
+      "leaf",
+      "expr_evaluator.cpp"
+    ],
+    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain",
+    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/expr_evaluator.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Weffc++",
+      "-Werror",
+      "-Wconversion",
+      "-Wsign-conversion",
+      "-o",
+      "leaf",
+      "tools/binary_operations.cpp"
+    ],
+    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain",
+    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/tools/binary_operations.cpp",
     "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf"
   }
 ]

@@ -37,6 +37,8 @@ private:
     // Private methods
     auto expression() -> const Expr*;
     auto ternary() -> const Expr*;
+    auto or_expr() -> const Expr*;
+    auto and_expr() -> const Expr*;
     auto equality() -> const Expr*;
     auto comparision() -> const Expr*;
     auto term() -> const Expr*;

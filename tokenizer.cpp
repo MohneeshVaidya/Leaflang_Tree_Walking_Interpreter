@@ -164,7 +164,7 @@ auto Tokenizer::gen_token(char character) -> void {
             }
             break;
         case '!':
-            if (match_character({ '!' })) {
+            if (match_character({ '=' })) {
                 add_token(k_bang_equal, "!=");
             } else {
                 add_token(k_bang, leaf::tools::to_string(character));

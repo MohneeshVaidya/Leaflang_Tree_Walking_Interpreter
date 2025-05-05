@@ -95,7 +95,69 @@ auto Parser::expect_token(TokenType type, const uint32_t line, const std::string
 
 // Private methods
 auto Parser::expression() -> const Expr* {
-    return term();
+    return ternary();
+}
+
+auto Parser::ternary() -> const Expr* {
+    const Expr* expr { or_expr() };
+
+    while (match_token({ k_question })) {
+        const Token* oper { peek_prev_token() };
+        const Expr* first { ternary() };
+        expect_token(k_colon, oper->line(), "':' is expected but not provided.");
+        const Expr* second { ternary() };
+        expr = TernaryExpr::create_object(expr, first, second);
+    }
+
+    return expr;
+}
+
+auto Parser::or_expr() -> const Expr* {
+    const Expr* expr { and_expr() };
+
+    while (match_token({ k_or })) {
+        const Token* oper { peek_prev_token() };
+        const Expr* right { and_expr() };
+        expr = BinaryExpr::create_object(expr, oper, right);
+    }
+
+    return expr;
+}
+
+auto Parser::and_expr() -> const Expr* {
+    const Expr* expr { equality() };
+
+    while (match_token({ k_and })) {
+        const Token* oper { peek_prev_token() };
+        const Expr* right { equality() };
+        expr = BinaryExpr::create_object(expr, oper, right);
+    }
+
+    return expr;
+}
+
+auto Parser::equality() -> const Expr* {
+    const Expr* expr { comparision() };
+
+    while (match_token({ k_equal_equal, k_bang_equal })) {
+        const Token* oper { peek_prev_token() };
+        const Expr* right { comparision() };
+        expr = BinaryExpr::create_object(expr, oper, right);
+    }
+
+    return expr;
+}
+
+auto Parser::comparision() -> const Expr* {
+    const Expr* expr { term() };
+
+    while (match_token({ k_lesser, k_lesser_equal, k_greater, k_greater_equal })) {
+        const Token* oper { peek_prev_token() };
+        const Expr* right { term() };
+        expr = BinaryExpr::create_object(expr, oper, right);
+    }
+
+    return expr;
 }
 
 auto Parser::term() -> const Expr* {

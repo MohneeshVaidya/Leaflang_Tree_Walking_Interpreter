@@ -12,7 +12,7 @@ auto LeafError::instance() -> LeafError* {
     return m_instance;
 };
 
-auto LeafError::destroy_instance() -> void {
+auto LeafError::delete_instance() -> void {
     delete m_instance;
     m_instance = nullptr;
 }
@@ -37,4 +37,10 @@ auto LeafError::add_parse_error(const uint32_t line, const std::string& message)
     m_messages.push_back(
         std::format("ParseError: [Near line {}] - {}", line, message)
     );
+}
+
+auto LeafError::runtime_error(const uint32_t line, const std::string& oper, const std::string& message) -> void {
+    throw std::string {
+        std::format("RuntimeError: [Near line {}] for operator '{}' - {}", line, oper, message)
+    };
 }

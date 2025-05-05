@@ -1,16 +1,17 @@
-#ifndef MATHEXPR_PRINTER_HPP
-#define MATHEXPR_PRINTER_HPP
+#ifndef EXPR_PRINTER_HPP
+#define EXPR_PRINTER_HPP
 
 #include "expr.hpp"
+#include "leaf_object.hpp"
+
 #include <vector>
 
-class MathExprPrinter : public ExprVisitor {
+class ExprPrinter : public ExprVisitor {
 private:
     auto evaluate(const Expr* expr) const -> LeafObject*;
 
 public:
-    auto print(const std::vector<const Expr*>& expressions) const -> void;
-
+    virtual auto execute(const std::vector<const Expr*>& expressions) const -> LeafObject* override;
     virtual auto visit_ternaryexpr(const TernaryExpr* expr) const -> LeafObject* override;
     virtual auto visit_binaryexpr(const BinaryExpr* expr) const -> LeafObject* override;
     virtual auto visit_unaryexpr(const UnaryExpr* expr) const -> LeafObject* override;

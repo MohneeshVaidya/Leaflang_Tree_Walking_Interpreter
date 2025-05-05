@@ -15,7 +15,7 @@ private:
 
 public:
     static auto instance() -> LeafError*;
-    static auto destroy_instance() -> void;
+    static auto delete_instance() -> void;
 
 private:
     bool m_has_errors { false };
@@ -27,6 +27,7 @@ public:
 
     auto add_error(const Token& token, const uint32_t line, const std::string& message) -> void;
     auto add_parse_error(const uint32_t line, const std::string& message) -> void;
+    auto runtime_error(const uint32_t line, const std::string& oper, const std::string& message) -> void;
 };
 
 #endif

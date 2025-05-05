@@ -3,6 +3,7 @@
 
 #include "leaf_object.hpp"
 #include "token.hpp"
+#include <vector>
 
 
 // ExprVisitor forward declaration
@@ -12,10 +13,9 @@ class ExprVisitor;
 // Expr classes
 class Expr {
 public:
-    virtual ~Expr() = default;
-
     static auto delete_object(const Expr* object) -> void;
 
+    virtual ~Expr() = default;
     virtual auto accept(const ExprVisitor* visitor) const -> LeafObject* = 0;
 };
 
@@ -133,6 +133,7 @@ public:
 class ExprVisitor {
 public:
     virtual ~ExprVisitor() = default;
+    virtual auto execute(const std::vector<const Expr*>& expressions) const -> LeafObject* = 0;
     virtual auto visit_ternaryexpr(const TernaryExpr* expr) const -> LeafObject* = 0;
     virtual auto visit_binaryexpr(const BinaryExpr* expr) const -> LeafObject* = 0;
     virtual auto visit_unaryexpr(const UnaryExpr* expr) const -> LeafObject* = 0;
