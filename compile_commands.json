@@ -15,9 +15,9 @@
       "leaf",
       "main.cpp"
     ],
-    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain",
-    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/main.cpp",
-    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf"
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/main.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
   },
   {
     "arguments": [
@@ -35,9 +35,9 @@
       "leaf",
       "token_type.cpp"
     ],
-    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain",
-    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/token_type.cpp",
-    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf"
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/token_type.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
   },
   {
     "arguments": [
@@ -55,9 +55,9 @@
       "leaf",
       "token.cpp"
     ],
-    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain",
-    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/token.cpp",
-    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf"
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/token.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
   },
   {
     "arguments": [
@@ -75,9 +75,9 @@
       "leaf",
       "tokenizer.cpp"
     ],
-    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain",
-    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/tokenizer.cpp",
-    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf"
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/tokenizer.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
   },
   {
     "arguments": [
@@ -95,9 +95,9 @@
       "leaf",
       "tools/leaf_tools.cpp"
     ],
-    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain",
-    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/tools/leaf_tools.cpp",
-    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf"
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/tools/leaf_tools.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
   },
   {
     "arguments": [
@@ -115,9 +115,9 @@
       "leaf",
       "leaf_error.cpp"
     ],
-    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain",
-    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf_error.cpp",
-    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf"
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf_error.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
   },
   {
     "arguments": [
@@ -135,9 +135,9 @@
       "leaf",
       "leaf_object.cpp"
     ],
-    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain",
-    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf_object.cpp",
-    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf"
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf_object.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
   },
   {
     "arguments": [
@@ -155,9 +155,9 @@
       "leaf",
       "expr.cpp"
     ],
-    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain",
-    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/expr.cpp",
-    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf"
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/expr.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
   },
   {
     "arguments": [
@@ -175,9 +175,9 @@
       "leaf",
       "parser.cpp"
     ],
-    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain",
-    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/parser.cpp",
-    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf"
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/parser.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
   },
   {
     "arguments": [
@@ -195,9 +195,9 @@
       "leaf",
       "expr_printer.cpp"
     ],
-    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain",
-    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/expr_printer.cpp",
-    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf"
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/expr_printer.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
   },
   {
     "arguments": [
@@ -213,11 +213,11 @@
       "-Wsign-conversion",
       "-o",
       "leaf",
-      "expr_evaluator.cpp"
+      "interpreter.cpp"
     ],
-    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain",
-    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/expr_evaluator.cpp",
-    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf"
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/interpreter.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
   },
   {
     "arguments": [
@@ -235,8 +235,8 @@
       "leaf",
       "tools/binary_operations.cpp"
     ],
-    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain",
-    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/tools/binary_operations.cpp",
-    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/leaflangTreeWalkginInterpreterMain/leaf"
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/tools/binary_operations.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
   }
 ]

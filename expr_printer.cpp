@@ -15,11 +15,16 @@ auto ExprPrinter::evaluate(const Expr* expr) const -> LeafObject* {
 // Public methods
 auto ExprPrinter::execute(const std::vector<const Expr*>& expressions) const -> LeafObject* {
     for (const Expr* expr : expressions) {
-        if (expr != nullptr) {
+        if (expr->type() != ExprType::k_null) {
             this->evaluate(expr);
             std::cout << "\n";
         }
     }
+    return nullptr;
+}
+
+auto ExprPrinter::visit_nullexpr([[maybe_unused]] const NullExpr* expr) const -> LeafObject* {
+    std::cout << "() ";
     return nullptr;
 }
 

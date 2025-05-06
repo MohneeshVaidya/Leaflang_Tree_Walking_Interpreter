@@ -3,6 +3,8 @@
 #include "leaf_error.hpp"
 #include "token_type.hpp"
 
+using namespace std::string_literals;
+
 using enum TokenType;
 
 Parser::Parser(const std::vector<const Token*>& tokens) :
@@ -104,7 +106,7 @@ auto Parser::ternary() -> const Expr* {
     while (match_token({ k_question })) {
         const Token* oper { peek_prev_token() };
         const Expr* first { ternary() };
-        expect_token(k_colon, oper->line(), "':' is expected but not provided.");
+        expect_token(k_colon, oper->line(), "':' is expected but not provided."s);
         const Expr* second { ternary() };
         expr = TernaryExpr::create_object(expr, first, second);
     }
@@ -205,22 +207,34 @@ auto Parser::exponent() -> const Expr* {
     return expr;
 }
 
+auto Parser::grouping() -> const Expr* {
+    const Token* token { peek_token() };
+    if (token->type() == k_right_paren) {
+        LeafError::instance()->add_parse_error(token->line(), "An expression is required before ')'."s);
+        move_current_right();
+        return NullExpr::create_object();
+    }
+
+    token = peek_prev_token();
+    const Expr* expr { expression() };
+    expect_token(k_right_paren, token->line(), "Each '(' must be accompanied by a matching ')'."s);
+    return GroupingExpr::create_object(expr);
+}
+
 auto Parser::primary() -> const Expr* {
     const Token* token { get_token() };
 
     if (token->type() == k_eof) {
-        return nullptr;
+        return NullExpr::create_object();
     }
 
     if (token->type() == k_left_paren) {
-        const Expr* expr { expression() };
-        expect_token(k_right_paren, token->line(), "Token '(' must have a trailing ')'");
-        return expr;
+        return grouping();
     }
 
     if (match_prev_token({ k_number, k_string, k_true, k_false, k_null })) {
         return PrimaryExpr::create_object(token);
     }
 
-    return nullptr;
+    return NullExpr::create_object();
 }

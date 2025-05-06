@@ -45,6 +45,7 @@ private:
     auto factor() -> const Expr*;
     auto unary() -> const Expr*;
     auto exponent() -> const Expr*;
+    auto grouping() -> const Expr*;
     auto primary() -> const Expr*;
 };
 

@@ -12,6 +12,7 @@ private:
 
 public:
     virtual auto execute(const std::vector<const Expr*>& expressions) const -> LeafObject* override;
+    virtual auto visit_nullexpr(const NullExpr* expr) const -> LeafObject* override;
     virtual auto visit_ternaryexpr(const TernaryExpr* expr) const -> LeafObject* override;
     virtual auto visit_binaryexpr(const BinaryExpr* expr) const -> LeafObject* override;
     virtual auto visit_unaryexpr(const UnaryExpr* expr) const -> LeafObject* override;

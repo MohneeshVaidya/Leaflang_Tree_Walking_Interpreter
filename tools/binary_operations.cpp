@@ -224,14 +224,14 @@ auto BinaryOperations::expect_type(ObjectType type, std::initializer_list<Object
 // Public methods
 auto BinaryOperations::execute(const Token* oper, OperandType left, OperandType right) const -> ReturnType {
     if (left == nullptr || right == nullptr) {
-        LeafError::instance()->runtime_error(oper->line(), oper->lexeme(), "Operands of binary operator must not be absent"s);
+        LeafError::instance()->runtime_error(oper->line(), oper->lexeme(), "Operands of binary operator must not be absent."s);
     }
 
     try {
         return m_operations_table.at(oper->type())(left, right);
     } catch (const ErrorCode error_code) {
         if (error_code == ErrorCode::k_type_mismatch) {
-            LeafError::instance()->runtime_error(oper->line(), oper->lexeme(), "Operands of binary operator must by of same type.");
+            LeafError::instance()->runtime_error(oper->line(), oper->lexeme(), "Operands of binary operator must be of same type.");
         } else if (error_code == ErrorCode::k_invalid_type) {
             LeafError::instance()->runtime_error(oper->line(), oper->lexeme(), "Operands of binary operator have invalid types.");
         }

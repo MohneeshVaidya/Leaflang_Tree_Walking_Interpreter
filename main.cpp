@@ -1,5 +1,6 @@
 #include "expr.hpp"
-#include "expr_evaluator.hpp"
+#include "expr_printer.hpp"
+#include "interpreter.hpp"
 #include "leaf_error.hpp"
 #include "parser.hpp"
 #include "tokenizer.hpp"
@@ -10,6 +11,7 @@
 #include <cstring>
 #include <format>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -85,12 +87,28 @@ auto run(const std::string& source) -> void {
 
     print_errors();
 
+    ExprPrinter printer { };
+    printer.execute(expressions);
+
+    std::cout << std::boolalpha;
+    std::cout << std::setprecision(20);
+
     try {
-        ExprEvaluator evaluator { };
-        evaluator.execute(expressions);
+        Interpreter interpreter { };
+        interpreter.execute(expressions);
     } catch (std::string& runtime_error) {
         std::cerr << runtime_error << "\n";
+
+        std::cout << std::noboolalpha;
+        std::cout << std::setprecision(6);
+
+        LeafError::delete_instance();
+        BinaryOperations::delete_instance();
+        std::exit(1);
     }
+
+    std::cout << std::noboolalpha;
+    std::cout << std::setprecision(6);
 
     LeafError::delete_instance();
     BinaryOperations::delete_instance();

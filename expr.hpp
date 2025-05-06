@@ -6,9 +6,20 @@
 #include <vector>
 
 
+// ExprType enum
+enum class ExprType {
+    k_null,
+    k_ternary,
+    k_binary,
+    k_unary,
+    k_exponent,
+    k_grouping,
+    k_primary,
+};
+
+
 // ExprVisitor forward declaration
 class ExprVisitor;
-
 
 // Expr classes
 class Expr {
@@ -17,8 +28,26 @@ public:
 
     virtual ~Expr() = default;
     virtual auto accept(const ExprVisitor* visitor) const -> LeafObject* = 0;
+    virtual auto type() const -> ExprType = 0;
 };
 
+// NullExpr
+class NullExpr: public Expr {
+public:
+    NullExpr() = default;
+    NullExpr(const NullExpr& source) = default;
+
+    ~NullExpr() = default;
+
+    static auto create_object() -> NullExpr*;
+
+    virtual auto accept(const ExprVisitor* visitor) const -> LeafObject* override;
+    virtual auto type() const -> ExprType override;
+
+    auto operator = (const NullExpr& other) -> NullExpr& = default;
+};
+
+// TernaryExpr
 class TernaryExpr : public Expr {
 public:
     const Expr* condition;
@@ -26,6 +55,7 @@ public:
     const Expr* second;
 
 public:
+
     TernaryExpr(const Expr* condition, const Expr* first, const Expr* second);
     TernaryExpr(const TernaryExpr& source) = default;
 
@@ -33,11 +63,13 @@ public:
 
     static auto create_object(const Expr* condition, const Expr* first, const Expr* second) -> TernaryExpr*;
 
-    auto operator = (const TernaryExpr& other) -> TernaryExpr& = default;
-
     virtual auto accept(const ExprVisitor* visitor) const -> LeafObject* override;
+    virtual auto type() const -> ExprType override;
+
+    auto operator = (const TernaryExpr& other) -> TernaryExpr& = default;
 };
 
+// BinaryExpr
 class BinaryExpr : public Expr {
 public:
     const Expr* left;
@@ -53,10 +85,12 @@ public:
     static auto create_object(const Expr* left, const Token* oper, const Expr* right) -> BinaryExpr*;
 
     auto operator = (const BinaryExpr& other) -> BinaryExpr& = default;
+    virtual auto type() const -> ExprType override;
 
     virtual auto accept(const ExprVisitor* visitor) const -> LeafObject* override;
 };
 
+// UnaryExpr
 class UnaryExpr: public Expr {
 public:
     const Token* oper;
@@ -70,11 +104,13 @@ public:
 
     static auto create_object(const Token* oper, const Expr* operand) -> UnaryExpr*;
 
-    auto operator = (const UnaryExpr& other) -> UnaryExpr& = default;
-
     virtual auto accept(const ExprVisitor* visitor) const -> LeafObject* override;
+    virtual auto type() const -> ExprType override;
+
+    auto operator = (const UnaryExpr& other) -> UnaryExpr& = default;
 };
 
+// ExponentExpr
 class ExponentExpr : public Expr {
 public:
     const Expr* left;
@@ -89,11 +125,13 @@ public:
 
     static auto create_object(const Expr* left, const Token* oper, const Expr* right) -> ExponentExpr*;
 
-    auto operator = (const ExponentExpr& other) -> ExponentExpr& = default;
-
     virtual auto accept(const ExprVisitor* visitor) const -> LeafObject* override;
+    virtual auto type() const -> ExprType override;
+
+    auto operator = (const ExponentExpr& other) -> ExponentExpr& = default;
 };
 
+// GroupingExpr
 class GroupingExpr : public Expr {
 public:
     const Expr* expression;
@@ -106,11 +144,13 @@ public:
 
     static auto create_object(const Expr* expression) -> GroupingExpr*;
 
-    auto operator = (const GroupingExpr& other) -> GroupingExpr& = default;
-
     virtual auto accept(const ExprVisitor* visitor) const -> LeafObject* override;
+    virtual auto type() const -> ExprType override;
+
+    auto operator = (const GroupingExpr& other) -> GroupingExpr& = default;
 };
 
+// PrimaryExpr
 class PrimaryExpr : public Expr {
 public:
     const Token* token;
@@ -123,9 +163,10 @@ public:
 
     static auto create_object(const Token* token) -> PrimaryExpr*;
 
-    auto operator = (const PrimaryExpr& other) -> PrimaryExpr& = default;
-
     virtual auto accept(const ExprVisitor* visitor) const -> LeafObject* override;
+    virtual auto type() const -> ExprType override;
+
+    auto operator = (const PrimaryExpr& other) -> PrimaryExpr& = default;
 };
 
 
@@ -134,6 +175,7 @@ class ExprVisitor {
 public:
     virtual ~ExprVisitor() = default;
     virtual auto execute(const std::vector<const Expr*>& expressions) const -> LeafObject* = 0;
+    virtual auto visit_nullexpr(const NullExpr* expr) const -> LeafObject* = 0;
     virtual auto visit_ternaryexpr(const TernaryExpr* expr) const -> LeafObject* = 0;
     virtual auto visit_binaryexpr(const BinaryExpr* expr) const -> LeafObject* = 0;
     virtual auto visit_unaryexpr(const UnaryExpr* expr) const -> LeafObject* = 0;

@@ -10,6 +10,20 @@ auto Expr::delete_object(const Expr* object) -> void {
 }
 
 
+// NullExpr
+auto NullExpr::create_object() -> NullExpr* {
+    return new NullExpr { };
+}
+
+auto NullExpr::accept(const ExprVisitor* visitor) const -> LeafObject* {
+    return visitor->visit_nullexpr(this);
+}
+
+auto NullExpr::type() const -> ExprType {
+    return ExprType::k_null;
+}
+
+
 // TernaryExpr
 TernaryExpr::TernaryExpr(const Expr* condition, const Expr* first, const Expr* second) :
     condition { condition },
@@ -36,6 +50,10 @@ auto TernaryExpr::accept(const ExprVisitor* visitor) const -> LeafObject* {
     return visitor->visit_ternaryexpr(this);
 }
 
+auto TernaryExpr::type() const -> ExprType {
+    return ExprType::k_ternary;
+}
+
 
 // BinaryExpr
 BinaryExpr::BinaryExpr(const Expr* left, const Token* oper, const Expr* right) :
@@ -59,6 +77,10 @@ auto BinaryExpr::accept(const ExprVisitor* visitor) const -> LeafObject* {
     return visitor->visit_binaryexpr(this);
 }
 
+auto BinaryExpr::type() const -> ExprType {
+    return ExprType::k_binary;
+}
+
 
 // UnaryExpr
 UnaryExpr::UnaryExpr(const Token* oper, const Expr* operand) :
@@ -78,6 +100,10 @@ auto UnaryExpr::create_object(const Token* oper, const Expr* operand) -> UnaryEx
 
 auto UnaryExpr::accept(const ExprVisitor* visitor) const -> LeafObject* {
     return visitor->visit_unaryexpr(this);
+}
+
+auto UnaryExpr::type() const -> ExprType {
+    return ExprType::k_unary;
 }
 
 
@@ -103,6 +129,10 @@ auto ExponentExpr::accept(const ExprVisitor* visitor) const -> LeafObject* {
     return visitor->visit_exponentexpr(this);
 }
 
+auto ExponentExpr::type() const -> ExprType {
+    return ExprType::k_exponent;
+}
+
 
 // GroupingExpr
 GroupingExpr::GroupingExpr(const Expr* expression) :
@@ -123,6 +153,10 @@ auto GroupingExpr::accept(const ExprVisitor* visitor) const -> LeafObject* {
     return visitor->visit_groupingexpr(this);
 }
 
+auto GroupingExpr::type() const -> ExprType {
+    return ExprType::k_grouping;
+}
+
 
 // PrimaryExpr
 PrimaryExpr::PrimaryExpr(const Token* token) :
@@ -141,4 +175,8 @@ auto PrimaryExpr::create_object(const Token* token) -> PrimaryExpr* {
 
 auto PrimaryExpr::accept(const ExprVisitor* visitor) const -> LeafObject* {
     return visitor->visit_primaryexpr(this);
+}
+
+auto PrimaryExpr::type() const -> ExprType {
+    return ExprType::k_primary;
 }
