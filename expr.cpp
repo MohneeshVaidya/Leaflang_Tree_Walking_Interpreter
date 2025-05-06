@@ -6,7 +6,6 @@
 // Expr
 auto Expr::delete_object(const Expr* object) -> void {
     delete object;
-    object = nullptr;
 }
 
 
@@ -33,13 +32,9 @@ TernaryExpr::TernaryExpr(const Expr* condition, const Expr* first, const Expr* s
     }
 
 TernaryExpr::~TernaryExpr() {
-    delete condition;
-    delete first;
-    delete second;
-
-    condition = nullptr;
-    first = nullptr;
-    second = nullptr;
+    Expr::delete_object(condition);
+    Expr::delete_object(first);
+    Expr::delete_object(second);
 }
 
 auto TernaryExpr::create_object(const Expr* condition, const Expr* first, const Expr* second) -> TernaryExpr* {
@@ -64,9 +59,9 @@ BinaryExpr::BinaryExpr(const Expr* left, const Token* oper, const Expr* right) :
     }
 
 BinaryExpr::~BinaryExpr() {
-    delete left;
+    Expr::delete_object(left);
     Token::delete_object(oper);
-    delete right;
+    Expr::delete_object(right);
 }
 
 auto BinaryExpr::create_object(const Expr* left, const Token* oper, const Expr* right) -> BinaryExpr* {
@@ -91,7 +86,7 @@ UnaryExpr::UnaryExpr(const Token* oper, const Expr* operand) :
 
 UnaryExpr::~UnaryExpr() {
     Token::delete_object(oper);
-    delete operand;
+    Expr::delete_object(operand);
 }
 
 auto UnaryExpr::create_object(const Token* oper, const Expr* operand) -> UnaryExpr* {
@@ -116,9 +111,9 @@ ExponentExpr::ExponentExpr(const Expr* left, const Token* oper, const Expr* righ
     }
 
 ExponentExpr::~ExponentExpr() {
-    delete left;
+    Expr::delete_object(left);
     Token::delete_object(oper);
-    delete right;
+    Expr::delete_object(right);
 }
 
 auto ExponentExpr::create_object(const Expr* left, const Token* oper, const Expr* right) -> ExponentExpr* {
@@ -141,8 +136,7 @@ GroupingExpr::GroupingExpr(const Expr* expression) :
     }
 
 GroupingExpr::~GroupingExpr() {
-    delete expression;
-    expression = nullptr;
+    Expr::delete_object(expression);
 }
 
 auto GroupingExpr::create_object(const Expr* expression) -> GroupingExpr* {
@@ -166,7 +160,6 @@ PrimaryExpr::PrimaryExpr(const Token* token) :
 
 PrimaryExpr::~PrimaryExpr() {
     Token::delete_object(token);
-    token = nullptr;
 }
 
 auto PrimaryExpr::create_object(const Token* token) -> PrimaryExpr* {

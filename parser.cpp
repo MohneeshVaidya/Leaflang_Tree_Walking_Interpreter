@@ -1,6 +1,7 @@
 #include "parser.hpp"
 #include "expr.hpp"
 #include "leaf_error.hpp"
+#include "stmt.hpp"
 #include "token_type.hpp"
 
 using namespace std::string_literals;
@@ -13,20 +14,20 @@ Parser::Parser(const std::vector<const Token*>& tokens) :
     }
 
 Parser::~Parser() {
-    for (const Expr* expression : m_expressions) {
-        Expr::delete_object(expression);
+    for (const Stmt* statement : m_statements) {
+        Stmt::delete_object(statement);
     }
 }
 
 
 // Public methods
-auto Parser::expressions() const -> const std::vector<const Expr*>& {
-    return m_expressions;
+auto Parser::statements() const -> const std::vector<const Stmt*>& {
+    return m_statements;
 }
 
 auto Parser::parse() -> Parser& {
     while(is_at_end() == false) {
-        m_expressions.push_back(expression());
+        m_statements.push_back(statement());
     }
     return *this;
 }
@@ -95,7 +96,27 @@ auto Parser::expect_token(TokenType type, const uint32_t line, const std::string
     LeafError::instance()->add_parse_error(line, message);
 }
 
+
 // Private methods
+auto Parser::statement() -> const Stmt* {
+    const Token* token { get_token() };
+    switch (token->type()) {
+        case k_print: return printstmt();
+        default: return expressionstmt();
+    }
+}
+
+auto Parser::printstmt() -> const Stmt* {
+    const Token* token { peek_prev_token() };
+    const Expr* expr { expression() };
+    expect_token(k_semicolon, token->line(), "A statement must ends with ';'."s);
+    return PrintStmt::create_object(expr);
+}
+
+auto Parser::expressionstmt() -> const Stmt* {
+    return ExpressionStmt::create_object(expression());
+}
+
 auto Parser::expression() -> const Expr* {
     return ternary();
 }

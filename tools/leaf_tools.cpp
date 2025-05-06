@@ -4,6 +4,16 @@
 #include <string>
 
 namespace leaf::tools {
+    auto get_special_character(char character) -> char {
+        char result {  };
+        switch (character) {
+            case 't': result = '\t'; break;
+            case 'n': result = '\n'; break;
+            case 'r': result = '\r'; break;
+        }
+        return result;
+    }
+
     auto to_string(char character) -> std::string {
         return std::string { character };
     }

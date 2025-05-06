@@ -1,8 +1,7 @@
-#include "expr.hpp"
-#include "expr_printer.hpp"
 #include "interpreter.hpp"
 #include "leaf_error.hpp"
 #include "parser.hpp"
+#include "stmt.hpp"
 #include "tokenizer.hpp"
 #include "token.hpp"
 #include "tools/binary_operations.hpp"
@@ -23,12 +22,16 @@ auto run(const std::string& source) -> void;
 auto print_errors() -> void;
 auto print_tokens(const std::vector<const Token*>& tokens) -> void;
 
+auto cleanup() -> void;
+
 int main(int argc, char* argv[]) {
     if (argc > 2 || (argc > 1 && std::strcmp(argv[1], "--help") == 0)) {
         std::cout << "Usage 1: ./leaf <fileName> (To execute a file.)\n";
         std::cout << "Usage 2: ./leaf (To run Repl (Run eval print loop)).\n";
         std::exit(0);
     }
+
+    std::atexit(cleanup);
 
     if (argc == 1) {
         run_repl();
@@ -83,35 +86,20 @@ auto run(const std::string& source) -> void {
     print_errors();
 
     Parser parser { tokens };
-    const std::vector<const Expr*> expressions { parser.parse().expressions() };
+    const std::vector<const Stmt*> statements { parser.parse().statements() };
 
     print_errors();
-
-    ExprPrinter printer { };
-    printer.execute(expressions);
 
     std::cout << std::boolalpha;
     std::cout << std::setprecision(20);
 
     try {
         Interpreter interpreter { };
-        interpreter.execute(expressions);
+        interpreter.execute(statements);
     } catch (std::string& runtime_error) {
         std::cerr << runtime_error << "\n";
-
-        std::cout << std::noboolalpha;
-        std::cout << std::setprecision(6);
-
-        LeafError::delete_instance();
-        BinaryOperations::delete_instance();
         std::exit(1);
     }
-
-    std::cout << std::noboolalpha;
-    std::cout << std::setprecision(6);
-
-    LeafError::delete_instance();
-    BinaryOperations::delete_instance();
 }
 
 auto print_errors() -> void {
@@ -119,8 +107,6 @@ auto print_errors() -> void {
         for (const std::string& message : LeafError::instance()->messages()) {
             std::cerr << message << "\n";
         }
-        LeafError::delete_instance();
-        BinaryOperations::delete_instance();
         std::exit(1);
     }
 }
@@ -129,4 +115,12 @@ auto print_tokens(const std::vector<const Token*>& tokens) -> void {
     for (const Token* token : tokens) {
         std::cout << *token << "\n";
     }
+}
+
+auto cleanup() -> void {
+    std::cout << std::noboolalpha;
+    std::cout << std::setprecision(6);
+
+    LeafError::delete_instance();
+    BinaryOperations::delete_instance();
 }

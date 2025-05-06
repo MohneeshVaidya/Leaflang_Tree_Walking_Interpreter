@@ -2,6 +2,7 @@
 #define PARSER_HPP
 
 #include "expr.hpp"
+#include "stmt.hpp"
 #include "token.hpp"
 #include "token_type.hpp"
 
@@ -10,7 +11,7 @@
 
 class Parser {
 private:
-    std::vector<const Expr*> m_expressions { };
+    std::vector<const Stmt*> m_statements { };
     const std::vector<const Token*>& m_tokens { };
     uint32_t m_current { 0 };
 
@@ -19,7 +20,7 @@ public:
     ~Parser();
 
     // public methods
-    auto expressions() const -> const std::vector<const Expr*>&;
+    auto statements() const -> const std::vector<const Stmt*>&;
     auto parse() -> Parser&;
 
 private:
@@ -35,6 +36,10 @@ private:
     auto expect_token(TokenType type, const uint32_t line, const std::string& message) -> void;
 
     // Private methods
+    auto statement() -> const Stmt*;
+    auto printstmt() -> const Stmt*;
+    auto expressionstmt() -> const Stmt*;
+
     auto expression() -> const Expr*;
     auto ternary() -> const Expr*;
     auto or_expr() -> const Expr*;

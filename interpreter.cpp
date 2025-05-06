@@ -1,6 +1,7 @@
 #include "interpreter.hpp"
 #include "leaf_error.hpp"
 #include "leaf_object.hpp"
+#include "stmt.hpp"
 #include "token_type.hpp"
 #include "tools/binary_operations.hpp"
 
@@ -10,12 +11,24 @@ using namespace std::string_literals;
 
 using enum TokenType;
 
+
 // Private methods
+auto Interpreter::execute_stmt(const Stmt* stmt) const -> void {
+    stmt->accept(this);
+}
+
 auto Interpreter::evaluate(const Expr* expr) const -> LeafObject* {
     return expr->accept(this);
 }
 
+
 // Public methods
+auto Interpreter::execute(const std::vector<const Stmt*>& statements) const -> void {
+    for (const Stmt* stmt : statements) {
+        execute_stmt(stmt);
+    }
+}
+
 auto Interpreter::execute(const std::vector<const Expr*>& expressions) const -> LeafObject* {
     for (const Expr* expr : expressions) {
         if (expr->type() != ExprType::k_null) {
@@ -24,6 +37,16 @@ auto Interpreter::execute(const std::vector<const Expr*>& expressions) const -> 
     }
     return nullptr;
 }
+
+
+auto Interpreter::visit_printstmt(const PrintStmt* stmt) const -> void {
+    std::cout << *evaluate(stmt->expr);
+}
+
+auto Interpreter::visit_expressionstmt(const ExpressionStmt* stmt) const -> void {
+    evaluate(stmt->expr);
+}
+
 
 auto Interpreter::visit_nullexpr([[maybe_unused]] const NullExpr* expr) const -> LeafObject* {
     return nullptr;

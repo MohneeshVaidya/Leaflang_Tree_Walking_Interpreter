@@ -51,6 +51,7 @@ auto Tokenizer::read_number() -> std::string {
 auto Tokenizer::read_string() -> std::string {
     std::string str { };
 
+    bool is_special { false };
     char character { get_character() };
     while (true) {
         if (character == '"') {
@@ -70,7 +71,21 @@ auto Tokenizer::read_string() -> std::string {
             );
             break;
         }
-        str.push_back(character);
+        if (character == '\\') {
+            if (is_special) {
+                str.push_back(character);
+                is_special = false;
+            } else {
+                is_special = true;
+            }
+        } else {
+            if (is_special) {
+                str.push_back(leaf::tools::get_special_character(character));
+            } else {
+                str.push_back(character);
+            }
+            is_special = false;
+        }
         character = get_character();
     }
 

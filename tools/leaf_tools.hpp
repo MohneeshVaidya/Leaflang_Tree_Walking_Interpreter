@@ -6,6 +6,7 @@
 #include <string>
 
 namespace leaf::tools {
+    auto get_special_character(char character) -> char;
     auto to_string(char character) -> std::string;
     auto is_numeric(char character) -> bool;
     auto is_alphabetic(char character) -> bool;
