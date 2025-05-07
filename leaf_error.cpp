@@ -44,3 +44,9 @@ auto LeafError::runtime_error(const uint32_t line, const std::string& oper, cons
         std::format("RuntimeError: [Near line {}] for operator '{}' - {}", line, oper, message)
     };
 }
+
+auto LeafError::runtime_error(const uint32_t line, const std::string& message) -> void {
+    throw std::string {
+        std::format("RuntimeError: [Near line {}] - {}", line, message)
+    };
+}

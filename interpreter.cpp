@@ -1,4 +1,6 @@
 #include "interpreter.hpp"
+#include "environment.hpp"
+#include "expr.hpp"
 #include "leaf_error.hpp"
 #include "leaf_object.hpp"
 #include "stmt.hpp"
@@ -6,10 +8,21 @@
 #include "tools/binary_operations.hpp"
 
 #include <cstdlib>
+#include <format>
 
 using namespace std::string_literals;
 
 using enum TokenType;
+
+
+Interpreter::Interpreter(Environment* environment) :
+    m_environment { environment }
+    {
+    }
+
+Interpreter::~Interpreter() {
+    Environment::delete_object(m_environment);
+}
 
 
 // Private methods
@@ -21,7 +34,6 @@ auto Interpreter::evaluate(const Expr* expr) const -> LeafObject* {
     return expr->accept(this);
 }
 
-
 // Public methods
 auto Interpreter::execute(const std::vector<const Stmt*>& statements) const -> void {
     for (const Stmt* stmt : statements) {
@@ -32,7 +44,7 @@ auto Interpreter::execute(const std::vector<const Stmt*>& statements) const -> v
 auto Interpreter::execute(const std::vector<const Expr*>& expressions) const -> LeafObject* {
     for (const Expr* expr : expressions) {
         if (expr->type() != ExprType::k_null) {
-            std::cout << *evaluate(expr) << "\n";
+            std::cout << evaluate(expr) << "\n";
         }
     }
     return nullptr;
@@ -40,16 +52,44 @@ auto Interpreter::execute(const std::vector<const Expr*>& expressions) const -> 
 
 
 auto Interpreter::visit_printstmt(const PrintStmt* stmt) const -> void {
-    std::cout << *evaluate(stmt->expr);
+    const LeafObject* value { evaluate(stmt->expr) };
+    std::cout << value;
 }
 
 auto Interpreter::visit_expressionstmt(const ExpressionStmt* stmt) const -> void {
     evaluate(stmt->expr);
 }
 
+auto Interpreter::visit_varstmt(const VarStmt* stmt) const -> void {
+    m_environment->insert_var(stmt->identifier, evaluate(stmt->expr));
+}
+
+auto Interpreter::visit_conststmt(const ConstStmt* stmt) const -> void {
+    m_environment->insert_const(stmt->identifier, evaluate(stmt->expr));
+}
+
 
 auto Interpreter::visit_nullexpr([[maybe_unused]] const NullExpr* expr) const -> LeafObject* {
-    return nullptr;
+    return LeafNull::create_object();
+}
+
+auto Interpreter::visit_assignexpr(const AssignExpr* expr) const -> LeafObject* {
+    const Token* left { expr->left };
+    if (left->type() != k_identifier) {
+        LeafError::instance()->runtime_error(expr->oper->line(), expr->oper->lexeme(), "Left hand operator of '=' must be a variable."s);
+    }
+    const LeafObject* right { evaluate(expr->right) };
+
+    if (m_environment->get_qualifier(left) == "const"s) {
+        LeafError::instance()->runtime_error(
+            expr->oper->line(),
+            expr->oper->lexeme(),
+            std::format("Const variable '{}' can not be re-assigned a value.", left->lexeme())
+        );
+    }
+
+    m_environment->assign(left, right);
+    return const_cast<LeafObject*>(right);
 }
 
 auto Interpreter::visit_ternaryexpr(const TernaryExpr* expr) const -> LeafObject* {
@@ -60,13 +100,13 @@ auto Interpreter::visit_ternaryexpr(const TernaryExpr* expr) const -> LeafObject
     return evaluate(expr->second);
 }
 
-auto Interpreter::visit_binaryexpr([[maybe_unused]] const BinaryExpr* expr) const -> LeafObject* {
+auto Interpreter::visit_binaryexpr(const BinaryExpr* expr) const -> LeafObject* {
     auto left { evaluate(expr->left) };
     auto right { evaluate(expr->right) };
     return BinaryOperations::instance()->execute(expr->oper, left, right);
 }
 
-auto Interpreter::visit_unaryexpr([[maybe_unused]] const UnaryExpr* expr) const -> LeafObject* {
+auto Interpreter::visit_unaryexpr(const UnaryExpr* expr) const -> LeafObject* {
     auto operand { evaluate(expr->operand) };
     if (expr->oper->lexeme() == "-") {
         if (operand->type() != ObjectType::k_number) {
@@ -78,17 +118,17 @@ auto Interpreter::visit_unaryexpr([[maybe_unused]] const UnaryExpr* expr) const 
     }
 }
 
-auto Interpreter::visit_exponentexpr([[maybe_unused]] const ExponentExpr* expr) const -> LeafObject* {
+auto Interpreter::visit_exponentexpr(const ExponentExpr* expr) const -> LeafObject* {
     auto left { evaluate(expr->left) };
     auto right { evaluate(expr->right) };
     return BinaryOperations::instance()->execute(expr->oper, left, right);
 }
 
-auto Interpreter::visit_groupingexpr([[maybe_unused]] const GroupingExpr* expr) const -> LeafObject* {
+auto Interpreter::visit_groupingexpr(const GroupingExpr* expr) const -> LeafObject* {
     return evaluate(expr->expression);
 }
 
-auto Interpreter::visit_primaryexpr([[maybe_unused]] const PrimaryExpr* expr) const -> LeafObject* {
+auto Interpreter::visit_primaryexpr(const PrimaryExpr* expr) const -> LeafObject* {
     if (expr == nullptr) {
         return nullptr;
     }
@@ -99,12 +139,12 @@ auto Interpreter::visit_primaryexpr([[maybe_unused]] const PrimaryExpr* expr) co
         return LeafNumber::create_object(expr->token);
     } else if (type == k_string) {
         return LeafString::create_object(expr->token);
-    } else if (type == k_true) {
-        return LeafBool::create_object(expr->token);
-    } else if (type == k_false) {
+    } else if (type == k_true || type == k_false) {
         return LeafBool::create_object(expr->token);
     } else if (type == k_null) {
         return LeafNull::create_object(expr->token);
+    } else if (type == k_identifier) {
+        return const_cast<LeafObject*>(m_environment->get(expr->token));
     }
     return nullptr;
 }

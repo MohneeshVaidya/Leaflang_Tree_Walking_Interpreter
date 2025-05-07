@@ -33,14 +33,17 @@ private:
     auto peek_prev_token() -> const Token*;
     auto match_token(std::initializer_list<TokenType> types) -> bool;
     auto match_prev_token(std::initializer_list<TokenType> types) -> bool;
-    auto expect_token(TokenType type, const uint32_t line, const std::string& message) -> void;
+    auto expect_token(TokenType type, const std::string& message) -> const Token*;
 
     // Private methods
     auto statement() -> const Stmt*;
+    auto varstmt() -> const Stmt*;
+    auto conststmt() -> const Stmt*;
     auto printstmt() -> const Stmt*;
     auto expressionstmt() -> const Stmt*;
 
     auto expression() -> const Expr*;
+    auto assign() -> const Expr*;
     auto ternary() -> const Expr*;
     auto or_expr() -> const Expr*;
     auto and_expr() -> const Expr*;

@@ -94,7 +94,7 @@ auto run(const std::string& source) -> void {
     std::cout << std::setprecision(20);
 
     try {
-        Interpreter interpreter { };
+        Interpreter interpreter { Environment::create_object() };
         interpreter.execute(statements);
     } catch (std::string& runtime_error) {
         std::cerr << runtime_error << "\n";

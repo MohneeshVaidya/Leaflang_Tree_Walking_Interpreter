@@ -2,6 +2,7 @@
 #include "expr.hpp"
 #include "leaf_error.hpp"
 #include "stmt.hpp"
+#include "token.hpp"
 #include "token_type.hpp"
 
 using namespace std::string_literals;
@@ -26,7 +27,7 @@ auto Parser::statements() const -> const std::vector<const Stmt*>& {
 }
 
 auto Parser::parse() -> Parser& {
-    while(is_at_end() == false) {
+    while(is_at_end() == false && peek_token()->type() != k_eof) {
         m_statements.push_back(statement());
     }
     return *this;
@@ -89,11 +90,12 @@ auto Parser::match_prev_token(std::initializer_list<TokenType> types) -> bool {
     return false;
 }
 
-auto Parser::expect_token(TokenType type, const uint32_t line, const std::string& message) -> void {
+auto Parser::expect_token(TokenType type, const std::string& message) -> const Token* {
     if (match_token({ type })) {
-        return;
+        return peek_prev_token();
     }
-    LeafError::instance()->add_parse_error(line, message);
+    LeafError::instance()->add_parse_error(peek_prev_token()->line(), message);
+    return nullptr;
 }
 
 
@@ -101,23 +103,64 @@ auto Parser::expect_token(TokenType type, const uint32_t line, const std::string
 auto Parser::statement() -> const Stmt* {
     const Token* token { get_token() };
     switch (token->type()) {
+        case k_var: return varstmt();
+        case k_const: return conststmt();
         case k_print: return printstmt();
-        default: return expressionstmt();
+        default: move_current_left(); return expressionstmt();
     }
 }
 
+auto Parser::varstmt() -> const Stmt* {
+    const Token* identifier_token { expect_token(k_identifier, "An identifier is required after 'var' keyword."s) };
+
+    const Expr* expr { NullExpr::create_object() };
+    if (match_token({ k_equal })) {
+        expr = expression();
+    }
+
+    expect_token(k_semicolon, "A statement must end with ';'."s);
+    return VarStmt::create_object(identifier_token, expr);
+}
+
+auto Parser::conststmt() -> const Stmt* {
+    const Token* identifier_token { expect_token(k_identifier, "An identifier is required after 'const' keyword."s) };
+
+    const Expr* expr { NullExpr::create_object() };
+    if (expect_token(k_equal, "Const declration must be provided an initializer."s)) {
+        expr = expression();
+        expect_token(k_semicolon, "A statement must end with ';'.");
+        return ConstStmt::create_object(identifier_token, expr);
+    }
+    expect_token(k_semicolon, "A statement must end with ';'.");
+    return nullptr;
+}
+
 auto Parser::printstmt() -> const Stmt* {
-    const Token* token { peek_prev_token() };
     const Expr* expr { expression() };
-    expect_token(k_semicolon, token->line(), "A statement must ends with ';'."s);
+    expect_token(k_semicolon, "A statement must end with ';'."s);
     return PrintStmt::create_object(expr);
 }
 
 auto Parser::expressionstmt() -> const Stmt* {
-    return ExpressionStmt::create_object(expression());
+    const Expr* expr { expression() };
+    expect_token(k_semicolon, "A statement must end with ';'.");
+    return ExpressionStmt::create_object(expr);
 }
 
 auto Parser::expression() -> const Expr* {
+    return assign();
+}
+
+auto Parser::assign() -> const Expr* {
+    if (match_token({ k_identifier })) {
+        const Token* identifier { peek_prev_token() };
+        if (match_token({ k_equal })) {
+            const Token* oper { peek_prev_token() };
+            const Expr* expr { assign() };
+            return AssignExpr::create_object(identifier, oper, expr);
+        }
+        move_current_left();
+    }
     return ternary();
 }
 
@@ -125,9 +168,8 @@ auto Parser::ternary() -> const Expr* {
     const Expr* expr { or_expr() };
 
     while (match_token({ k_question })) {
-        const Token* oper { peek_prev_token() };
         const Expr* first { ternary() };
-        expect_token(k_colon, oper->line(), "':' is expected but not provided."s);
+        expect_token(k_colon, "':' is expected but not provided."s);
         const Expr* second { ternary() };
         expr = TernaryExpr::create_object(expr, first, second);
     }
@@ -238,7 +280,7 @@ auto Parser::grouping() -> const Expr* {
 
     token = peek_prev_token();
     const Expr* expr { expression() };
-    expect_token(k_right_paren, token->line(), "Each '(' must be accompanied by a matching ')'."s);
+    expect_token(k_right_paren, "Each '(' must be accompanied by a matching ')'."s);
     return GroupingExpr::create_object(expr);
 }
 
@@ -253,7 +295,7 @@ auto Parser::primary() -> const Expr* {
         return grouping();
     }
 
-    if (match_prev_token({ k_number, k_string, k_true, k_false, k_null })) {
+    if (match_prev_token({ k_number, k_string, k_true, k_false, k_null, k_identifier })) {
         return PrimaryExpr::create_object(token);
     }
 

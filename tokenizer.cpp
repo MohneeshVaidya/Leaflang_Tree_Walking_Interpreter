@@ -31,6 +31,9 @@ auto Tokenizer::read_comment() -> void {
     while (current_character != '\n' && current_character != '\0') {
         current_character = get_character();
     }
+    if (current_character == '\n') {
+        m_line++;
+    }
 }
 
 auto Tokenizer::read_number() -> std::string {

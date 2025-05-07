@@ -1,5 +1,6 @@
 #include "stmt.hpp"
 #include "expr.hpp"
+#include "token.hpp"
 
 
 // Stmt classes
@@ -51,4 +52,54 @@ auto ExpressionStmt::accept(const StmtVisitor* visitor) const -> void {
 
 auto ExpressionStmt::type() const -> StmtType {
     return StmtType::k_expression;
+}
+
+
+// VarStmt
+auto VarStmt::create_object(const Token* identifier, const Expr* expr) -> VarStmt* {
+    return new VarStmt { identifier, expr };
+}
+
+VarStmt::VarStmt(const Token* identifier, const Expr* expr) :
+    identifier { Token::create_object(*identifier) },
+    expr { expr }
+    {
+    }
+
+VarStmt::~VarStmt() {
+    Token::delete_object(identifier);
+    Expr::delete_object(expr);
+}
+
+auto VarStmt::accept(const StmtVisitor* visitor) const -> void {
+    return visitor->visit_varstmt(this);
+}
+
+auto VarStmt::type() const -> StmtType {
+    return StmtType::k_var;
+}
+
+
+// ConstStmt
+auto ConstStmt::create_object(const Token* identifier, const Expr* expr) -> ConstStmt* {
+    return new ConstStmt { identifier, expr };
+}
+
+ConstStmt::ConstStmt(const Token* identifier, const Expr* expr) :
+    identifier { Token::create_object(*identifier) },
+    expr { expr }
+    {
+    }
+
+ConstStmt::~ConstStmt() {
+    Token::delete_object(identifier);
+    Expr::delete_object(expr);
+}
+
+auto ConstStmt::accept(const StmtVisitor* visitor) const -> void {
+    return visitor->visit_conststmt(this);
+}
+
+auto ConstStmt::type() const -> StmtType {
+    return StmtType::k_const;
 }

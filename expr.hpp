@@ -9,12 +9,14 @@
 // ExprType enum
 enum class ExprType {
     k_null,
+    k_assign,
     k_ternary,
     k_binary,
     k_unary,
     k_exponent,
     k_grouping,
     k_primary,
+    k_variable,
 };
 
 
@@ -47,6 +49,28 @@ public:
     auto operator = (const NullExpr& other) -> NullExpr& = default;
 };
 
+
+// AssignExpr
+class AssignExpr : public Expr {
+public:
+    const Token* left;
+    const Token* oper;
+    const Expr* right;
+
+    static auto create_object(const Token* left, const Token* oper, const Expr* right) -> AssignExpr*;
+
+    AssignExpr(const Token* left, const Token* oper, const Expr* right);
+    AssignExpr(const AssignExpr& source) = default;
+
+    ~AssignExpr();
+
+    virtual auto accept(const ExprVisitor* visitor) const -> LeafObject* override;
+    virtual auto type() const -> ExprType override;
+
+    auto operator = (const AssignExpr& other) -> AssignExpr& = default;
+};
+
+
 // TernaryExpr
 class TernaryExpr : public Expr {
 public:
@@ -54,7 +78,6 @@ public:
     const Expr* first;
     const Expr* second;
 
-public:
 
     TernaryExpr(const Expr* condition, const Expr* first, const Expr* second);
     TernaryExpr(const TernaryExpr& source) = default;
@@ -76,7 +99,7 @@ public:
     const Token* oper;
     const Expr* right;
 
-public:
+
     BinaryExpr(const Expr* left, const Token* oper, const Expr* right);
     BinaryExpr(const BinaryExpr& source) = default;
 
@@ -96,7 +119,7 @@ public:
     const Token* oper;
     const Expr* operand;
 
-public:
+
     UnaryExpr(const Token* oper, const Expr* operand);
     UnaryExpr(const UnaryExpr& source) = default;
 
@@ -117,7 +140,7 @@ public:
     const Token* oper;
     const Expr* right;
 
-public:
+
     ExponentExpr(const Expr* left, const Token* oper, const Expr* right);
     ExponentExpr(const ExponentExpr& source) = default;
 
@@ -136,7 +159,7 @@ class GroupingExpr : public Expr {
 public:
     const Expr* expression;
 
-public:
+
     GroupingExpr(const Expr* expression);
     GroupingExpr(const GroupingExpr& source) = default;
 
@@ -155,7 +178,6 @@ class PrimaryExpr : public Expr {
 public:
     const Token* token;
 
-public:
     PrimaryExpr(const Token* token);
     PrimaryExpr(const PrimaryExpr& source) = default;
 
@@ -169,13 +191,13 @@ public:
     auto operator = (const PrimaryExpr& other) -> PrimaryExpr& = default;
 };
 
-
 // ExprVisitor
 class ExprVisitor {
 public:
     virtual ~ExprVisitor() = default;
     virtual auto execute(const std::vector<const Expr*>& expressions) const -> LeafObject* = 0;
     virtual auto visit_nullexpr(const NullExpr* expr) const -> LeafObject* = 0;
+    virtual auto visit_assignexpr(const AssignExpr* expr) const -> LeafObject* = 0;
     virtual auto visit_ternaryexpr(const TernaryExpr* expr) const -> LeafObject* = 0;
     virtual auto visit_binaryexpr(const BinaryExpr* expr) const -> LeafObject* = 0;
     virtual auto visit_unaryexpr(const UnaryExpr* expr) const -> LeafObject* = 0;

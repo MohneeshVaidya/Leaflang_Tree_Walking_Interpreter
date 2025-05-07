@@ -1,0 +1,8 @@
+var mohneesh;
+
+const expression = (
+    1 == 1 and 2 == 1 ? "Yes" : (mohneesh = "Mohneesh Vaidya") ? "mmmmmm" : "hhh"
+);
+
+print expression;
+print "\n" + mohneesh + "\n\n";

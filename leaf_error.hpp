@@ -28,6 +28,7 @@ public:
     auto add_error(const Token& token, const uint32_t line, const std::string& message) -> void;
     auto add_parse_error(const uint32_t line, const std::string& message) -> void;
     auto runtime_error(const uint32_t line, const std::string& oper, const std::string& message) -> void;
+    auto runtime_error(const uint32_t line, const std::string& message) -> void;
 };
 
 #endif

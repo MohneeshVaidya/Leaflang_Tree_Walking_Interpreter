@@ -23,6 +23,33 @@ auto NullExpr::type() const -> ExprType {
 }
 
 
+// AssignExpr
+auto AssignExpr::create_object(const Token* left, const Token* oper, const Expr* right) -> AssignExpr* {
+    return new AssignExpr { left, oper, right };
+}
+
+AssignExpr::AssignExpr(const Token* left, const Token* oper, const Expr* right) :
+    left { Token::create_object(*left) },
+    oper { Token::create_object(*oper) },
+    right { right }
+    {
+    }
+
+AssignExpr::~AssignExpr() {
+    Token::delete_object(left);
+    Token::delete_object(oper);
+    Expr::delete_object(right);
+}
+
+auto AssignExpr::accept(const ExprVisitor* visitor) const -> LeafObject* {
+    return visitor->visit_assignexpr(this);
+}
+
+auto AssignExpr::type() const -> ExprType {
+    return ExprType::k_assign;
+}
+
+
 // TernaryExpr
 TernaryExpr::TernaryExpr(const Expr* condition, const Expr* first, const Expr* second) :
     condition { condition },

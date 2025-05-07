@@ -2,6 +2,7 @@
 #define STMT_HPP
 
 #include "expr.hpp"
+#include "token.hpp"
 #include <vector>
 
 
@@ -9,6 +10,8 @@
 enum class StmtType {
     k_print,
     k_expression,
+    k_var,
+    k_const,
 };
 
 
@@ -32,7 +35,6 @@ class PrintStmt : public Stmt {
 public:
     const Expr* expr;
 
-public:
     static auto create_object(const Expr* expr) -> PrintStmt*;
 
     PrintStmt(const Expr* expr);
@@ -52,7 +54,6 @@ class ExpressionStmt : public Stmt {
 public:
     const Expr* expr;
 
-public:
     static auto create_object(const Expr* expr) -> ExpressionStmt*;
 
     ExpressionStmt(const Expr* expr);
@@ -67,6 +68,46 @@ public:
 };
 
 
+// VarStmt
+class VarStmt : public Stmt {
+public:
+    const Token* identifier;
+    const Expr* expr;
+
+    static auto create_object(const Token* identifier, const Expr* expr) -> VarStmt*;
+
+    VarStmt(const Token* identifier, const Expr* expr);
+    VarStmt(const VarStmt& source) = default;
+
+    ~VarStmt();
+
+    virtual auto accept(const StmtVisitor* visitor) const -> void override;
+    virtual auto type() const -> StmtType override;
+
+    auto operator = (const VarStmt& other) -> VarStmt& = default;
+};
+
+
+// ConstStmt
+class ConstStmt : public Stmt {
+    public:
+        const Token* identifier;
+        const Expr* expr;
+
+        static auto create_object(const Token* identifier, const Expr* expr) -> ConstStmt*;
+
+        ConstStmt(const Token* identifier, const Expr* expr);
+        ConstStmt(const ConstStmt& source) = default;
+
+        ~ConstStmt();
+
+        virtual auto accept(const StmtVisitor* visitor) const -> void override;
+        virtual auto type() const -> StmtType override;
+
+        auto operator = (const ConstStmt& other) -> ConstStmt& = default;
+};
+
+
 // StmtVisitor
 class StmtVisitor {
 public:
@@ -74,6 +115,8 @@ public:
     virtual auto execute(const std::vector<const Stmt*>& statements) const -> void = 0;
     virtual auto visit_printstmt(const PrintStmt* stmt) const -> void = 0;
     virtual auto visit_expressionstmt(const ExpressionStmt* stmt) const -> void = 0;
+    virtual auto visit_varstmt(const VarStmt* stmt) const -> void = 0;
+    virtual auto visit_conststmt(const ConstStmt* stmt) const -> void = 0;
 };
 
 
