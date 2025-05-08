@@ -24,9 +24,12 @@ public:
     virtual auto execute(const std::vector<const Expr*>& expressions) const -> LeafObject* override;
 
     virtual auto visit_printstmt(const PrintStmt* stmt) const -> void override;
+    virtual auto visit_printlnstmt(const PrintlnStmt* stmt) const -> void override;
     virtual auto visit_expressionstmt(const ExpressionStmt* stmt) const -> void override;
     virtual auto visit_varstmt(const VarStmt* stmt) const -> void override;
     virtual auto visit_conststmt(const ConstStmt* stmt) const -> void override;
+    virtual auto visit_blockstmt(const BlockStmt* stmt) -> void override;
+    virtual auto visit_ifstmt(const IfStmt* stmt) -> void override;
 
     virtual auto visit_nullexpr(const NullExpr* expr) const -> LeafObject* override;
     virtual auto visit_assignexpr(const AssignExpr* expr) const -> LeafObject* override;

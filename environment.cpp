@@ -7,13 +7,18 @@
 
 using namespace std::string_literals;
 
-auto Environment::create_object() -> Environment* {
-    return new Environment { };
+auto Environment::create_object(Environment* parent) -> Environment* {
+    return new Environment { parent };
 }
 
 auto Environment::delete_object(const Environment* object) -> void {
     delete object;
 }
+
+Environment::Environment(Environment* parent) :
+    m_parent { parent }
+    {
+    }
 
 auto Environment::has_name(const std::string& name) const -> bool {
     return (
@@ -22,11 +27,75 @@ auto Environment::has_name(const std::string& name) const -> bool {
     );
 }
 
+auto Environment::assign(Environment* environment, const Token* name, const LeafObject* value) -> void {
+    if (environment->m_var_table.contains(name->lexeme())) {
+        environment->m_var_table.insert_or_assign(name->lexeme(), value);
+        return;
+    }
+
+    if (environment->m_const_table.contains(name->lexeme())) {
+        environment->m_const_table.insert_or_assign(name->lexeme(), value);
+        return;
+    }
+
+    if (environment->m_parent) {
+        assign(environment->m_parent, name, value);
+        return;
+    }
+
+    LeafError::instance()->runtime_error(
+        name->line(),
+        std::format("You can not assign variable '{}' as it is not declared.", name->lexeme())
+    );
+}
+
+auto Environment::get(const Environment* environment, const Token* name) const -> const LeafObject* {
+    if (environment->m_var_table.contains(name->lexeme())) {
+        return environment->m_var_table.at(name->lexeme());
+    }
+
+    if (environment->m_const_table.contains(name->lexeme())) {
+        return environment->m_const_table.at(name->lexeme());
+    }
+
+    if (environment->m_parent) {
+        return get(environment->m_parent, name);
+    }
+
+    LeafError::instance()->runtime_error(
+        name->line(),
+        std::format("You can not read variable '{}' as it is not declared.", name->lexeme())
+    );
+
+    return nullptr;
+}
+
+auto Environment::get_qualifier(const Environment* environment, const Token* name) const -> std::string {
+    if (environment->m_var_table.contains(name->lexeme())) {
+        return "var"s;
+    }
+
+    if (environment->m_const_table.contains(name->lexeme())) {
+        return "const"s;
+    }
+
+    if (environment->m_parent) {
+        return get_qualifier(environment->m_parent, name);
+    }
+
+    return ""s;
+}
+
+
+auto Environment::parent() const -> Environment* {
+    return m_parent;
+}
+
 auto Environment::insert_var(const Token* name, const LeafObject* value) -> void {
     if (has_name(name->lexeme())) {
         LeafError::instance()->runtime_error(
             name->line(),
-            std::format("You can not re-declare variable '{}'.", name->lexeme())
+            std::format("You can not re-declare variable '{}' in same scope.", name->lexeme())
         );
     }
     m_var_table.insert(std::make_pair(name->lexeme(), value));
@@ -36,47 +105,21 @@ auto Environment::insert_const(const Token* name, const LeafObject* value) -> vo
     if (has_name(name->lexeme())) {
         LeafError::instance()->runtime_error(
             name->line(),
-            std::format("You can not re-declare variable '{}'.", name->lexeme())
+            std::format("You can not re-declare variable '{}' in same scope.", name->lexeme())
         );
     }
     m_const_table.insert(std::make_pair(name->lexeme(), value));
 }
 
 auto Environment::assign(const Token* name, const LeafObject* value) -> void {
-    if (has_name(name->lexeme()) == false) {
-        LeafError::instance()->runtime_error(
-            name->line(),
-            std::format("You can not assign variable '{}' as it is not declared.", name->lexeme())
-        );
-    }
-    m_var_table.insert_or_assign(name->lexeme(), value);
+    assign(this, name, value);
 }
 
 auto Environment::get(const Token* name) const -> const LeafObject* {
-    if (has_name(name->lexeme()) == false) {
-        LeafError::instance()->runtime_error(
-            name->line(),
-            std::format("You can not read variable '{}' as it is not declared.", name->lexeme())
-        );
-    }
-
-    if (m_var_table.contains(name->lexeme())) {
-        return m_var_table.at(name->lexeme());
-    } else if (m_const_table.contains(name->lexeme())) {
-        return m_const_table.at(name->lexeme());
-    }
-
-    return nullptr;
+    return get(this, name);
 }
 
 auto Environment::get_qualifier(const Token* name) const -> std::string {
-    if (m_var_table.contains(name->lexeme())) {
-        return "var"s;
-    }
-
-    if (m_const_table.contains(name->lexeme())) {
-        return "const"s;
-    }
-    return ""s;
+    return get_qualifier(this, name);
 }
 

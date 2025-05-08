@@ -1,8 +1,20 @@
-var mohneesh;
+const value = 2;
 
-const expression = (
-    1 == 1 and 2 == 1 ? "Yes" : (mohneesh = "Mohneesh Vaidya") ? "mmmmmm" : "hhh"
-);
-
-print expression;
-print "\n" + mohneesh + "\n\n";
+if value == 1 {
+    println "Value == 1";
+}
+elseif value == 2 {
+    println "Value == 2";
+}
+elseif value == 3 {
+    println "Value == 3";
+}
+elseif value == 4 {
+    println "Value == 4";
+}
+elseif value == 5 {
+    println "Value == 5";
+}
+else {
+    println "Value is not in range [1, 5]";
+}

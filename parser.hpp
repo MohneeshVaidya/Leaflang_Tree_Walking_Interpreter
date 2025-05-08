@@ -19,7 +19,7 @@ public:
     Parser(const std::vector<const Token*>& tokens);
     ~Parser();
 
-    // public methods
+    // Public methods
     auto statements() const -> const std::vector<const Stmt*>&;
     auto parse() -> Parser&;
 
@@ -34,13 +34,18 @@ private:
     auto match_token(std::initializer_list<TokenType> types) -> bool;
     auto match_prev_token(std::initializer_list<TokenType> types) -> bool;
     auto expect_token(TokenType type, const std::string& message) -> const Token*;
+    auto synchronize() -> void;
 
     // Private methods
+    auto top_statement() -> const Stmt*;
     auto statement() -> const Stmt*;
     auto varstmt() -> const Stmt*;
     auto conststmt() -> const Stmt*;
     auto printstmt() -> const Stmt*;
+    auto printlnstmt() -> const Stmt*;
     auto expressionstmt() -> const Stmt*;
+    auto blockstmt() -> const Stmt*;
+    auto ifstmt() -> const Stmt*;
 
     auto expression() -> const Expr*;
     auto assign() -> const Expr*;

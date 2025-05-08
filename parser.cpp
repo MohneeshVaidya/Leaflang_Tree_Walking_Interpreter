@@ -4,6 +4,7 @@
 #include "stmt.hpp"
 #include "token.hpp"
 #include "token_type.hpp"
+#include <utility>
 
 using namespace std::string_literals;
 
@@ -27,8 +28,11 @@ auto Parser::statements() const -> const std::vector<const Stmt*>& {
 }
 
 auto Parser::parse() -> Parser& {
-    while(is_at_end() == false && peek_token()->type() != k_eof) {
-        m_statements.push_back(statement());
+    while(is_at_end() == false) {
+        if (peek_token()->type() == k_eof) {
+            break;
+        }
+        m_statements.push_back(top_statement());
     }
     return *this;
 }
@@ -95,17 +99,58 @@ auto Parser::expect_token(TokenType type, const std::string& message) -> const T
         return peek_prev_token();
     }
     LeafError::instance()->add_parse_error(peek_prev_token()->line(), message);
-    return nullptr;
+    throw std::string { };
+}
+
+auto Parser::synchronize() -> void {
+    const Token* curr_token { get_token() };
+    while (true) {
+        switch (curr_token->type()) {
+            case k_print:
+                [[fallthrough]];
+            case k_println:
+                [[fallthrough]];
+            case k_var:
+                [[fallthrough]];
+            case k_const:
+                [[fallthrough]];
+            case k_left_brace:
+                [[fallthrough]];
+            case k_if:
+                [[fallthrough]];
+            case k_for:
+                [[fallthrough]];
+            case k_do:
+                [[fallthrough]];
+            case k_eof:
+                move_current_left();
+                return;
+            default:
+                curr_token = get_token();
+        }
+    }
 }
 
 
 // Private methods
+auto Parser::top_statement() -> const Stmt* {
+    try {
+        return statement();
+    } catch (const std::string&) {
+        synchronize();
+        return nullptr;
+    }
+}
+
 auto Parser::statement() -> const Stmt* {
     const Token* token { get_token() };
     switch (token->type()) {
         case k_var: return varstmt();
         case k_const: return conststmt();
         case k_print: return printstmt();
+        case k_println: return printlnstmt();
+        case k_left_brace: return blockstmt();
+        case k_if: return ifstmt();
         default: move_current_left(); return expressionstmt();
     }
 }
@@ -141,11 +186,52 @@ auto Parser::printstmt() -> const Stmt* {
     return PrintStmt::create_object(expr);
 }
 
+auto Parser::printlnstmt() -> const Stmt* {
+    const Expr* expr { expression() };
+    expect_token(k_semicolon, "A statement must end with ';'."s);
+    return PrintlnStmt::create_object(expr);
+}
+
 auto Parser::expressionstmt() -> const Stmt* {
     const Expr* expr { expression() };
     expect_token(k_semicolon, "A statement must end with ';'.");
     return ExpressionStmt::create_object(expr);
 }
+
+auto Parser::blockstmt() -> const Stmt* {
+    std::vector<const Stmt*> statements { };
+    while (match_token({ k_right_brace }) == false) {
+        statements.push_back(statement());
+    }
+    return BlockStmt::create_object(statements);
+}
+
+auto Parser::ifstmt() -> const Stmt* {
+    std::vector<std::pair<const Expr*, const Stmt*>> statements { };
+    const Expr* condition { expression() };
+    if (expect_token(k_left_brace, "'{' is expected after 'if' condition."s)) {
+        const Stmt* stmts { blockstmt() };
+        statements.push_back(
+            std::make_pair(condition, stmts));
+    }
+    while (match_token({ k_elseif })) {
+        condition = expression();
+        if (expect_token(k_left_brace, "'{' is expected after 'elseif' condition."s)) {
+            const Stmt* stmts { blockstmt() };
+            statements.push_back(
+                std::make_pair(condition, stmts));
+        }
+    }
+    if (match_token({ k_else })) {
+        if (expect_token(k_left_brace, "'{' is expected after 'else'."s)) {
+            const Stmt* stmts { blockstmt() };
+            statements.push_back(
+                std::make_pair(nullptr, stmts));
+        }
+    }
+    return IfStmt::create_object(statements);
+}
+
 
 auto Parser::expression() -> const Expr* {
     return assign();
@@ -299,5 +385,8 @@ auto Parser::primary() -> const Expr* {
         return PrimaryExpr::create_object(token);
     }
 
+    LeafError::instance()->add_parse_error(
+        token->line(), std::format("An expression is expected but found '{}'.", token->lexeme()));
+    move_current_left();
     return NullExpr::create_object();
 }

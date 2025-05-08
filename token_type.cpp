@@ -7,6 +7,7 @@ using enum TokenType;
 std::ostream& operator << (std::ostream& stream, const TokenType& token) {
     switch (token) {
         case k_print        : stream << "k_print"; break;
+        case k_println      : stream << "k_println"; break;
         case k_var          : stream << "k_var"; break;
         case k_const        : stream << "k_const"; break;
         case k_if           : stream << "k_if"; break;

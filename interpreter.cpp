@@ -34,6 +34,7 @@ auto Interpreter::evaluate(const Expr* expr) const -> LeafObject* {
     return expr->accept(this);
 }
 
+
 // Public methods
 auto Interpreter::execute(const std::vector<const Stmt*>& statements) const -> void {
     for (const Stmt* stmt : statements) {
@@ -56,6 +57,11 @@ auto Interpreter::visit_printstmt(const PrintStmt* stmt) const -> void {
     std::cout << value;
 }
 
+auto Interpreter::visit_printlnstmt(const PrintlnStmt* stmt) const -> void {
+    const LeafObject* value { evaluate(stmt->expr) };
+    std::cout << value << "\n";
+}
+
 auto Interpreter::visit_expressionstmt(const ExpressionStmt* stmt) const -> void {
     evaluate(stmt->expr);
 }
@@ -66,6 +72,32 @@ auto Interpreter::visit_varstmt(const VarStmt* stmt) const -> void {
 
 auto Interpreter::visit_conststmt(const ConstStmt* stmt) const -> void {
     m_environment->insert_const(stmt->identifier, evaluate(stmt->expr));
+}
+
+auto Interpreter::visit_blockstmt(const BlockStmt* stmt) -> void {
+    Environment* environment { Environment::create_object(m_environment) };
+    m_environment = environment;
+
+    for (const Stmt* statement : stmt->statements) {
+        execute_stmt(statement);
+    }
+
+    m_environment = environment->parent();
+    Environment::delete_object(environment);
+}
+
+auto Interpreter::visit_ifstmt(const IfStmt* stmt) -> void {
+    for (auto statement : stmt->statements) {
+        if (statement.first == nullptr) {
+            execute_stmt(statement.second);
+            break;
+        }
+        const LeafObject* condition { evaluate(statement.first) };
+        if (condition->is_truthy()) {
+            execute_stmt(statement.second);
+            break;
+        }
+    }
 }
 
 

@@ -41,11 +41,14 @@ auto Tokenizer::read_number() -> std::string {
 
     char character { peek_character() };
 
-    while (leaf::tools::is_numeric(character)) {
+    while (leaf::tools::is_numeric(character) || character == '.') {
         number.push_back(character);
 
         move_current_right();
         character = peek_character();
+    }
+    if (number.back() == '.') {
+        number.push_back('0');
     }
 
     return number;
@@ -265,6 +268,8 @@ auto Tokenizer::add_token(const TokenType type, const std::string& lexeme) -> vo
 auto Tokenizer::add_identifier_token(const std::string& identifier) -> void {
     if (identifier == "print") {
         m_tokens.push_back(Token::create_object(k_print, identifier, m_line));
+    } else if (identifier == "println") {
+        m_tokens.push_back(Token::create_object(k_println, identifier, m_line));
     } else if (identifier == "var") {
         m_tokens.push_back(Token::create_object(k_var, identifier, m_line));
     } else if (identifier == "const") {
