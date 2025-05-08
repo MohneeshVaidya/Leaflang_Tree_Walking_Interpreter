@@ -29,6 +29,3 @@ for var j = 1; j <= 11; j = j + 1 {
 println (
     1 + 2 + 3 * 4 / 5
 );
-println j;
-println "\n";
-
