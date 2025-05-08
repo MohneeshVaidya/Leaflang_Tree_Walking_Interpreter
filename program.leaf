@@ -1,31 +1,46 @@
-const value = 2;
-
-if value < 0 and value > 1 {
-    println (
-        "Value is either less than 0 or greater than 1"
-    );
-}
-elseif value > 1 {
-    println (
-        "Value is greater than 1"
-    );
-}
-else {
-    println "Value is equal to 1";
-}
-
 var i = 1;
-for i < 10 {
+for i <= 10 {
     println i;
-    i = i + 2;
+    i = i + 1;
 }
 
-println "\n\n";
+println "\n";
 
-for var j = 1; j <= 11; j = j + 1 {
+for i = 1; i <= 10; i = i + 2 {
+    println i;
+}
+
+println "\n";
+
+for var j = 1; j <= 10; j = j + 3 {
     println j;
 }
 
+println "";
+
+for var i = 1; i <= 2; i = i + 1 {
+    println i;
+    const value = 2;
+
+    if value < 0 and value > 1 {
+        println (
+            "Value is either less than 0 or greater than 1"
+        );
+    }
+    elseif value > 1 {
+        println (
+            "Value is greater than 1"
+        );
+    }
+    else {
+        println "Value is equal to 1";
+    }
+}
+
+println "";
+
 println (
-    1 + 2 + 3 * 4 / 5
+    i = ((i == 11) ? "i is equal to 11" : "i is not equal to 11")
 );
+
+println i;
