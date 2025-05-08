@@ -29,7 +29,8 @@ public:
     virtual auto visit_varstmt(const VarStmt* stmt) const -> void override;
     virtual auto visit_conststmt(const ConstStmt* stmt) const -> void override;
     virtual auto visit_blockstmt(const BlockStmt* stmt) -> void override;
-    virtual auto visit_ifstmt(const IfStmt* stmt) -> void override;
+    virtual auto visit_ifstmt(const IfStmt* stmt) const -> void override;
+    virtual auto visit_forstmt(const ForStmt* stmt) const -> void override;
 
     virtual auto visit_nullexpr(const NullExpr* expr) const -> LeafObject* override;
     virtual auto visit_assignexpr(const AssignExpr* expr) const -> LeafObject* override;

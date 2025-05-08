@@ -4,6 +4,8 @@
 #include "stmt.hpp"
 #include "token.hpp"
 #include "token_type.hpp"
+
+#include <cstdint>
 #include <utility>
 
 using namespace std::string_literals;
@@ -102,6 +104,16 @@ auto Parser::expect_token(TokenType type, const std::string& message) -> const T
     throw std::string { };
 }
 
+auto Parser::for_helper() -> const Stmt* {
+    const Stmt* step_stmt { ExpressionStmt::create_object(expression()) };
+    expect_token(k_left_brace, "'{' must be provided to start 'for' block."s);
+
+    BlockStmt* block_stmt { const_cast<BlockStmt*>(dynamic_cast<const BlockStmt*>(blockstmt())) };
+    block_stmt->statements.push_back(step_stmt);
+
+    return block_stmt;
+}
+
 auto Parser::synchronize() -> void {
     const Token* curr_token { get_token() };
     while (true) {
@@ -151,6 +163,7 @@ auto Parser::statement() -> const Stmt* {
         case k_println: return printlnstmt();
         case k_left_brace: return blockstmt();
         case k_if: return ifstmt();
+        case k_for: return forstmt();
         default: move_current_left(); return expressionstmt();
     }
 }
@@ -230,6 +243,52 @@ auto Parser::ifstmt() -> const Stmt* {
         }
     }
     return IfStmt::create_object(statements);
+}
+
+auto Parser::forstmt() -> const Stmt* {
+    if (match_token({ k_left_brace })) {
+        const Stmt* statements { blockstmt() };
+        return ForStmt::create_object(nullptr, statements);
+    } else if (match_token({ k_var })) {
+        std::vector<const Stmt*> statements { };
+
+        const Stmt* decl_stmt { varstmt() };
+        const ExpressionStmt* condition { dynamic_cast<const ExpressionStmt*>(expressionstmt()) };
+
+        const Stmt* block_stmt { for_helper() };
+
+        statements.push_back(decl_stmt);
+        statements.push_back(ForStmt::create_object(condition->expr, block_stmt));
+        return BlockStmt::create_object(statements);
+    } else {
+        const uint32_t original_pos { m_current };
+        uint32_t num_semi { 0 };
+        while (match_token({ k_left_brace }) == false) {
+            if (peek_token()->type() == k_semicolon) {
+                num_semi = num_semi + 1;
+            }
+            move_current_right();
+        }
+        m_current = original_pos;
+        if (num_semi == 0) {
+            const Expr* condition { expression() };
+            expect_token(k_left_brace, "'{' must be provided after for condition."s);
+            const Stmt* statements { blockstmt() };
+            return ForStmt::create_object(condition, statements);
+        } else {
+            std::vector<const Stmt*> statements { };
+
+            const Stmt* assign_stmt { expressionstmt() };
+            const ExpressionStmt* condition { dynamic_cast<const ExpressionStmt*>(expressionstmt()) };
+
+            const Stmt* block_stmt { for_helper() };
+
+            statements.push_back(assign_stmt);
+            statements.push_back(ForStmt::create_object(condition->expr, block_stmt));
+            return BlockStmt::create_object(statements);
+        }
+    }
+    return nullptr;
 }
 
 

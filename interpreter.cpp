@@ -86,7 +86,7 @@ auto Interpreter::visit_blockstmt(const BlockStmt* stmt) -> void {
     Environment::delete_object(environment);
 }
 
-auto Interpreter::visit_ifstmt(const IfStmt* stmt) -> void {
+auto Interpreter::visit_ifstmt(const IfStmt* stmt) const -> void {
     for (auto statement : stmt->statements) {
         if (statement.first == nullptr) {
             execute_stmt(statement.second);
@@ -97,6 +97,19 @@ auto Interpreter::visit_ifstmt(const IfStmt* stmt) -> void {
             execute_stmt(statement.second);
             break;
         }
+    }
+}
+
+auto Interpreter::visit_forstmt(const ForStmt* stmt) const -> void {
+    if (stmt->condition == nullptr) {
+        while (true) {
+            execute_stmt(stmt->block_stmt);
+        }
+        return;
+    }
+
+    while (evaluate(stmt->condition)->is_truthy()) {
+        execute_stmt(stmt->block_stmt);
     }
 }
 

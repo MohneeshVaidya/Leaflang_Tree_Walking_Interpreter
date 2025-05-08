@@ -1,20 +1,34 @@
 const value = 2;
 
-if value == 1 {
-    println "Value == 1";
+if value < 0 and value > 1 {
+    println (
+        "Value is either less than 0 or greater than 1"
+    );
 }
-elseif value == 2 {
-    println "Value == 2";
-}
-elseif value == 3 {
-    println "Value == 3";
-}
-elseif value == 4 {
-    println "Value == 4";
-}
-elseif value == 5 {
-    println "Value == 5";
+elseif value > 1 {
+    println (
+        "Value is greater than 1"
+    );
 }
 else {
-    println "Value is not in range [1, 5]";
+    println "Value is equal to 1";
 }
+
+var i = 1;
+for i < 10 {
+    println i;
+    i = i + 2;
+}
+
+println "\n\n";
+
+for var j = 1; j <= 11; j = j + 1 {
+    println j;
+}
+
+println (
+    1 + 2 + 3 * 4 / 5
+);
+println j;
+println "\n";
+

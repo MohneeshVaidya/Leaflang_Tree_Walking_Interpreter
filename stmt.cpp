@@ -177,3 +177,28 @@ auto IfStmt::accept(const StmtVisitor* visitor) const -> void {
 auto IfStmt::type() const -> StmtType {
     return StmtType::k_if;
 }
+
+
+// ForStmt
+ForStmt::ForStmt(const Expr* condition, const Stmt* block_stmt) :
+    condition { condition },
+    block_stmt { block_stmt }
+    {
+    }
+
+ForStmt::~ForStmt() {
+    Expr::delete_object(condition);
+    Stmt::delete_object(block_stmt);
+}
+
+auto ForStmt::create_object(const Expr* condition, const Stmt* block_stmt) -> ForStmt* {
+    return new ForStmt { condition, block_stmt };
+}
+
+auto ForStmt::accept(const StmtVisitor* visitor) const -> void {
+    return const_cast<StmtVisitor*>(visitor)->visit_forstmt(this);
+}
+
+auto ForStmt::type() const -> StmtType {
+    return StmtType::k_for;
+}

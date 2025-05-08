@@ -34,6 +34,7 @@ private:
     auto match_token(std::initializer_list<TokenType> types) -> bool;
     auto match_prev_token(std::initializer_list<TokenType> types) -> bool;
     auto expect_token(TokenType type, const std::string& message) -> const Token*;
+    auto for_helper() -> const Stmt*;
     auto synchronize() -> void;
 
     // Private methods
@@ -46,6 +47,7 @@ private:
     auto expressionstmt() -> const Stmt*;
     auto blockstmt() -> const Stmt*;
     auto ifstmt() -> const Stmt*;
+    auto forstmt() -> const Stmt*;
 
     auto expression() -> const Expr*;
     auto assign() -> const Expr*;

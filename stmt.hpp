@@ -14,6 +14,7 @@ enum class StmtType {
     k_const,
     k_block,
     k_if,
+    k_for,
 };
 
 
@@ -172,6 +173,27 @@ public:
 };
 
 
+// ForStmt
+class ForStmt : public Stmt {
+public:
+    const Expr* condition;
+    const Stmt* block_stmt;
+
+private:
+    ForStmt(const Expr* condition, const Stmt* block_stmt);
+    ForStmt(const ForStmt& source) = default;
+    auto operator = (const ForStmt& source) -> ForStmt& = default;
+
+public:
+    ~ForStmt();
+
+    static auto create_object(const Expr* condition, const Stmt* block_stmt) -> ForStmt*;
+
+    virtual auto accept(const StmtVisitor* visitor) const -> void override;
+    virtual auto type() const -> StmtType override;
+};
+
+
 // StmtVisitor
 class StmtVisitor {
 public:
@@ -183,7 +205,8 @@ public:
     virtual auto visit_varstmt(const VarStmt* stmt) const -> void = 0;
     virtual auto visit_conststmt(const ConstStmt* stmt) const -> void = 0;
     virtual auto visit_blockstmt(const BlockStmt* stmt) -> void = 0;
-    virtual auto visit_ifstmt(const IfStmt* stmt) -> void = 0;
+    virtual auto visit_ifstmt(const IfStmt* stmt) const -> void = 0;
+    virtual auto visit_forstmt(const ForStmt* stmt) const -> void = 0;
 };
 
 
