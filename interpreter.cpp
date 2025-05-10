@@ -261,19 +261,29 @@ auto Interpreter::visit_callexpr(const CallExpr* expr) -> LeafObject* {
     const FunctionCtx prev_ctx { func_ctx };
     func_ctx = FunctionCtx::k_function;
 
-    const LeafObject* value { m_environment->get(expr->identifier) };
-    if (value->type() != ObjectType::k_function) {
-        LeafError::instance()->runtime_error(
-            expr->identifier->line(),
-            std::format("'{}' is not callable.", expr->identifier->lexeme()));
+    const LeafObject* value { };
+
+    if (expr->identifier) {
+        value = m_environment->get(expr->identifier);
+        if (value->type() != ObjectType::k_function) {
+            LeafError::instance()->runtime_error(
+                expr->identifier->line(),
+                std::format("'{}' is not callable.", expr->identifier->lexeme()));
+        }
+    } else if (expr->expr) {
+        value = evaluate(expr->expr);
     }
+
     LeafFunction* casted_value { const_cast<LeafFunction*>(dynamic_cast<const LeafFunction*>(value)) };
+
     if (casted_value->parameters.size() != expr->arguments.size()) {
         LeafError::instance()->runtime_error(
             expr->identifier->line(),
             std::format("Number of arguments does not match number of parameters for function '{}'.", expr->identifier->lexeme()));
     }
+
     LeafObject* return_value { casted_value->call(expr->arguments, const_cast<Interpreter*>(this)) };
+
     func_ctx = prev_ctx;
     return return_value;
 }

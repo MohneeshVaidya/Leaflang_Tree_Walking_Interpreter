@@ -66,6 +66,7 @@ private:
     auto unary() -> const Expr*;
     auto exponent() -> const Expr*;
     auto call(const Token* identifier) -> const Expr*;
+    auto call(const Expr* expr) -> const Expr*;
     auto grouping() -> const Expr*;
     auto primary() -> const Expr*;
     auto function() -> const Expr*;

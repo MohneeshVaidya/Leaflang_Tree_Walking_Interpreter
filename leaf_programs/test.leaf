@@ -1,0 +1,10 @@
+const value = function (a) {
+    return function (b) {
+        return function (c) {
+            return (a * (b) - c);
+        };
+    };
+}
+(10)(20)(30);
+
+println value;

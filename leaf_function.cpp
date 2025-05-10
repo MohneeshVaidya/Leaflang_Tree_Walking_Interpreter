@@ -34,11 +34,20 @@ auto FunctionExpr::type() const -> ExprType {
 // CallExpr
 CallExpr::CallExpr(const Token* identifier, const std::vector<const Expr*>& arguments) :
     identifier { identifier },
+    expr { nullptr },
+    arguments { arguments }
+    {
+    }
+
+CallExpr::CallExpr(const Expr* expr, const std::vector<const Expr*>& arguments) :
+    identifier { nullptr },
+    expr { expr },
     arguments { arguments }
     {
     }
 
 CallExpr::~CallExpr() {
+    Expr::delete_object(expr);
     for (const Expr* expr : arguments) {
         Expr::delete_object(expr);
     }
@@ -46,6 +55,10 @@ CallExpr::~CallExpr() {
 
 auto CallExpr::create_object(const Token* identifier, const std::vector<const Expr*>& arguments) -> CallExpr* {
     return new CallExpr { identifier, arguments };
+}
+
+auto CallExpr::create_object(const Expr* expr, const std::vector<const Expr*>& arguments) -> CallExpr* {
+    return new CallExpr { expr, arguments };
 }
 
 auto CallExpr::accept(const ExprVisitor* visitor) const -> LeafObject* {

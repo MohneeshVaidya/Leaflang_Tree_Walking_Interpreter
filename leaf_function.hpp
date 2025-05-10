@@ -35,16 +35,19 @@ public:
 class CallExpr : public Expr {
 public:
     const Token* identifier;
+    const Expr* expr;   // Either function or call expression
     std::vector<const Expr*> arguments;
 
 private:
     CallExpr(const Token* identifier, const std::vector<const Expr*>& arguments);
+    CallExpr(const Expr* expr, const std::vector<const Expr*>& arguments);
     CallExpr(const CallExpr& source) = default;
     auto operator = (const CallExpr& other) -> CallExpr& = default;
 
 public:
     ~CallExpr();
     static auto create_object(const Token* identifier, const std::vector<const Expr*>& arguments) -> CallExpr*;
+    static auto create_object(const Expr* expr, const std::vector<const Expr*>& arguments) -> CallExpr*;
 
     virtual auto accept(const ExprVisitor* visitor) const -> LeafObject* override;
     virtual auto type() const -> ExprType override;

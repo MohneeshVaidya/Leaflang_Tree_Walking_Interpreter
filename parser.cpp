@@ -461,7 +461,24 @@ auto Parser::call(const Token* identifier) -> const Expr* {
         arguments.push_back(expression());
         match_token({ k_comma });
     }
-    return CallExpr::create_object(identifier, arguments);
+    const CallExpr* call_expr { CallExpr::create_object(identifier, arguments) };
+    if (match_token({ k_left_paren })) {
+        return call(call_expr);
+    }
+    return call_expr;
+}
+
+auto Parser::call(const Expr* function_expr) -> const Expr* {
+    std::vector<const Expr*> arguments { };
+    while (match_token({ k_right_paren }) == false) {
+        arguments.push_back(expression());
+        match_token({ k_comma });
+    }
+    const CallExpr* call_expr { CallExpr::create_object(function_expr, arguments) };
+    if (match_token({ k_left_paren })) {
+        return call(call_expr);
+    }
+    return call_expr;
 }
 
 auto Parser::grouping() -> const Expr* {
@@ -514,5 +531,10 @@ auto Parser::function() -> const Expr* {
         match_token({ k_comma });
     }
     expect_token(k_left_brace, "'{' is required after argument list of function but not provided."s);
-    return FunctionExpr::create_object(parameters, blockstmt());
+
+    const FunctionExpr* function_expr { FunctionExpr::create_object(parameters, blockstmt()) };
+    if (match_token({ k_left_paren })) {
+        return call(function_expr);
+    }
+    return function_expr;
 }
