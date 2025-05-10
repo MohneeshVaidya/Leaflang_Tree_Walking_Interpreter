@@ -1,0 +1,15 @@
+const User = struct {
+    var fullname;
+    var username;
+    var email;
+    var password;
+    var age;
+};
+
+User.__construct = function (fullname, username, email, password, age) {
+    this.fullname = fullname;
+    this.username = username;
+    this.email    = email;
+    this.password = password;
+    this.age      = age;
+};

@@ -1,0 +1,18 @@
+var i = 1;
+for {
+    if i == 101 {
+        break;
+    }
+    if i % 10 == 0 {
+        println "";
+
+        if i % 20 == 0 {
+            i = i + 1;
+            continue;
+        }
+    }
+
+    print i;
+    print "\t";
+    i = i + 1;
+}

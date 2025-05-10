@@ -292,8 +292,8 @@ auto Tokenizer::add_identifier_token(const std::string& identifier) -> void {
         m_tokens.push_back(Token::create_object(k_function, identifier, m_line));
     } else if (identifier == "return") {
         m_tokens.push_back(Token::create_object(k_return, identifier, m_line));
-    } else if (identifier == "class") {
-        m_tokens.push_back(Token::create_object(k_class, identifier, m_line));
+    } else if (identifier == "struct") {
+        m_tokens.push_back(Token::create_object(k_struct, identifier, m_line));
     } else if (identifier == "extends") {
         m_tokens.push_back(Token::create_object(k_extends, identifier, m_line));
     } else if (identifier == "this") {

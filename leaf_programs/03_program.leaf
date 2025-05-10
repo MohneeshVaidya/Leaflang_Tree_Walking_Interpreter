@@ -1,9 +1,36 @@
-const binaryOperation = function (operation, a, b) {
-    return operation(a, b);
+const getBinaryOperation = function (option) {
+    if option == "+" {
+        return function (a, b) { return a + b; };
+    } elseif option == "-" {
+        return function (a, b) { return a - b; };
+    } elseif option == "*" {
+        return function (a, b) { return a * b; };
+    } elseif option == "/" {
+        return function (a, b) { return a / b; };
+    } elseif option == "%" {
+        return function (a, b) { return a % b; };
+    } elseif option == "**" {
+        return function (a, b) { return a ** b; };
+    } else {
+        return function (a, b) { return null; };
+    }
 };
 
-const addNums = function (a, b) {
-    return a + b;
-};
+const add = getBinaryOperation("+");
+const sub = getBinaryOperation("-");
+const mul = getBinaryOperation("*");
+const div = getBinaryOperation("/");
+const mod = getBinaryOperation("%");
+const pow = getBinaryOperation("**");
+const any = getBinaryOperation("LeafLang");
 
-println binaryOperation(addNums, 100, 101);
+var a = 8;
+var b = 7;
+
+println add(a, b);
+println sub(a, b);
+println mul(a, b);
+println div(a, b);
+println mod(a, b);
+println pow(a, b);
+println any(a, b);

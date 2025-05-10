@@ -47,3 +47,4 @@ const binaryOperation = function (operator, a, b) {
 };
 
 println binaryOperation(addNums, 100, 101);
+println binaryOperation(addNumsDup, 100, 101);
