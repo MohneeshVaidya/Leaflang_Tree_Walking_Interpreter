@@ -1,0 +1,49 @@
+const getCounter = function () {
+    var count = 1;
+    return function () {
+        println count;
+
+        if count < 5 or count > 10 {
+            println "Either count is less than 5 or greater than 10";
+        } else {
+            println "Ok";
+        }
+        count = count + 1;
+    };
+};
+
+const getCount = getCounter();
+
+getCount();
+getCount();
+getCount();
+getCount();
+getCount();
+getCount();
+getCount();
+getCount();
+getCount();
+getCount();
+getCount();
+getCount();
+
+const functionTaker = function (callback) {
+    println callback(2, 6);
+};
+
+const addNums = function (a, b) {
+    return a + b;
+};
+
+println addNums(10, 20);
+
+const addNumsDup = addNums;
+println addNumsDup(30, 50);
+
+functionTaker(addNums);
+
+const binaryOperation = function (operator, a, b) {
+    return operator(a, b);
+};
+
+println binaryOperation(addNums, 100, 101);

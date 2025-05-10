@@ -12,6 +12,7 @@ enum class ObjectType {
     k_string,
     k_bool,
     k_identifier,
+    k_function,
 };
 
 
@@ -106,29 +107,5 @@ public:
 
     auto value() const -> bool;
 };
-
-
-// LeafIdentifier
-// class LeafIdentifier : public LeafObject {
-// private:
-//     const std::string& m_name;
-//     const LeafObject* m_value;
-//
-//     LeafIdentifier(const std::string& name, const LeafObject* value);
-//     LeafIdentifier(const LeafIdentifier& source) = default;
-//
-// public:
-//     static auto create_object(const std::string& name, const LeafObject* value) -> LeafIdentifier*;
-//
-//     virtual auto type() const -> ObjectType override;
-//     virtual auto is_truthy() const -> bool override;
-//
-//     auto name() const -> const std::string&;
-//     auto value() const -> const LeafObject*;
-//
-//     auto operator = ([[maybe_unused]] const LeafIdentifier& other) -> LeafIdentifier& {
-//         return *this;
-//     };
-// };
 
 #endif

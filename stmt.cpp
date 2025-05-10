@@ -1,4 +1,5 @@
 #include "stmt.hpp"
+#include "environment.hpp"
 #include "expr.hpp"
 #include "token.hpp"
 
@@ -145,7 +146,7 @@ BlockStmt::~BlockStmt() {
 }
 
 auto BlockStmt::accept(const StmtVisitor* visitor) const -> void {
-    return const_cast<StmtVisitor*>(visitor)->visit_blockstmt(this);
+    return const_cast<StmtVisitor*>(visitor)->visit_blockstmt(this, Environment::create_object());
 }
 
 auto BlockStmt::type() const -> StmtType {
@@ -171,7 +172,7 @@ auto IfStmt::create_object(const std::vector<std::pair<const Expr*, const Stmt*>
 }
 
 auto IfStmt::accept(const StmtVisitor* visitor) const -> void {
-    return const_cast<StmtVisitor*>(visitor)->visit_ifstmt(this);
+    return visitor->visit_ifstmt(this);
 }
 
 auto IfStmt::type() const -> StmtType {
@@ -201,4 +202,67 @@ auto ForStmt::accept(const StmtVisitor* visitor) const -> void {
 
 auto ForStmt::type() const -> StmtType {
     return StmtType::k_for;
+}
+
+
+// BreakStmt
+BreakStmt::BreakStmt(const uint32_t line) :
+    line { line }
+    {
+    }
+
+auto BreakStmt::create_object(const uint32_t line) -> BreakStmt* {
+    return new BreakStmt { line };
+}
+
+auto BreakStmt::accept(const StmtVisitor* visitor) const -> void {
+    return visitor->visit_breakstmt(this);
+}
+
+auto BreakStmt::type() const -> StmtType {
+    return StmtType::k_break;
+}
+
+
+// ContinueStmt
+ContinueStmt::ContinueStmt(const uint32_t line, const Expr* step_expr) :
+    line { line },
+    step_expr { step_expr }
+    {
+    }
+
+auto ContinueStmt::create_object(const uint32_t line, const Expr* step_expr) -> ContinueStmt* {
+    return new ContinueStmt { line, step_expr };
+}
+
+auto ContinueStmt::accept(const StmtVisitor* visitor) const -> void {
+    return visitor->visit_continuestmt(this);
+}
+
+auto ContinueStmt::type() const -> StmtType {
+    return StmtType::k_continue;
+}
+
+
+// ReturnStmt
+ReturnStmt::ReturnStmt(const Token* token, const Expr* value) :
+    token { token },
+    value { value }
+    {
+    }
+
+ReturnStmt::~ReturnStmt() {
+    Expr::delete_object(value);
+}
+
+auto ReturnStmt::create_object(const Token* token, const Expr* value) -> ReturnStmt* {
+    return new ReturnStmt { token, value };
+}
+
+auto ReturnStmt::accept(const StmtVisitor* visitor) const -> void {
+    return visitor->visit_returnstmt(this);
+}
+
+auto ReturnStmt::type() const -> StmtType {
+    return StmtType::k_return;
 }

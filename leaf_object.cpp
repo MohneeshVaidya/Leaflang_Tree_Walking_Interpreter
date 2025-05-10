@@ -26,6 +26,8 @@ auto operator << (std::ostream& stream, const LeafObject* object) -> std::ostrea
         stream << dynamic_cast<const LeafString*>(object)->value();
     } else if (object->type() == k_bool) {
         stream << dynamic_cast<const LeafBool*>(object)->value();
+    } else if (object->type() == k_function) {
+        stream << "leaf_function { }";
     }
     return stream;
 }
@@ -160,32 +162,3 @@ auto LeafBool::is_truthy() const -> bool {
 auto LeafBool::value() const -> bool {
     return m_value;
 }
-
-
-// LeafIdentifier
-// auto LeafIdentifier::create_object(const std::string& name, const LeafObject* value) -> LeafIdentifier* {
-//     return new LeafIdentifier { name, value };
-// }
-//
-// LeafIdentifier::LeafIdentifier(const std::string& name, const LeafObject* value) :
-//     LeafObject { nullptr },
-//     m_name { name },
-//     m_value { value }
-//     {
-//     }
-//
-// auto LeafIdentifier::type() const -> ObjectType {
-//     return k_identifier;
-// }
-//
-// auto LeafIdentifier::is_truthy() const -> bool {
-//     return true;
-// }
-//
-// auto LeafIdentifier::name() const -> const std::string& {
-//     return m_name;
-// }
-//
-// auto LeafIdentifier::value() const -> const LeafObject* {
-//     return m_value;
-// }

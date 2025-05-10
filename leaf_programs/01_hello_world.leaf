@@ -1,0 +1,3 @@
+print "Hello world, this is print.\n";
+
+println "Hello world, this is println.";

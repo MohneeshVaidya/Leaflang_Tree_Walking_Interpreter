@@ -1,8 +1,11 @@
 #ifndef STMT_HPP
 #define STMT_HPP
 
+#include "environment.hpp"
 #include "expr.hpp"
 #include "token.hpp"
+
+#include <cstdint>
 #include <vector>
 
 
@@ -15,6 +18,9 @@ enum class StmtType {
     k_block,
     k_if,
     k_for,
+    k_break,
+    k_continue,
+    k_return,
 };
 
 
@@ -194,6 +200,61 @@ public:
 };
 
 
+// BreakStmt
+class BreakStmt : public Stmt {
+public:
+    const uint32_t line;
+
+private:
+    BreakStmt(const uint32_t line);
+
+public:
+    static auto create_object(const uint32_t line) -> BreakStmt*;
+
+    virtual auto accept(const StmtVisitor* visitor) const -> void override;
+    virtual auto type() const -> StmtType override;
+};
+
+
+// ContinueStmt
+class ContinueStmt : public Stmt {
+public:
+    const uint32_t line;
+    const Expr* step_expr;  // ContinueStmt is not responsible to deallocate the memory for 'step_expr'
+
+private:
+    ContinueStmt(const uint32_t line, const Expr* step_expr);
+    ContinueStmt(const ContinueStmt& source) = default;
+    auto operator = (const ContinueStmt&) -> ContinueStmt& { return *this; };
+
+public:
+    static auto create_object(const uint32_t line, const Expr* step_expr) -> ContinueStmt*;
+
+    virtual auto accept(const StmtVisitor* visitor) const -> void override;
+    virtual auto type() const -> StmtType override;
+};
+
+
+// ReturnStmt
+class ReturnStmt : public Stmt {
+public:
+    const Token* token;
+    const Expr* value;
+
+private:
+    ReturnStmt(const Token* token, const Expr* value);
+    ReturnStmt(const ReturnStmt& source) = default;
+    auto operator = (const ReturnStmt& other) -> ReturnStmt& = default;
+
+public:
+    ~ReturnStmt();
+    static auto create_object(const Token* token, const Expr* value) -> ReturnStmt*;
+
+    virtual auto accept(const StmtVisitor* visitor) const -> void override;
+    virtual auto type() const -> StmtType override;
+};
+
+
 // StmtVisitor
 class StmtVisitor {
 public:
@@ -204,9 +265,12 @@ public:
     virtual auto visit_expressionstmt(const ExpressionStmt* stmt) const -> void = 0;
     virtual auto visit_varstmt(const VarStmt* stmt) const -> void = 0;
     virtual auto visit_conststmt(const ConstStmt* stmt) const -> void = 0;
-    virtual auto visit_blockstmt(const BlockStmt* stmt) -> void = 0;
+    virtual auto visit_blockstmt(const BlockStmt* stmt, Environment* environment) -> void = 0;
     virtual auto visit_ifstmt(const IfStmt* stmt) const -> void = 0;
-    virtual auto visit_forstmt(const ForStmt* stmt) const -> void = 0;
+    virtual auto visit_forstmt(const ForStmt* stmt) -> void = 0;
+    virtual auto visit_breakstmt(const BreakStmt* stmt) const -> void = 0;
+    virtual auto visit_continuestmt(const ContinueStmt* stmt) const -> void = 0;
+    virtual auto visit_returnstmt(const ReturnStmt* stmt) const -> void = 0;
 };
 
 

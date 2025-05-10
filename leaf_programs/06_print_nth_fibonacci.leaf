@@ -1,0 +1,13 @@
+const nth_fibonacci = function (num) {
+    if (num == 1) {
+        return 0;
+    }
+    if (num == 2) {
+        return 1;
+    }
+    return nth_fibonacci(num - 1) + nth_fibonacci(num - 2);
+};
+
+for var num = 1; num <= 31; num = num + 1 {
+    println nth_fibonacci(num);
+}

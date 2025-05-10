@@ -9,11 +9,13 @@
 
 class Environment {
 private:
-    Environment* m_parent;
+    Environment* m_parent { nullptr };
+    bool m_is_closure { false };
 
     std::unordered_map<std::string, const LeafObject*> m_var_table { };
     std::unordered_map<std::string, const LeafObject*> m_const_table { };
 
+    Environment() = default;
     Environment(Environment* parent);
     Environment(const Environment& source) = default;
     auto operator = (const Environment& other) -> Environment& = default;
@@ -24,10 +26,15 @@ private:
     auto get_qualifier(const Environment* environment, const Token* name) const -> std::string;
 
 public:
+    static auto create_object() -> Environment*;
     static auto create_object(Environment* parent) -> Environment*;
     static auto delete_object(const Environment* object) -> void;
 
+    static auto get_closure(const Environment* environment) -> Environment*;
+
     auto parent() const -> Environment*;
+    auto set_parent(Environment* parent) -> void;
+    auto make_closure() -> Environment*;
     auto insert_var(const Token* name, const LeafObject* value) -> void;
     auto insert_const(const Token* name, const LeafObject* value) -> void;
     auto assign(const Token* name, const LeafObject* value) -> void;

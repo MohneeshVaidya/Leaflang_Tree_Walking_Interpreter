@@ -7,6 +7,7 @@
 #include "token_type.hpp"
 
 #include <cstdint>
+#include <stack>
 #include <vector>
 
 class Parser {
@@ -14,6 +15,7 @@ private:
     std::vector<const Stmt*> m_statements { };
     const std::vector<const Token*>& m_tokens { };
     uint32_t m_current { 0 };
+    std::stack<const Expr*> stack { };  // Will be used to store step_statements for continue_statements in for loops.
 
 public:
     Parser(const std::vector<const Token*>& tokens);
@@ -48,6 +50,9 @@ private:
     auto blockstmt() -> const Stmt*;
     auto ifstmt() -> const Stmt*;
     auto forstmt() -> const Stmt*;
+    auto breakstmt() -> const Stmt*;
+    auto continuestmt() -> const Stmt*;
+    auto returnstmt() -> const Stmt*;
 
     auto expression() -> const Expr*;
     auto assign() -> const Expr*;
@@ -60,8 +65,10 @@ private:
     auto factor() -> const Expr*;
     auto unary() -> const Expr*;
     auto exponent() -> const Expr*;
+    auto call(const Token* identifier) -> const Expr*;
     auto grouping() -> const Expr*;
     auto primary() -> const Expr*;
+    auto function() -> const Expr*;
 };
 
 #endif

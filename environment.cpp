@@ -7,12 +7,38 @@
 
 using namespace std::string_literals;
 
+auto Environment::create_object() -> Environment* {
+    return new Environment { };
+}
+
 auto Environment::create_object(Environment* parent) -> Environment* {
     return new Environment { parent };
 }
 
 auto Environment::delete_object(const Environment* object) -> void {
-    delete object;
+    if (object->m_is_closure == false) {
+        delete object;
+    }
+}
+
+auto Environment::get_closure(const Environment* environment) -> Environment* {
+    const Environment* curr_environment { environment };
+    Environment* closure { create_object() };
+
+    while (curr_environment) {
+        for (auto item : curr_environment->m_var_table) {
+            if (closure->m_var_table.contains(item.first) == false) {
+                closure->m_var_table.insert_or_assign(item.first, item.second);
+            }
+        }
+        for (auto item : curr_environment->m_const_table) {
+            if (closure->m_const_table.contains(item.first) == false) {
+                closure->m_const_table.insert_or_assign(item.first, item.second);
+            }
+        }
+        curr_environment = curr_environment->parent();
+    }
+    return closure;
 }
 
 Environment::Environment(Environment* parent) :
@@ -89,6 +115,15 @@ auto Environment::get_qualifier(const Environment* environment, const Token* nam
 
 auto Environment::parent() const -> Environment* {
     return m_parent;
+}
+
+auto Environment::set_parent(Environment* parent) -> void {
+    m_parent = parent;
+}
+
+auto Environment::make_closure() -> Environment* {
+    m_is_closure = true;
+    return this;
 }
 
 auto Environment::insert_var(const Token* name, const LeafObject* value) -> void {

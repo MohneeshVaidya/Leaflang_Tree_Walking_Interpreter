@@ -1,0 +1,9 @@
+const binaryOperation = function (operation, a, b) {
+    return operation(a, b);
+};
+
+const addNums = function (a, b) {
+    return a + b;
+};
+
+println binaryOperation(addNums, 100, 101);

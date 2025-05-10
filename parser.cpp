@@ -1,5 +1,6 @@
 #include "parser.hpp"
 #include "expr.hpp"
+#include "leaf_function.hpp"
 #include "leaf_error.hpp"
 #include "stmt.hpp"
 #include "token.hpp"
@@ -105,7 +106,8 @@ auto Parser::expect_token(TokenType type, const std::string& message) -> const T
 }
 
 auto Parser::for_helper() -> const Stmt* {
-    const Stmt* step_stmt { ExpressionStmt::create_object(expression()) };
+    stack.top() = expression();
+    const Stmt* step_stmt { ExpressionStmt::create_object(stack.top()) };
     expect_token(k_left_brace, "'{' must be provided to start 'for' block."s);
 
     BlockStmt* block_stmt { const_cast<BlockStmt*>(dynamic_cast<const BlockStmt*>(blockstmt())) };
@@ -164,6 +166,9 @@ auto Parser::statement() -> const Stmt* {
         case k_left_brace: return blockstmt();
         case k_if: return ifstmt();
         case k_for: return forstmt();
+        case k_break: return breakstmt();
+        case k_continue: return continuestmt();
+        case k_return: return returnstmt();
         default: move_current_left(); return expressionstmt();
     }
 }
@@ -246,9 +251,12 @@ auto Parser::ifstmt() -> const Stmt* {
 }
 
 auto Parser::forstmt() -> const Stmt* {
+    stack.push(nullptr);
+    const Stmt* to_return { };
+
     if (match_token({ k_left_brace })) {
         const Stmt* statements { blockstmt() };
-        return ForStmt::create_object(nullptr, statements);
+        to_return = ForStmt::create_object(nullptr, statements);
     } else if (match_token({ k_var })) {
         std::vector<const Stmt*> statements { };
 
@@ -259,7 +267,7 @@ auto Parser::forstmt() -> const Stmt* {
 
         statements.push_back(decl_stmt);
         statements.push_back(ForStmt::create_object(condition->expr, block_stmt));
-        return BlockStmt::create_object(statements);
+        to_return = BlockStmt::create_object(statements);
     } else {
         const uint32_t original_pos { m_current };
         uint32_t num_semi { 0 };
@@ -274,7 +282,7 @@ auto Parser::forstmt() -> const Stmt* {
             const Expr* condition { expression() };
             expect_token(k_left_brace, "'{' must be provided after for condition."s);
             const Stmt* statements { blockstmt() };
-            return ForStmt::create_object(condition, statements);
+            to_return = ForStmt::create_object(condition, statements);
         } else {
             std::vector<const Stmt*> statements { };
 
@@ -285,10 +293,40 @@ auto Parser::forstmt() -> const Stmt* {
 
             statements.push_back(assign_stmt);
             statements.push_back(ForStmt::create_object(condition->expr, block_stmt));
-            return BlockStmt::create_object(statements);
+            to_return = BlockStmt::create_object(statements);
         }
     }
-    return nullptr;
+    stack.pop();
+    return to_return;
+}
+
+auto Parser::breakstmt() -> const Stmt* {
+    const uint32_t line { peek_prev_token()->line() };
+    expect_token(k_semicolon, "A statement must end with ';'."s);
+    return BreakStmt::create_object(line);
+}
+
+auto Parser::continuestmt() -> const Stmt* {
+    const uint32_t line { peek_prev_token()->line() };
+    expect_token(k_semicolon, "A statement must end with ';'."s);
+
+    const Expr* step_expr { nullptr };
+    if (stack.empty() == false) {
+        step_expr = stack.top();
+    }
+
+    const Stmt* stmt { ContinueStmt::create_object(line, step_expr) };
+    return stmt;
+}
+
+auto Parser::returnstmt() -> const Stmt* {
+    const Token* token { peek_prev_token() };
+    if (match_token({ k_semicolon })) {
+        return ReturnStmt::create_object(token, NullExpr::create_object());
+    }
+    const Expr* value { expression() };
+    expect_token(k_semicolon, "A statement must end with ';'."s);
+    return ReturnStmt::create_object(token, value);
 }
 
 
@@ -305,6 +343,8 @@ auto Parser::assign() -> const Expr* {
             return AssignExpr::create_object(identifier, oper, expr);
         }
         move_current_left();
+    } else if (match_token({ k_function })) {
+        return function();
     }
     return ternary();
 }
@@ -415,6 +455,15 @@ auto Parser::exponent() -> const Expr* {
     return expr;
 }
 
+auto Parser::call(const Token* identifier) -> const Expr* {
+    std::vector<const Expr*> arguments { };
+    while (match_token({ k_right_paren }) == false) {
+        arguments.push_back(expression());
+        match_token({ k_comma });
+    }
+    return CallExpr::create_object(identifier, arguments);
+}
+
 auto Parser::grouping() -> const Expr* {
     const Token* token { peek_token() };
     if (token->type() == k_right_paren) {
@@ -440,7 +489,14 @@ auto Parser::primary() -> const Expr* {
         return grouping();
     }
 
-    if (match_prev_token({ k_number, k_string, k_true, k_false, k_null, k_identifier })) {
+    if (match_prev_token({ k_number, k_string, k_true, k_false, k_null })) {
+        return PrimaryExpr::create_object(token);
+    }
+
+    if (match_prev_token({ k_identifier })) {
+        if (match_token({ k_left_paren })) {
+            return call(token);
+        }
         return PrimaryExpr::create_object(token);
     }
 
@@ -448,4 +504,15 @@ auto Parser::primary() -> const Expr* {
         token->line(), std::format("An expression is expected but found '{}'.", token->lexeme()));
     move_current_left();
     return NullExpr::create_object();
+}
+
+auto Parser::function() -> const Expr* {
+    expect_token(k_left_paren, "'(' is required after 'function' keyword but not provided."s);
+    std::vector<const Token*> parameters { };
+    while (match_token({ k_right_paren }) == false) {
+        parameters.push_back(get_token());
+        match_token({ k_comma });
+    }
+    expect_token(k_left_brace, "'{' is required after argument list of function but not provided."s);
+    return FunctionExpr::create_object(parameters, blockstmt());
 }

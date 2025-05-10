@@ -1,0 +1,16 @@
+const factorial = function (num) {
+    if num <= 1 {
+        return 1;
+    }
+
+    return num * factorial(num - 1);
+};
+
+
+var num;
+for num = 0; num < 11; num = num + 1 {
+    print "factorial(";
+    print num;
+    print ") = ";
+    println factorial(num);
+}

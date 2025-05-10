@@ -3,6 +3,7 @@
 #include "expr.hpp"
 #include "leaf_error.hpp"
 #include "leaf_object.hpp"
+#include "leaf_function.hpp"
 #include "stmt.hpp"
 #include "token_type.hpp"
 #include "tools/binary_operations.hpp"
@@ -15,6 +16,14 @@ using namespace std::string_literals;
 using enum TokenType;
 
 
+// Break
+class Break { };
+
+// Continue
+class Continue { };
+
+
+// Interpreter
 Interpreter::Interpreter(Environment* environment) :
     m_environment { environment }
     {
@@ -74,14 +83,19 @@ auto Interpreter::visit_conststmt(const ConstStmt* stmt) const -> void {
     m_environment->insert_const(stmt->identifier, evaluate(stmt->expr));
 }
 
-auto Interpreter::visit_blockstmt(const BlockStmt* stmt) -> void {
-    Environment* environment { Environment::create_object(m_environment) };
+auto Interpreter::visit_blockstmt(const BlockStmt* stmt, Environment* environment) -> void {
+    environment->set_parent(m_environment);
     m_environment = environment;
 
-    for (const Stmt* statement : stmt->statements) {
-        execute_stmt(statement);
+    try {
+        for (const Stmt* statement : stmt->statements) {
+            execute_stmt(statement);
+        }
+    } catch (LeafObject* return_value) {
+        m_environment = environment->parent();
+        Environment::delete_object(environment);
+        throw return_value;
     }
-
     m_environment = environment->parent();
     Environment::delete_object(environment);
 }
@@ -100,21 +114,66 @@ auto Interpreter::visit_ifstmt(const IfStmt* stmt) const -> void {
     }
 }
 
-auto Interpreter::visit_forstmt(const ForStmt* stmt) const -> void {
-    if (stmt->condition == nullptr) {
-        while (true) {
-            execute_stmt(stmt->block_stmt);
+auto Interpreter::visit_forstmt(const ForStmt* stmt) -> void {
+    const BlockCtx prev_block_ctx { block_ctx };
+    block_ctx = BlockCtx::k_loop;
+    try {
+        if (stmt->condition == nullptr) {
+            while (true) {
+                try {
+                    execute_stmt(stmt->block_stmt);
+                } catch (const Continue&) {
+                }
+            }
+            return;
         }
+
+        while (evaluate(stmt->condition)->is_truthy()) {
+            try {
+                execute_stmt(stmt->block_stmt);
+            } catch (const Continue&) {
+            }
+        }
+    } catch (const Break&) {
+    }
+    block_ctx = prev_block_ctx;
+}
+
+auto Interpreter::visit_breakstmt(const BreakStmt* stmt) const -> void {
+    if (block_ctx == BlockCtx::k_loop) {
+        throw Break { };
         return;
     }
+    LeafError::instance()->runtime_error(
+        stmt->line,
+        "'break' can only be used within the context of a loop."s
+    );
+}
 
-    while (evaluate(stmt->condition)->is_truthy()) {
-        execute_stmt(stmt->block_stmt);
+auto Interpreter::visit_continuestmt(const ContinueStmt* stmt) const -> void {
+    if (block_ctx == BlockCtx::k_loop) {
+        if (stmt->step_expr) {
+            evaluate(stmt->step_expr);
+        }
+        throw Continue { };
+        return;
     }
+    LeafError::instance()->runtime_error(
+        stmt->line,
+        "'continue' can only be used within the context of a loop."s
+    );
+}
+
+auto Interpreter::visit_returnstmt(const ReturnStmt* stmt) const -> void {
+    if (func_ctx == FunctionCtx::k_function) {
+        throw evaluate(stmt->value);
+    }
+    LeafError::instance()->runtime_error(
+        stmt->token->line(), "'return' statement can only be used within the context of a function."s);
 }
 
 
-auto Interpreter::visit_nullexpr([[maybe_unused]] const NullExpr* expr) const -> LeafObject* {
+auto Interpreter::visit_nullexpr(const NullExpr*) const -> LeafObject* {
     return LeafNull::create_object();
 }
 
@@ -192,4 +251,29 @@ auto Interpreter::visit_primaryexpr(const PrimaryExpr* expr) const -> LeafObject
         return const_cast<LeafObject*>(m_environment->get(expr->token));
     }
     return nullptr;
+}
+
+auto Interpreter::visit_functionexpr(const FunctionExpr* expr) const -> LeafObject* {
+    return LeafFunction::create_object(expr->parameters, expr->block_stmt, m_environment->make_closure());
+}
+
+auto Interpreter::visit_callexpr(const CallExpr* expr) -> LeafObject* {
+    const FunctionCtx prev_ctx { func_ctx };
+    func_ctx = FunctionCtx::k_function;
+
+    const LeafObject* value { m_environment->get(expr->identifier) };
+    if (value->type() != ObjectType::k_function) {
+        LeafError::instance()->runtime_error(
+            expr->identifier->line(),
+            std::format("'{}' is not callable.", expr->identifier->lexeme()));
+    }
+    LeafFunction* casted_value { const_cast<LeafFunction*>(dynamic_cast<const LeafFunction*>(value)) };
+    if (casted_value->parameters.size() != expr->arguments.size()) {
+        LeafError::instance()->runtime_error(
+            expr->identifier->line(),
+            std::format("Number of arguments does not match number of parameters for function '{}'.", expr->identifier->lexeme()));
+    }
+    LeafObject* return_value { casted_value->call(expr->arguments, const_cast<Interpreter*>(this)) };
+    func_ctx = prev_ctx;
+    return return_value;
 }

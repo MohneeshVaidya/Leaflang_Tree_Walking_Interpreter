@@ -15,7 +15,10 @@ std::ostream& operator << (std::ostream& stream, const TokenType& token) {
         case k_else         : stream << "k_else"; break;
         case k_for          : stream << "k_for"; break;
         case k_do           : stream << "k_do"; break;
+        case k_break        : stream << "k_break"; break;
+        case k_continue     : stream << "k_continue"; break;
         case k_function     : stream << "k_function"; break;
+        case k_return       : stream << "k_return"; break;
         case k_class        : stream << "k_class"; break;
         case k_extends      : stream << "k_extends"; break;
         case k_this         : stream << "k_this"; break;

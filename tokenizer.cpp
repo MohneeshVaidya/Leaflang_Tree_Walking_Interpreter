@@ -284,8 +284,14 @@ auto Tokenizer::add_identifier_token(const std::string& identifier) -> void {
         m_tokens.push_back(Token::create_object(k_for, identifier, m_line));
     } else if (identifier == "do") {
         m_tokens.push_back(Token::create_object(k_do, identifier, m_line));
+    } else if (identifier == "break") {
+        m_tokens.push_back(Token::create_object(k_break, identifier, m_line));
+    } else if (identifier == "continue") {
+        m_tokens.push_back(Token::create_object(k_continue, identifier, m_line));
     } else if (identifier == "function") {
         m_tokens.push_back(Token::create_object(k_function, identifier, m_line));
+    } else if (identifier == "return") {
+        m_tokens.push_back(Token::create_object(k_return, identifier, m_line));
     } else if (identifier == "class") {
         m_tokens.push_back(Token::create_object(k_class, identifier, m_line));
     } else if (identifier == "extends") {

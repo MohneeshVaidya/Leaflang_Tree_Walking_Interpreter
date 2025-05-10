@@ -16,6 +16,8 @@ enum class ExprType {
     k_exponent,
     k_grouping,
     k_primary,
+    k_function,
+    k_call,
 };
 
 
@@ -193,6 +195,12 @@ public:
 
 };
 
+// Forward declaration for FunctionExpr
+class FunctionExpr;
+
+// Forward declaration for CallExpr
+class CallExpr;
+
 // ExprVisitor
 class ExprVisitor {
 public:
@@ -206,6 +214,8 @@ public:
     virtual auto visit_exponentexpr(const ExponentExpr* expr) const -> LeafObject* = 0;
     virtual auto visit_groupingexpr(const GroupingExpr* expr) const -> LeafObject* = 0;
     virtual auto visit_primaryexpr(const PrimaryExpr* expr) const -> LeafObject* = 0;
+    virtual auto visit_functionexpr(const FunctionExpr* expr) const -> LeafObject* = 0;
+    virtual auto visit_callexpr(const CallExpr* expr) -> LeafObject* = 0;
 };
 
 #endif
