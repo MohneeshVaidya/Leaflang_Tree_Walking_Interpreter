@@ -1,47 +1,21 @@
-struct BinaryOperation {
-    add;
-    sub;
-    mul;
-    div;
-    mod;
-    pow;
+{
+    struct RandomStruct {
+        field1;
+        field2;
+        field3;
 
-    __construct() {};
-};
+        __construct() {
 
-const binaryOperation = BinaryOperation();
+        };
+    };
 
-binaryOperation.add = function (a, b) {
-    return a + b;
-};
+    var instance = RandomStruct();
+    println instance;
 
-binaryOperation.sub = function (a, b) {
-    return a - b;
-};
+    println instance.field1 = instance.field2 = instance.field3 = "Computer science";
 
-binaryOperation.mul = function (a, b) {
-    return a * b;
-};
+    println instance;
 
-binaryOperation.div = function (a, b) {
-    return a / b;
-};
-
-binaryOperation.mod = function (a, b) {
-    return a % b;
-};
-
-binaryOperation.pow = function (a, b) {
-    return a ** b;
-};
-
-
-const a = 10;
-const b = 5;
-
-println binaryOperation.add(a, b);
-println binaryOperation.sub(a, b);
-println binaryOperation.mul(a, b);
-println binaryOperation.div(a, b);
-println binaryOperation.mod(a, b);
-println binaryOperation.pow(a, b);
+    instance = "Hello world";
+    println instance;
+}

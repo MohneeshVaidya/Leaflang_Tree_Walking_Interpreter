@@ -12,10 +12,10 @@ struct User {
 const user = User();
 println user;
 
-user.fullname = "Mohneesh Vaidya";
-user.username = "Warrior_Vegito";
-user.email    = "warrior.vegito.007@gmail.com";
-user.password = "warrior_vegito_is_great";
-user.age      = 26;
+user.fullname = "Leaflang";
+user.username = "Tree_Walking_Interpreter";
+user.email    = "leaflang@gmail.com";
+user.password = "leaflang_the_tree_walking_interpreter";
+user.age      = 26.5;
 
 println user;
