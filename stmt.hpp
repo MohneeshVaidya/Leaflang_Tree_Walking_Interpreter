@@ -31,227 +31,227 @@ class StmtVisitor;
 // Stmt classes
 class Stmt {
 public:
-    static auto delete_object(const Stmt* object) -> void;
+    static auto delete_object(Stmt* object) -> void;
 
     virtual ~Stmt() = default;
-    virtual auto accept(const StmtVisitor* visitor) const -> void = 0;
-    virtual auto type() const -> StmtType = 0;
+    virtual auto accept(StmtVisitor* visitor) -> void = 0;
+    virtual auto type() -> StmtType = 0;
 };
 
 
 // PrintStmt
 class PrintStmt : public Stmt {
 public:
-    const Expr* expr;
+    Expr* expr;
 
 private:
-    PrintStmt(const Expr* expr);
-    PrintStmt(const PrintStmt& source) = default;
-    auto operator = (const PrintStmt& other) -> PrintStmt& = default;
+    PrintStmt(Expr* expr);
+    PrintStmt(PrintStmt& source) = default;
+    auto operator = (PrintStmt& other) -> PrintStmt& = default;
 
 public:
     ~PrintStmt();
 
-    static auto create_object(const Expr* expr) -> PrintStmt*;
+    static auto create_object(Expr* expr) -> PrintStmt*;
 
-    virtual auto accept(const StmtVisitor* visitor) const -> void override;
-    virtual auto type() const -> StmtType override;
+    virtual auto accept(StmtVisitor* visitor) -> void override;
+    virtual auto type() -> StmtType override;
 };
 
 
 // PrintlnStmt
 class PrintlnStmt : public Stmt {
 public:
-    const Expr* expr;
+    Expr* expr;
 
 private:
-    PrintlnStmt(const Expr* expr);
-    PrintlnStmt(const PrintlnStmt& source) = default;
-    auto operator = (const PrintlnStmt& other) -> PrintlnStmt& = default;
+    PrintlnStmt(Expr* expr);
+    PrintlnStmt(PrintlnStmt& source) = default;
+    auto operator = (PrintlnStmt& other) -> PrintlnStmt& = default;
 
 public:
     ~PrintlnStmt();
 
-    static auto create_object(const Expr* expr) -> PrintlnStmt*;
+    static auto create_object(Expr* expr) -> PrintlnStmt*;
 
-    virtual auto accept(const StmtVisitor* visitor) const -> void override;
-    virtual auto type() const -> StmtType override;
+    virtual auto accept(StmtVisitor* visitor) -> void override;
+    virtual auto type() -> StmtType override;
 };
 
 
 // ExpressionStmt
 class ExpressionStmt : public Stmt {
 public:
-    const Expr* expr;
+    Expr* expr;
 
 private:
-    ExpressionStmt(const Expr* expr);
-    ExpressionStmt(const ExpressionStmt& source) = default;
-    auto operator = (const ExpressionStmt& other) -> ExpressionStmt& = default;
+    ExpressionStmt(Expr* expr);
+    ExpressionStmt(ExpressionStmt& source) = default;
+    auto operator = (ExpressionStmt& other) -> ExpressionStmt& = default;
 
 public:
     ~ExpressionStmt();
 
-    static auto create_object(const Expr* expr) -> ExpressionStmt*;
+    static auto create_object(Expr* expr) -> ExpressionStmt*;
 
-    virtual auto accept(const StmtVisitor* visitor) const -> void override;
-    virtual auto type() const -> StmtType override;
+    virtual auto accept(StmtVisitor* visitor) -> void override;
+    virtual auto type() -> StmtType override;
 };
 
 
 // VarStmt
 class VarStmt : public Stmt {
 public:
-    const Token* identifier;
-    const Expr* expr;
+    Token* identifier;
+    Expr* expr;
 
 private:
-    VarStmt(const Token* identifier, const Expr* expr);
-    VarStmt(const VarStmt& source) = default;
-    auto operator = (const VarStmt& other) -> VarStmt& = default;
+    VarStmt(Token* identifier, Expr* expr);
+    VarStmt(VarStmt& source) = default;
+    auto operator = (VarStmt& other) -> VarStmt& = default;
 
 public:
     ~VarStmt();
 
-    static auto create_object(const Token* identifier, const Expr* expr) -> VarStmt*;
+    static auto create_object(Token* identifier, Expr* expr) -> VarStmt*;
 
-    virtual auto accept(const StmtVisitor* visitor) const -> void override;
-    virtual auto type() const -> StmtType override;
+    virtual auto accept(StmtVisitor* visitor) -> void override;
+    virtual auto type() -> StmtType override;
 };
 
 
 // ConstStmt
 class ConstStmt : public Stmt {
 public:
-    const Token* identifier;
-    const Expr* expr;
+    Token* identifier;
+    Expr* expr;
 
 private:
-    ConstStmt(const Token* identifier, const Expr* expr);
-    ConstStmt(const ConstStmt& source) = default;
-    auto operator = (const ConstStmt& other) -> ConstStmt& = default;
+    ConstStmt(Token* identifier, Expr* expr);
+    ConstStmt(ConstStmt& source) = default;
+    auto operator = (ConstStmt& other) -> ConstStmt& = default;
 
 public:
     ~ConstStmt();
 
-    static auto create_object(const Token* identifier, const Expr* expr) -> ConstStmt*;
+    static auto create_object(Token* identifier, Expr* expr) -> ConstStmt*;
 
-    virtual auto accept(const StmtVisitor* visitor) const -> void override;
-    virtual auto type() const -> StmtType override;
+    virtual auto accept(StmtVisitor* visitor) -> void override;
+    virtual auto type() -> StmtType override;
 };
 
 
 // BlockStmt
 class BlockStmt : public Stmt {
 public:
-    std::vector<const Stmt*> statements;
+    std::vector<Stmt*> statements;
 
 private:
-    BlockStmt(const std::vector<const Stmt*>& statements);
-    BlockStmt(const BlockStmt& source) = default;
-    auto operator = (const BlockStmt& other) -> BlockStmt& = default;
+    BlockStmt(std::vector<Stmt*>& statements);
+    BlockStmt(BlockStmt& source) = default;
+    auto operator = (BlockStmt& other) -> BlockStmt& = default;
 
 public:
     ~BlockStmt();
 
-    static auto create_object(const std::vector<const Stmt*>& statements) -> BlockStmt*;
+    static auto create_object(std::vector<Stmt*>& statements) -> BlockStmt*;
 
-    virtual auto accept(const StmtVisitor* visitor) const -> void override;
-    virtual auto type() const -> StmtType override;
+    virtual auto accept(StmtVisitor* visitor) -> void override;
+    virtual auto type() -> StmtType override;
 };
 
 
 // IfStmt
 class IfStmt : public Stmt {
 public:
-    std::vector<std::pair<const Expr*, const Stmt*>> statements;
+    std::vector<std::pair<Expr*, Stmt*>> statements;
 
 private:
-    IfStmt(const std::vector<std::pair<const Expr*, const Stmt*>>& statements);
+    IfStmt(std::vector<std::pair<Expr*, Stmt*>>& statements);
 
 public:
     ~IfStmt();
 
-    static auto create_object(const std::vector<std::pair<const Expr*, const Stmt*>>& statements) -> IfStmt*;
+    static auto create_object(std::vector<std::pair<Expr*, Stmt*>>& statements) -> IfStmt*;
 
-    virtual auto accept(const StmtVisitor* visitor) const -> void override;
-    virtual auto type() const -> StmtType override;
+    virtual auto accept(StmtVisitor* visitor) -> void override;
+    virtual auto type() -> StmtType override;
 };
 
 
 // ForStmt
 class ForStmt : public Stmt {
 public:
-    const Expr* condition;
-    const Stmt* block_stmt;
+    Expr* condition;
+    Stmt* block_stmt;
 
 private:
-    ForStmt(const Expr* condition, const Stmt* block_stmt);
-    ForStmt(const ForStmt& source) = default;
-    auto operator = (const ForStmt& source) -> ForStmt& = default;
+    ForStmt(Expr* condition, Stmt* block_stmt);
+    ForStmt(ForStmt& source) = default;
+    auto operator = (ForStmt& source) -> ForStmt& = default;
 
 public:
     ~ForStmt();
 
-    static auto create_object(const Expr* condition, const Stmt* block_stmt) -> ForStmt*;
+    static auto create_object(Expr* condition, Stmt* block_stmt) -> ForStmt*;
 
-    virtual auto accept(const StmtVisitor* visitor) const -> void override;
-    virtual auto type() const -> StmtType override;
+    virtual auto accept(StmtVisitor* visitor) -> void override;
+    virtual auto type() -> StmtType override;
 };
 
 
 // BreakStmt
 class BreakStmt : public Stmt {
 public:
-    const uint32_t line;
+    uint32_t line;
 
 private:
-    BreakStmt(const uint32_t line);
+    BreakStmt(uint32_t line);
 
 public:
-    static auto create_object(const uint32_t line) -> BreakStmt*;
+    static auto create_object(uint32_t line) -> BreakStmt*;
 
-    virtual auto accept(const StmtVisitor* visitor) const -> void override;
-    virtual auto type() const -> StmtType override;
+    virtual auto accept(StmtVisitor* visitor) -> void override;
+    virtual auto type() -> StmtType override;
 };
 
 
 // ContinueStmt
 class ContinueStmt : public Stmt {
 public:
-    const uint32_t line;
-    const Expr* step_expr;  // ContinueStmt is not responsible to deallocate the memory for 'step_expr'
+    uint32_t line;
+    Expr* step_expr;  // ContinueStmt is not responsible to deallocate the memory for 'step_expr'
 
 private:
-    ContinueStmt(const uint32_t line, const Expr* step_expr);
-    ContinueStmt(const ContinueStmt& source) = default;
-    auto operator = (const ContinueStmt&) -> ContinueStmt& { return *this; };
+    ContinueStmt(uint32_t line, Expr* step_expr);
+    ContinueStmt(ContinueStmt& source) = default;
+    auto operator = (ContinueStmt&) -> ContinueStmt& { return *this; };
 
 public:
-    static auto create_object(const uint32_t line, const Expr* step_expr) -> ContinueStmt*;
+    static auto create_object(uint32_t line, Expr* step_expr) -> ContinueStmt*;
 
-    virtual auto accept(const StmtVisitor* visitor) const -> void override;
-    virtual auto type() const -> StmtType override;
+    virtual auto accept(StmtVisitor* visitor) -> void override;
+    virtual auto type() -> StmtType override;
 };
 
 
 // ReturnStmt
 class ReturnStmt : public Stmt {
 public:
-    const Token* token;
-    const Expr* value;
+    Token* token;
+    Expr* value;
 
 private:
-    ReturnStmt(const Token* token, const Expr* value);
-    ReturnStmt(const ReturnStmt& source) = default;
-    auto operator = (const ReturnStmt& other) -> ReturnStmt& = default;
+    ReturnStmt(Token* token, Expr* value);
+    ReturnStmt(ReturnStmt& source) = default;
+    auto operator = (ReturnStmt& other) -> ReturnStmt& = default;
 
 public:
     ~ReturnStmt();
-    static auto create_object(const Token* token, const Expr* value) -> ReturnStmt*;
+    static auto create_object(Token* token, Expr* value) -> ReturnStmt*;
 
-    virtual auto accept(const StmtVisitor* visitor) const -> void override;
-    virtual auto type() const -> StmtType override;
+    virtual auto accept(StmtVisitor* visitor) -> void override;
+    virtual auto type() -> StmtType override;
 };
 
 
@@ -259,18 +259,18 @@ public:
 class StmtVisitor {
 public:
     virtual ~StmtVisitor() = default;
-    virtual auto execute(const std::vector<const Stmt*>& statements) const -> void = 0;
-    virtual auto visit_printstmt(const PrintStmt* stmt) const -> void = 0;
-    virtual auto visit_printlnstmt(const PrintlnStmt* stmt) const -> void = 0;
-    virtual auto visit_expressionstmt(const ExpressionStmt* stmt) const -> void = 0;
-    virtual auto visit_varstmt(const VarStmt* stmt) const -> void = 0;
-    virtual auto visit_conststmt(const ConstStmt* stmt) const -> void = 0;
-    virtual auto visit_blockstmt(const BlockStmt* stmt, Environment* environment) -> void = 0;
-    virtual auto visit_ifstmt(const IfStmt* stmt) const -> void = 0;
-    virtual auto visit_forstmt(const ForStmt* stmt) -> void = 0;
-    virtual auto visit_breakstmt(const BreakStmt* stmt) const -> void = 0;
-    virtual auto visit_continuestmt(const ContinueStmt* stmt) const -> void = 0;
-    virtual auto visit_returnstmt(const ReturnStmt* stmt) const -> void = 0;
+    virtual auto execute(std::vector<Stmt*>& statements) -> void = 0;
+    virtual auto visit_printstmt(PrintStmt* stmt) -> void = 0;
+    virtual auto visit_printlnstmt(PrintlnStmt* stmt) -> void = 0;
+    virtual auto visit_expressionstmt(ExpressionStmt* stmt) -> void = 0;
+    virtual auto visit_varstmt(VarStmt* stmt) -> void = 0;
+    virtual auto visit_conststmt(ConstStmt* stmt) -> void = 0;
+    virtual auto visit_blockstmt(BlockStmt* stmt, Environment* environment) -> void = 0;
+    virtual auto visit_ifstmt(IfStmt* stmt) -> void = 0;
+    virtual auto visit_forstmt(ForStmt* stmt) -> void = 0;
+    virtual auto visit_breakstmt(BreakStmt* stmt) -> void = 0;
+    virtual auto visit_continuestmt(ContinueStmt* stmt) -> void = 0;
+    virtual auto visit_returnstmt(ReturnStmt* stmt) -> void = 0;
 };
 
 

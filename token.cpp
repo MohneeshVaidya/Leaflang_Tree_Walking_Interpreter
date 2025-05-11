@@ -15,30 +15,30 @@ auto Token::create_object(TokenType type, const std::string& lexeme, uint32_t li
     return new Token { type, lexeme, line };
 }
 
-auto Token::create_object(const Token& source) -> Token* {
+auto Token::create_object(Token& source) -> Token* {
     return create_object(source.type(), source.lexeme(), source.line());
 }
 
-auto Token::delete_object(const Token* object) -> void {
+auto Token::delete_object(Token* object) -> void {
     delete object;
     object = nullptr;
 }
 
 // Getters
 
-auto Token::type() const -> TokenType {
+auto Token::type() -> TokenType {
     return m_type;
 }
 
-auto Token::lexeme() const -> const std::string& {
+auto Token::lexeme() -> const std::string& {
     return m_lexeme;
 }
 
-auto Token::line() const -> uint32_t {
+auto Token::line() -> uint32_t {
     return m_line;
 }
 
-std::ostream& operator << (std::ostream& stream, const Token& token) {
+std::ostream& operator << (std::ostream& stream, Token& token) {
     stream << "{\n";
     stream << "    type   : " << token.type() << "\n";
     stream << "    lexeme : " << token.lexeme() << "\n";

@@ -10,8 +10,8 @@
 
 class Tokenizer {
 private:
-    const std::string m_source { };
-    std::vector<const Token*> m_tokens { };
+    std::string m_source { };
+    std::vector<Token*> m_tokens { };
     uint32_t m_line { 1 };
     uint32_t m_current { 0 };
 
@@ -33,12 +33,12 @@ private:
     auto peek_character() -> char;
     auto match_character(std::initializer_list<char> characters) -> bool;
     auto gen_token(char character) -> void;
-    auto add_token(const TokenType type, const std::string& lexeme) -> void;
+    auto add_token(TokenType type, const std::string& lexeme) -> void;
     auto add_identifier_token(const std::string& identifier) -> void;
 
 public:
     // Getters
-    auto tokens() -> const std::vector<const Token*>&;
+    auto tokens() -> std::vector<Token*>&;
 
     // Public methods
     auto tokenize() -> Tokenizer&;

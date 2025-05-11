@@ -7,14 +7,14 @@
 
 
 // Private methods
-auto ExprPrinter::evaluate(const Expr* expr) const -> LeafObject* {
+auto ExprPrinter::evaluate(Expr* expr) -> LeafObject* {
     return expr->accept(this);
 }
 
 
 // Public methods
-auto ExprPrinter::execute(const std::vector<const Expr*>& expressions) const -> LeafObject* {
-    for (const Expr* expr : expressions) {
+auto ExprPrinter::execute(std::vector<Expr*>& expressions) -> LeafObject* {
+    for (Expr* expr : expressions) {
         if (expr->type() != ExprType::k_null) {
             this->evaluate(expr);
             std::cout << "\n";
@@ -23,12 +23,12 @@ auto ExprPrinter::execute(const std::vector<const Expr*>& expressions) const -> 
     return nullptr;
 }
 
-auto ExprPrinter::visit_nullexpr([[maybe_unused]] const NullExpr* expr) const -> LeafObject* {
+auto ExprPrinter::visit_nullexpr([[maybe_unused]] NullExpr* expr) -> LeafObject* {
     std::cout << "() ";
     return nullptr;
 }
 
-auto ExprPrinter::visit_ternaryexpr([[maybe_unused]] const TernaryExpr* expr) const -> LeafObject* {
+auto ExprPrinter::visit_ternaryexpr([[maybe_unused]] TernaryExpr* expr) -> LeafObject* {
     std::cout << "( ";
     evaluate(expr->condition);
     std::cout << "? ";
@@ -39,7 +39,7 @@ auto ExprPrinter::visit_ternaryexpr([[maybe_unused]] const TernaryExpr* expr) co
     return nullptr;
 }
 
-auto ExprPrinter::visit_binaryexpr(const BinaryExpr* expr) const -> LeafObject* {
+auto ExprPrinter::visit_binaryexpr(BinaryExpr* expr) -> LeafObject* {
     std::cout << std::format("( {} ", expr->oper->lexeme());
     evaluate(expr->left);
     evaluate(expr->right);
@@ -47,26 +47,26 @@ auto ExprPrinter::visit_binaryexpr(const BinaryExpr* expr) const -> LeafObject* 
     return nullptr;
 }
 
-auto ExprPrinter::visit_unaryexpr(const UnaryExpr* expr) const -> LeafObject* {
+auto ExprPrinter::visit_unaryexpr(UnaryExpr* expr) -> LeafObject* {
     std::cout << std::format("( {} ", expr->oper->lexeme());
     evaluate(expr->operand);
     std::cout << ") ";
     return nullptr;
 }
-auto ExprPrinter::visit_exponentexpr(const ExponentExpr* expr) const -> LeafObject* {
+auto ExprPrinter::visit_exponentexpr(ExponentExpr* expr) -> LeafObject* {
     std::cout << "( ** ";
     evaluate(expr->left);
     evaluate(expr->right);
     std::cout << ") ";
     return nullptr;
 }
-auto ExprPrinter::visit_groupingexpr(const GroupingExpr* expr) const -> LeafObject* {
+auto ExprPrinter::visit_groupingexpr(GroupingExpr* expr) -> LeafObject* {
     std::cout << "( ";
     evaluate(expr->expression);
     std::cout << ") ";
     return nullptr;
 }
-auto ExprPrinter::visit_primaryexpr(const PrimaryExpr* expr) const -> LeafObject* {
+auto ExprPrinter::visit_primaryexpr(PrimaryExpr* expr) -> LeafObject* {
     std::cout << expr->token->lexeme() << " ";
     return nullptr;
 }

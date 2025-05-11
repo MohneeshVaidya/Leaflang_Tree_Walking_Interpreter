@@ -1,15 +1,21 @@
-const User = struct {
-    var fullname;
-    var username;
-    var email;
-    var password;
-    var age;
+struct User {
+    fullname;
+    username;
+    email;
+    password;
+    age;
+
+    __construct() {
+    }
 };
 
-User.__construct = function (fullname, username, email, password, age) {
-    this.fullname = fullname;
-    this.username = username;
-    this.email    = email;
-    this.password = password;
-    this.age      = age;
-};
+const user = User();
+println user;
+
+user.fullname = "Mohneesh Vaidya";
+user.username = "Warrior_Vegito";
+user.email    = "warrior.vegito.007@gmail.com";
+user.password = "warrior_vegito_is_great";
+user.age      = 26;
+
+println user;

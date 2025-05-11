@@ -7,39 +7,47 @@
 #include <string>
 #include <unordered_map>
 
+// Forwared declaration
+class LeafFunction;
+
 class Environment {
 private:
     Environment* m_parent { nullptr };
     bool m_is_closure { false };
 
-    std::unordered_map<std::string, const LeafObject*> m_var_table { };
-    std::unordered_map<std::string, const LeafObject*> m_const_table { };
+    std::unordered_map<std::string, LeafObject*> m_var_table { };
+    std::unordered_map<std::string, LeafObject*> m_const_table { };
+    std::unordered_map<std::string,
+        std::unordered_map<std::string, LeafFunction*>> m_metaclass { };
 
     Environment() = default;
     Environment(Environment* parent);
-    Environment(const Environment& source) = default;
-    auto operator = (const Environment& other) -> Environment& = default;
+    Environment(Environment& source) = default;
+    auto operator = (Environment& other) -> Environment& = default;
 
-    auto has_name(const std::string& name) const -> bool;
-    auto assign(Environment* environment, const Token* name, const LeafObject* value) -> void;
-    auto get(const Environment* environment, const Token* name) const -> const LeafObject*;
-    auto get_qualifier(const Environment* environment, const Token* name) const -> std::string;
+    auto has_name(const std::string& name) -> bool;
+    auto assign(Environment* environment, Token* name, LeafObject* value) -> void;
+    auto get(Environment* environment, Token* name) -> LeafObject*;
+    auto get_qualifier(Environment* environment, Token* name) -> std::string;
 
 public:
     static auto create_object() -> Environment*;
     static auto create_object(Environment* parent) -> Environment*;
-    static auto delete_object(const Environment* object) -> void;
+    static auto delete_object(Environment* object) -> void;
 
-    static auto get_closure(const Environment* environment) -> Environment*;
+    static auto get_closure(Environment* environment) -> Environment*;
 
-    auto parent() const -> Environment*;
+    auto parent() -> Environment*;
     auto set_parent(Environment* parent) -> void;
     auto make_closure() -> Environment*;
-    auto insert_var(const Token* name, const LeafObject* value) -> void;
-    auto insert_const(const Token* name, const LeafObject* value) -> void;
-    auto assign(const Token* name, const LeafObject* value) -> void;
-    auto get(const Token* name) const -> const LeafObject*;
-    auto get_qualifier(const Token* name) const -> std::string;
+    auto insert_var(Token* name, LeafObject* value) -> void;
+    auto insert_const(Token* name, LeafObject* value) -> void;
+    auto assign(Token* name, LeafObject* value) -> void;
+    auto get(Token* name) -> LeafObject*;
+    auto get_qualifier(Token* name) -> std::string;
+
+    auto metaclass_add_method(Token* struct_name, const std::string& method_name, LeafFunction* method) -> void;
+    auto metaclass_get_method(Token* struct_name, const std::string& method_name) -> LeafFunction*;
 };
 
 #endif

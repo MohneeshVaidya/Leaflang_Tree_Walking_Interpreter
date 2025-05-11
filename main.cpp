@@ -20,7 +20,7 @@ auto run_file(const std::string& filepath) -> void;
 auto run(const std::string& source) -> void;
 
 auto print_errors() -> void;
-auto print_tokens(const std::vector<const Token*>& tokens) -> void;
+auto print_tokens(std::vector<Token*>& tokens) -> void;
 
 auto cleanup() -> void;
 
@@ -81,12 +81,12 @@ auto run_file(const std::string& filepath) -> void {
 
 auto run(const std::string& source) -> void {
     Tokenizer tokenizer { source };
-    std::vector<const Token*> tokens { tokenizer.tokenize().tokens() };
+    std::vector<Token*> tokens { tokenizer.tokenize().tokens() };
 
     print_errors();
 
     Parser parser { tokens };
-    const std::vector<const Stmt*> statements { parser.parse().statements() };
+    std::vector<Stmt*> statements { parser.parse().statements() };
 
     print_errors();
 
@@ -96,7 +96,7 @@ auto run(const std::string& source) -> void {
     try {
         Interpreter interpreter { Environment::create_object(nullptr) };
         interpreter.execute(statements);
-    } catch (std::string& runtime_error) {
+    } catch (const std::string& runtime_error) {
         std::cerr << runtime_error << "\n";
         std::exit(1);
     }
@@ -111,8 +111,8 @@ auto print_errors() -> void {
     }
 }
 
-auto print_tokens(const std::vector<const Token*>& tokens) -> void {
-    for (const Token* token : tokens) {
+auto print_tokens(std::vector<Token*>& tokens) -> void {
+    for (Token* token : tokens) {
         std::cout << *token << "\n";
     }
 }

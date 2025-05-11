@@ -15,7 +15,7 @@ Tokenizer::Tokenizer(const std::string& source) :
     }
 
 Tokenizer::~Tokenizer() {
-    for (const Token* token : m_tokens) {
+    for (Token* token : m_tokens) {
         Token::delete_object(token);
     }
 }
@@ -261,7 +261,7 @@ auto Tokenizer::gen_token(char character) -> void {
     }
 }
 
-auto Tokenizer::add_token(const TokenType type, const std::string& lexeme) -> void {
+auto Tokenizer::add_token(TokenType type, const std::string& lexeme) -> void {
     m_tokens.emplace_back(Token::create_object(type, lexeme, m_line));
 }
 
@@ -294,6 +294,8 @@ auto Tokenizer::add_identifier_token(const std::string& identifier) -> void {
         m_tokens.push_back(Token::create_object(k_return, identifier, m_line));
     } else if (identifier == "struct") {
         m_tokens.push_back(Token::create_object(k_struct, identifier, m_line));
+    } else if (identifier == "__construct") {
+        m_tokens.push_back(Token::create_object(k_construct, identifier, m_line));
     } else if (identifier == "extends") {
         m_tokens.push_back(Token::create_object(k_extends, identifier, m_line));
     } else if (identifier == "this") {
@@ -319,7 +321,7 @@ auto Tokenizer::add_identifier_token(const std::string& identifier) -> void {
 
 
 // Getters
-auto Tokenizer::tokens() -> const std::vector<const Token*>& {
+auto Tokenizer::tokens() -> std::vector<Token*>& {
     return m_tokens;
 }
 

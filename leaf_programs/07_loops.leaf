@@ -16,3 +16,14 @@ for {
     print "\t";
     i = i + 1;
 }
+
+const value = function (a) {
+    return function (b) {
+        return function (c) {
+            return (a * (b) - c);
+        };
+    };
+}
+(10)(20)(30);
+
+println value;

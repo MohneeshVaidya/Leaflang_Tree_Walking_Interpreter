@@ -8,7 +8,8 @@
 #include <cstdint>
 
 // FunctionExpr
-FunctionExpr::FunctionExpr(const std::vector<const Token*>& parameters, const Stmt* block_stmt) :
+FunctionExpr::FunctionExpr(Token* identifier, std::vector<Token*>& parameters, Stmt* block_stmt) :
+    identifier { identifier },
     parameters { parameters },
     block_stmt { block_stmt }
     {
@@ -18,28 +19,28 @@ FunctionExpr::~FunctionExpr() {
     Stmt::delete_object(block_stmt);
 }
 
-auto FunctionExpr::create_object(const std::vector<const Token*>& parameters, const Stmt* block_stmt) -> FunctionExpr* {
-    return new FunctionExpr { parameters, block_stmt };
+auto FunctionExpr::create_object(Token* identifier, std::vector<Token*>& parameters, Stmt* block_stmt) -> FunctionExpr* {
+    return new FunctionExpr { identifier, parameters, block_stmt };
 }
 
-auto FunctionExpr::accept(const ExprVisitor* visitor) const -> LeafObject* {
+auto FunctionExpr::accept(ExprVisitor* visitor) -> LeafObject* {
     return visitor->visit_functionexpr(this);
 }
 
-auto FunctionExpr::type() const -> ExprType {
+auto FunctionExpr::type() -> ExprType {
     return ExprType::k_function;
 }
 
 
 // CallExpr
-CallExpr::CallExpr(const Token* identifier, const std::vector<const Expr*>& arguments) :
+CallExpr::CallExpr(Token* identifier, std::vector<Expr*>& arguments) :
     identifier { identifier },
     expr { nullptr },
     arguments { arguments }
     {
     }
 
-CallExpr::CallExpr(const Expr* expr, const std::vector<const Expr*>& arguments) :
+CallExpr::CallExpr(Expr* expr, std::vector<Expr*>& arguments) :
     identifier { nullptr },
     expr { expr },
     arguments { arguments }
@@ -48,30 +49,30 @@ CallExpr::CallExpr(const Expr* expr, const std::vector<const Expr*>& arguments) 
 
 CallExpr::~CallExpr() {
     Expr::delete_object(expr);
-    for (const Expr* expr : arguments) {
+    for (Expr* expr : arguments) {
         Expr::delete_object(expr);
     }
 }
 
-auto CallExpr::create_object(const Token* identifier, const std::vector<const Expr*>& arguments) -> CallExpr* {
+auto CallExpr::create_object(Token* identifier, std::vector<Expr*>& arguments) -> CallExpr* {
     return new CallExpr { identifier, arguments };
 }
 
-auto CallExpr::create_object(const Expr* expr, const std::vector<const Expr*>& arguments) -> CallExpr* {
+auto CallExpr::create_object(Expr* expr, std::vector<Expr*>& arguments) -> CallExpr* {
     return new CallExpr { expr, arguments };
 }
 
-auto CallExpr::accept(const ExprVisitor* visitor) const -> LeafObject* {
+auto CallExpr::accept(ExprVisitor* visitor) -> LeafObject* {
     return const_cast<ExprVisitor*>(visitor)->visit_callexpr(this);
 }
 
-auto CallExpr::type() const -> ExprType {
+auto CallExpr::type() -> ExprType {
     return ExprType::k_call;
 }
 
 
 // LeafFunction
-LeafFunction::LeafFunction(const std::vector<const Token*>& parameters, const Stmt* block_stmt, Environment* closure) :
+LeafFunction::LeafFunction(std::vector<Token*>& parameters, Stmt* block_stmt, Environment* closure) :
     LeafObject { nullptr },
     parameters { parameters},
     block_stmt { block_stmt },
@@ -83,19 +84,19 @@ LeafFunction::~LeafFunction() {
     delete closure;
 }
 
-auto LeafFunction::create_object(const std::vector<const Token*>& parameters, const Stmt* block_stmt, Environment* closure) -> LeafFunction* {
+auto LeafFunction::create_object(std::vector<Token*>& parameters, Stmt* block_stmt, Environment* closure) -> LeafFunction* {
     return new LeafFunction { parameters, block_stmt, closure };
 }
 
-auto LeafFunction::type() const -> ObjectType {
+auto LeafFunction::type() -> ObjectType {
     return ObjectType::k_function;
 }
 
-auto LeafFunction::is_truthy() const -> bool {
+auto LeafFunction::is_truthy() -> bool {
     return true;
 }
 
-auto LeafFunction::call(const std::vector<const Expr*>& arguments, Interpreter* interpreter) -> LeafObject* {
+auto LeafFunction::call(std::vector<Expr*>& arguments, Interpreter* interpreter) -> LeafObject* {
     Environment* environment { Environment::create_object() };
 
     for (uint32_t i { 0 }; i < parameters.size(); i++) {
@@ -103,15 +104,18 @@ auto LeafFunction::call(const std::vector<const Expr*>& arguments, Interpreter* 
             parameters.at(i), interpreter->evaluate(arguments.at(i)));
     }
 
-    Environment* environment_snapshot { interpreter->m_environment };
+    Environment* previous_envioronment { interpreter->m_environment };
     interpreter->m_environment = closure;
 
     try {
-        interpreter->visit_blockstmt(dynamic_cast<const BlockStmt*>(block_stmt), environment);
-        interpreter->m_environment = environment_snapshot;
+        interpreter->visit_blockstmt(dynamic_cast<BlockStmt*>(block_stmt), environment);
+        interpreter->m_environment = previous_envioronment;
+        if (interpreter->m_called_ctx == CalledCtx::k_constructor) {
+            return interpreter->m_current_instance;
+        }
         return LeafNull::create_object();
     } catch (LeafObject* return_value) {
-        interpreter->m_environment = environment_snapshot;
+        interpreter->m_environment = previous_envioronment;
         return return_value;
     }
 }

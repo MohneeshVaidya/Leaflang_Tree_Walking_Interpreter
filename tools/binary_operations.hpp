@@ -10,12 +10,12 @@
 #include <unordered_map>
 
 using ReturnType = LeafObject*;
-using OperandType = const LeafObject*;
+using OperandType = LeafObject*;
 using OperationsTableType = std::unordered_map<TokenType, std::function<ReturnType(OperandType, OperandType)>>;
 
 class BinaryOperations {
 private:
-    static const BinaryOperations* m_instance;
+    static BinaryOperations* m_instance;
 
 private:
     OperationsTableType m_operations_table { };
@@ -24,14 +24,14 @@ private:
     BinaryOperations();
 
     // Private methods
-    auto expect_same_type(OperandType left, OperandType right) const -> void;
-    auto expect_type(ObjectType type, std::initializer_list<ObjectType> expected) const -> void;
+    auto expect_same_type(OperandType left, OperandType right) -> void;
+    auto expect_type(ObjectType type, std::initializer_list<ObjectType> expected) -> void;
 
 public:
-    static auto instance() -> const BinaryOperations*;
+    static auto instance() -> BinaryOperations*;
     static auto delete_instance() -> void;
 
-    auto execute(const Token* oper, OperandType left, OperandType right) const -> ReturnType;
+    auto execute(Token* oper, OperandType left, OperandType right) -> ReturnType;
 };
 
 enum class ErrorCode {

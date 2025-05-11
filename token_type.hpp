@@ -19,6 +19,7 @@ enum class TokenType {
     k_function,
     k_return,
     k_struct,
+    k_construct,
     k_extends,
     k_this,
     k_super,

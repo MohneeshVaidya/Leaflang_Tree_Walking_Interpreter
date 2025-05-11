@@ -8,17 +8,17 @@
 
 class ExprPrinter : public ExprVisitor {
 private:
-    auto evaluate(const Expr* expr) const -> LeafObject*;
+    auto evaluate(Expr* expr) -> LeafObject*;
 
 public:
-    virtual auto execute(const std::vector<const Expr*>& expressions) const -> LeafObject* override;
-    virtual auto visit_nullexpr(const NullExpr* expr) const -> LeafObject* override;
-    virtual auto visit_ternaryexpr(const TernaryExpr* expr) const -> LeafObject* override;
-    virtual auto visit_binaryexpr(const BinaryExpr* expr) const -> LeafObject* override;
-    virtual auto visit_unaryexpr(const UnaryExpr* expr) const -> LeafObject* override;
-    virtual auto visit_exponentexpr(const ExponentExpr* expr) const -> LeafObject* override;
-    virtual auto visit_groupingexpr(const GroupingExpr* expr) const -> LeafObject* override;
-    virtual auto visit_primaryexpr(const PrimaryExpr* expr) const -> LeafObject* override;
+    virtual auto execute(std::vector<Expr*>& expressions) -> LeafObject* override;
+    virtual auto visit_nullexpr(NullExpr* expr) -> LeafObject* override;
+    virtual auto visit_ternaryexpr(TernaryExpr* expr) -> LeafObject* override;
+    virtual auto visit_binaryexpr(BinaryExpr* expr) -> LeafObject* override;
+    virtual auto visit_unaryexpr(UnaryExpr* expr) -> LeafObject* override;
+    virtual auto visit_exponentexpr(ExponentExpr* expr) -> LeafObject* override;
+    virtual auto visit_groupingexpr(GroupingExpr* expr) -> LeafObject* override;
+    virtual auto visit_primaryexpr(PrimaryExpr* expr) -> LeafObject* override;
 };
 
 #endif

@@ -12,17 +12,17 @@
 
 class Parser {
 private:
-    std::vector<const Stmt*> m_statements { };
-    const std::vector<const Token*>& m_tokens { };
+    std::vector<Stmt*> m_statements { };
+    const std::vector<Token*>& m_tokens { };
     uint32_t m_current { 0 };
-    std::stack<const Expr*> stack { };  // Will be used to store step_statements for continue_statements in for loops.
+    std::stack<Expr*> stack { };  // Will be used to store step_statements for continue_statements in for loops.
 
 public:
-    Parser(const std::vector<const Token*>& tokens);
+    Parser(std::vector<Token*>& tokens);
     ~Parser();
 
     // Public methods
-    auto statements() const -> const std::vector<const Stmt*>&;
+    auto statements() -> std::vector<Stmt*>&;
     auto parse() -> Parser&;
 
 private:
@@ -30,46 +30,52 @@ private:
     auto is_at_end() -> bool;
     auto move_current_left() -> void;
     auto move_current_right() -> void;
-    auto get_token() -> const Token*;
-    auto peek_token() -> const Token*;
-    auto peek_prev_token() -> const Token*;
+    auto get_token() -> Token*;
+    auto peek_token() -> Token*;
+    auto peek_prev_token() -> Token*;
+    auto peek_next_token() -> Token*;
     auto match_token(std::initializer_list<TokenType> types) -> bool;
     auto match_prev_token(std::initializer_list<TokenType> types) -> bool;
-    auto expect_token(TokenType type, const std::string& message) -> const Token*;
-    auto for_helper() -> const Stmt*;
+    auto match_next_token(std::initializer_list<TokenType> types) -> bool;
+    auto expect_token(TokenType type, const std::string& message) -> Token*;
+    auto for_helper() -> Stmt*;
+    auto struct_field_helper(std::vector<Token*>& fields) -> void;
+    auto struct_method_helper(std::vector<FunctionExpr*>& methods) -> void;
     auto synchronize() -> void;
 
     // Private methods
-    auto top_statement() -> const Stmt*;
-    auto statement() -> const Stmt*;
-    auto varstmt() -> const Stmt*;
-    auto conststmt() -> const Stmt*;
-    auto printstmt() -> const Stmt*;
-    auto printlnstmt() -> const Stmt*;
-    auto expressionstmt() -> const Stmt*;
-    auto blockstmt() -> const Stmt*;
-    auto ifstmt() -> const Stmt*;
-    auto forstmt() -> const Stmt*;
-    auto breakstmt() -> const Stmt*;
-    auto continuestmt() -> const Stmt*;
-    auto returnstmt() -> const Stmt*;
+    auto top_statement() -> Stmt*;
+    auto statement() -> Stmt*;
+    auto varstmt() -> Stmt*;
+    auto conststmt() -> Stmt*;
+    auto printstmt() -> Stmt*;
+    auto printlnstmt() -> Stmt*;
+    auto expressionstmt() -> Stmt*;
+    auto blockstmt() -> Stmt*;
+    auto ifstmt() -> Stmt*;
+    auto forstmt() -> Stmt*;
+    auto breakstmt() -> Stmt*;
+    auto continuestmt() -> Stmt*;
+    auto returnstmt() -> Stmt*;
 
-    auto expression() -> const Expr*;
-    auto assign() -> const Expr*;
-    auto ternary() -> const Expr*;
-    auto or_expr() -> const Expr*;
-    auto and_expr() -> const Expr*;
-    auto equality() -> const Expr*;
-    auto comparision() -> const Expr*;
-    auto term() -> const Expr*;
-    auto factor() -> const Expr*;
-    auto unary() -> const Expr*;
-    auto exponent() -> const Expr*;
-    auto call(const Token* identifier) -> const Expr*;
-    auto call(const Expr* expr) -> const Expr*;
-    auto grouping() -> const Expr*;
-    auto primary() -> const Expr*;
-    auto function() -> const Expr*;
+    auto expression() -> Expr*;
+    auto assign() -> Expr*;
+    auto ternary() -> Expr*;
+    auto or_expr() -> Expr*;
+    auto and_expr() -> Expr*;
+    auto equality() -> Expr*;
+    auto comparision() -> Expr*;
+    auto term() -> Expr*;
+    auto factor() -> Expr*;
+    auto unary() -> Expr*;
+    auto exponent() -> Expr*;
+    auto get(Expr* left_expr) -> Expr*;
+    auto call(Token* identifier) -> Expr*;
+    auto call(Expr* expr) -> Expr*;
+    auto grouping() -> Expr*;
+    auto primary() -> Expr*;
+    auto function(Token* identifier) -> Expr*;
+    auto structexpr() -> Expr*;
 };
 
 #endif

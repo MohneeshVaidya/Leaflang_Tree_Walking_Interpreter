@@ -15,14 +15,14 @@ auto Environment::create_object(Environment* parent) -> Environment* {
     return new Environment { parent };
 }
 
-auto Environment::delete_object(const Environment* object) -> void {
+auto Environment::delete_object(Environment* object) -> void {
     if (object->m_is_closure == false) {
         delete object;
     }
 }
 
-auto Environment::get_closure(const Environment* environment) -> Environment* {
-    const Environment* curr_environment { environment };
+auto Environment::get_closure(Environment* environment) -> Environment* {
+    Environment* curr_environment { environment };
     Environment* closure { create_object() };
 
     while (curr_environment) {
@@ -46,14 +46,14 @@ Environment::Environment(Environment* parent) :
     {
     }
 
-auto Environment::has_name(const std::string& name) const -> bool {
+auto Environment::has_name(const std::string& name) -> bool {
     return (
         m_var_table.contains(name) ||
         m_const_table.contains(name)
     );
 }
 
-auto Environment::assign(Environment* environment, const Token* name, const LeafObject* value) -> void {
+auto Environment::assign(Environment* environment, Token* name, LeafObject* value) -> void {
     if (environment->m_var_table.contains(name->lexeme())) {
         environment->m_var_table.insert_or_assign(name->lexeme(), value);
         return;
@@ -75,7 +75,7 @@ auto Environment::assign(Environment* environment, const Token* name, const Leaf
     );
 }
 
-auto Environment::get(const Environment* environment, const Token* name) const -> const LeafObject* {
+auto Environment::get(Environment* environment, Token* name) -> LeafObject* {
     if (environment->m_var_table.contains(name->lexeme())) {
         return environment->m_var_table.at(name->lexeme());
     }
@@ -96,7 +96,7 @@ auto Environment::get(const Environment* environment, const Token* name) const -
     return nullptr;
 }
 
-auto Environment::get_qualifier(const Environment* environment, const Token* name) const -> std::string {
+auto Environment::get_qualifier(Environment* environment, Token* name) -> std::string {
     if (environment->m_var_table.contains(name->lexeme())) {
         return "var"s;
     }
@@ -113,7 +113,7 @@ auto Environment::get_qualifier(const Environment* environment, const Token* nam
 }
 
 
-auto Environment::parent() const -> Environment* {
+auto Environment::parent() -> Environment* {
     return m_parent;
 }
 
@@ -126,7 +126,7 @@ auto Environment::make_closure() -> Environment* {
     return this;
 }
 
-auto Environment::insert_var(const Token* name, const LeafObject* value) -> void {
+auto Environment::insert_var(Token* name, LeafObject* value) -> void {
     if (has_name(name->lexeme())) {
         LeafError::instance()->runtime_error(
             name->line(),
@@ -136,7 +136,7 @@ auto Environment::insert_var(const Token* name, const LeafObject* value) -> void
     m_var_table.insert(std::make_pair(name->lexeme(), value));
 }
 
-auto Environment::insert_const(const Token* name, const LeafObject* value) -> void {
+auto Environment::insert_const(Token* name, LeafObject* value) -> void {
     if (has_name(name->lexeme())) {
         LeafError::instance()->runtime_error(
             name->line(),
@@ -146,15 +146,33 @@ auto Environment::insert_const(const Token* name, const LeafObject* value) -> vo
     m_const_table.insert(std::make_pair(name->lexeme(), value));
 }
 
-auto Environment::assign(const Token* name, const LeafObject* value) -> void {
+auto Environment::assign(Token* name, LeafObject* value) -> void {
     assign(this, name, value);
 }
 
-auto Environment::get(const Token* name) const -> const LeafObject* {
+auto Environment::get(Token* name) -> LeafObject* {
     return get(this, name);
 }
 
-auto Environment::get_qualifier(const Token* name) const -> std::string {
+auto Environment::get_qualifier(Token* name) -> std::string {
     return get_qualifier(this, name);
 }
 
+
+auto Environment::metaclass_add_method(Token* struct_name, const std::string& method_name, LeafFunction* method) -> void {
+    if (m_metaclass.contains(struct_name->lexeme()) == false) {
+        m_metaclass.insert_or_assign(struct_name->lexeme(),
+                                     std::unordered_map<std::string, LeafFunction*>{ });
+    }
+    m_metaclass.at(struct_name->lexeme()).insert_or_assign(method_name, method);
+}
+
+auto Environment::metaclass_get_method(Token* struct_name, const std::string& method_name) -> LeafFunction* {
+    if (m_metaclass.contains(struct_name->lexeme()) == false) {
+        return nullptr;
+    } else if (m_metaclass.at(struct_name->lexeme()).contains(method_name) == false) {
+        return nullptr;
+    } else {
+        return m_metaclass.at(struct_name->lexeme()).at(method_name);
+    }
+}

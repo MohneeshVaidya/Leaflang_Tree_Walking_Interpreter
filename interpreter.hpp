@@ -4,6 +4,7 @@
 #include "environment.hpp"
 #include "expr.hpp"
 #include "leaf_object.hpp"
+#include "leaf_struct.hpp"
 #include "stmt.hpp"
 
 #include <vector>
@@ -16,9 +17,11 @@ enum class BlockCtx {
 };
 
 // FunctionCtx
-enum class FunctionCtx {
+enum class CalledCtx {
     k_none,
     k_function,
+    k_constructor,
+    k_method,
 };
 
 
@@ -28,44 +31,49 @@ class Interpreter : public ExprVisitor, public StmtVisitor {
 
 private:
     Environment* m_environment { };
-    BlockCtx block_ctx { BlockCtx::k_none };
-    FunctionCtx func_ctx { FunctionCtx::k_none };
+    BlockCtx m_block_ctx { BlockCtx::k_none };
+    CalledCtx m_called_ctx { CalledCtx::k_none };
+    LeafStructInstance* m_current_instance { nullptr };
+    bool m_is_method { false };
 
-    auto execute_stmt(const Stmt* stmt) const -> void;
-    auto evaluate(const Expr* expr) const -> LeafObject*;
+    auto execute_stmt(Stmt* stmt) -> void;
+    auto evaluate(Expr* expr) -> LeafObject*;
 
-    auto operator = (const Interpreter& other) -> Interpreter& = default;
+    auto operator = (Interpreter& other) -> Interpreter& = default;
 
 public:
     Interpreter(Environment* environment);
-    Interpreter(const Interpreter& source) = default;
+    Interpreter(Interpreter& source) = default;
     ~Interpreter();
 
-    virtual auto execute(const std::vector<const Stmt*>& statements) const -> void override;
-    virtual auto execute(const std::vector<const Expr*>& expressions) const -> LeafObject* override;
+    virtual auto execute(std::vector<Stmt*>& statements) -> void override;
+    virtual auto execute(std::vector<Expr*>& expressions) -> LeafObject* override;
 
-    virtual auto visit_printstmt(const PrintStmt* stmt) const -> void override;
-    virtual auto visit_printlnstmt(const PrintlnStmt* stmt) const -> void override;
-    virtual auto visit_expressionstmt(const ExpressionStmt* stmt) const -> void override;
-    virtual auto visit_varstmt(const VarStmt* stmt) const -> void override;
-    virtual auto visit_conststmt(const ConstStmt* stmt) const -> void override;
-    virtual auto visit_blockstmt(const BlockStmt* stmt, Environment* environment) -> void override;
-    virtual auto visit_ifstmt(const IfStmt* stmt) const -> void override;
-    virtual auto visit_forstmt(const ForStmt* stmt) -> void override;
-    virtual auto visit_breakstmt(const BreakStmt* stmt) const -> void override;
-    virtual auto visit_continuestmt(const ContinueStmt* stmt) const -> void override;
-    virtual auto visit_returnstmt(const ReturnStmt* stmt) const -> void override;
+    virtual auto visit_printstmt(PrintStmt* stmt) -> void override;
+    virtual auto visit_printlnstmt(PrintlnStmt* stmt) -> void override;
+    virtual auto visit_expressionstmt(ExpressionStmt* stmt) -> void override;
+    virtual auto visit_varstmt(VarStmt* stmt) -> void override;
+    virtual auto visit_conststmt(ConstStmt* stmt) -> void override;
+    virtual auto visit_blockstmt(BlockStmt* stmt, Environment* environment) -> void override;
+    virtual auto visit_ifstmt(IfStmt* stmt) -> void override;
+    virtual auto visit_forstmt(ForStmt* stmt) -> void override;
+    virtual auto visit_breakstmt(BreakStmt* stmt) -> void override;
+    virtual auto visit_continuestmt(ContinueStmt* stmt) -> void override;
+    virtual auto visit_returnstmt(ReturnStmt* stmt) -> void override;
 
-    virtual auto visit_nullexpr(const NullExpr* expr) const -> LeafObject* override;
-    virtual auto visit_assignexpr(const AssignExpr* expr) const -> LeafObject* override;
-    virtual auto visit_ternaryexpr(const TernaryExpr* expr) const -> LeafObject* override;
-    virtual auto visit_binaryexpr(const BinaryExpr* expr) const -> LeafObject* override;
-    virtual auto visit_unaryexpr(const UnaryExpr* expr) const -> LeafObject* override;
-    virtual auto visit_exponentexpr(const ExponentExpr* expr) const -> LeafObject* override;
-    virtual auto visit_groupingexpr(const GroupingExpr* expr) const -> LeafObject* override;
-    virtual auto visit_primaryexpr(const PrimaryExpr* expr) const -> LeafObject* override;
-    virtual auto visit_functionexpr(const FunctionExpr* expr) const -> LeafObject* override;
-    virtual auto visit_callexpr(const CallExpr* expr) -> LeafObject* override;
+    virtual auto visit_nullexpr(NullExpr* expr) -> LeafObject* override;
+    virtual auto visit_assignexpr(AssignExpr* expr) -> LeafObject* override;
+    virtual auto visit_ternaryexpr(TernaryExpr* expr) -> LeafObject* override;
+    virtual auto visit_binaryexpr(BinaryExpr* expr) -> LeafObject* override;
+    virtual auto visit_unaryexpr(UnaryExpr* expr) -> LeafObject* override;
+    virtual auto visit_exponentexpr(ExponentExpr* expr) -> LeafObject* override;
+    virtual auto visit_groupingexpr(GroupingExpr* expr) -> LeafObject* override;
+    virtual auto visit_primaryexpr(PrimaryExpr* expr) -> LeafObject* override;
+    virtual auto visit_functionexpr(FunctionExpr* expr) -> LeafObject* override;
+    virtual auto visit_callexpr(CallExpr* expr) -> LeafObject* override;
+    virtual auto visit_structexpr(StructExpr* expr) -> LeafObject* override;
+    virtual auto visit_getexpr(GetExpr* expr) -> LeafObject* override;
+    virtual auto visit_setexpr(SetExpr* expr) -> LeafObject* override;
 };
 
 #endif

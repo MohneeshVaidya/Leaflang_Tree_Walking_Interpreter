@@ -13,99 +13,100 @@ enum class ObjectType {
     k_bool,
     k_identifier,
     k_function,
+    k_struct,
+    k_struct_instance,
 };
 
 
 // LeafObject classes
 class LeafObject {
 protected:
-    const Token* m_token;
+    Token* m_token;
 
-    LeafObject(const Token* token);
-    LeafObject(const LeafObject& source) = default;
+    LeafObject(Token* token);
+    LeafObject(LeafObject& source) = default;
+    auto operator = (LeafObject& other) -> LeafObject& = default;
 
 public:
-    static auto delete_object(const LeafObject* object) -> void;
+    static auto delete_object(LeafObject* object) -> void;
 
     virtual ~LeafObject();
-    virtual auto type() const -> ObjectType = 0;
-    virtual auto is_truthy() const -> bool = 0;
-
-    auto operator = (const LeafObject& other) -> LeafObject& = default;
+    virtual auto type() -> ObjectType = 0;
+    virtual auto is_truthy() -> bool = 0;
 };
 
-auto operator << (std::ostream& stream, const LeafObject* object) -> std::ostream&;
+auto operator << (std::ostream& stream, LeafObject* object) -> std::ostream&;
 
 
 // LeafNull
 class LeafNull : public LeafObject {
 private:
-    LeafNull(const Token* token);
+    LeafNull(Token* token);
     LeafNull();
 
 public:
-    static auto create_object(const Token* token) -> LeafNull*;
+    static auto create_object(Token* token) -> LeafNull*;
     static auto create_object() -> LeafNull*;
 
-    virtual auto type() const -> ObjectType override;
-    virtual auto is_truthy() const -> bool override;
+    virtual auto type() -> ObjectType override;
+    virtual auto is_truthy() -> bool override;
 };
 
 
 // LeafNumber
 class LeafNumber : public LeafObject {
 private:
-    const double m_value;
+    double m_value;
 
-    LeafNumber(const Token* token);
-    LeafNumber(const double value);
+    LeafNumber(Token* token);
+    LeafNumber(double value);
 
 public:
-    static auto create_object(const Token* token) -> LeafNumber*;
-    static auto create_object(const double value) -> LeafNumber*;
+    static auto create_object(Token* token) -> LeafNumber*;
+    static auto create_object(double value) -> LeafNumber*;
 
-    virtual auto type() const -> ObjectType override;
-    virtual auto is_truthy() const -> bool override;
+    virtual auto type() -> ObjectType override;
+    virtual auto is_truthy() -> bool override;
 
-    auto value() const -> double;
+    auto value() -> double;
 };
 
 
 // LeafString
 class LeafString : public LeafObject {
 private:
-    const std::string m_value;
+    std::string m_value;
 
-    LeafString(const Token* token);
+    LeafString(Token* token);
     LeafString(const std::string& value);
 
 public:
-    static auto create_object(const Token* token) -> LeafString*;
+    static auto create_object(Token* token) -> LeafString*;
     static auto create_object(const std::string& value) -> LeafString*;
 
-    virtual auto type() const -> ObjectType override;
-    virtual auto is_truthy() const-> bool override;
+    virtual auto type() -> ObjectType override;
+    virtual auto is_truthy() -> bool override;
 
-    auto value() const -> const std::string&;
+    auto value() -> std::string&;
 };
 
 
 // LeafBool
 class LeafBool : public LeafObject {
 private:
-    const bool m_value;
+    bool m_value;
 
-    LeafBool(const Token* token);
-    LeafBool(const bool value);
+    LeafBool(Token* token);
+    LeafBool(bool value);
 
 public:
-    static auto create_object(const Token* token) -> LeafBool*;
-    static auto create_object(const bool value) -> LeafBool*;
+    static auto create_object(Token* token) -> LeafBool*;
+    static auto create_object(bool value) -> LeafBool*;
 
-    virtual auto type() const -> ObjectType override;
-    virtual auto is_truthy() const-> bool override;
+    virtual auto type() -> ObjectType override;
+    virtual auto is_truthy() -> bool override;
 
-    auto value() const -> bool;
+    auto value() -> bool;
 };
 
 #endif

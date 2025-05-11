@@ -5,17 +5,17 @@
 
 
 // Stmt classes
-auto Stmt::delete_object(const Stmt* object) -> void {
+auto Stmt::delete_object(Stmt* object) -> void {
     delete object;
 }
 
 
 // PrintStmt
-auto PrintStmt::create_object(const Expr* expr) -> PrintStmt* {
+auto PrintStmt::create_object(Expr* expr) -> PrintStmt* {
     return new PrintStmt { expr };
 }
 
-PrintStmt::PrintStmt(const Expr* expr) :
+PrintStmt::PrintStmt(Expr* expr) :
     expr { expr }
     {
     }
@@ -24,21 +24,21 @@ PrintStmt::~PrintStmt() {
     Expr::delete_object(expr);
 }
 
-auto PrintStmt::accept(const StmtVisitor* visitor) const -> void {
+auto PrintStmt::accept(StmtVisitor* visitor) -> void {
     return visitor->visit_printstmt(this);
 }
 
-auto PrintStmt::type() const -> StmtType {
+auto PrintStmt::type() -> StmtType {
     return StmtType::k_print;
 }
 
 
 // PrintlnStmt
-auto PrintlnStmt::create_object(const Expr* expr) -> PrintlnStmt* {
+auto PrintlnStmt::create_object(Expr* expr) -> PrintlnStmt* {
     return new PrintlnStmt { expr };
 }
 
-PrintlnStmt::PrintlnStmt(const Expr* expr) :
+PrintlnStmt::PrintlnStmt(Expr* expr) :
     expr { expr }
     {
     }
@@ -47,21 +47,21 @@ PrintlnStmt::~PrintlnStmt() {
     Expr::delete_object(expr);
 }
 
-auto PrintlnStmt::accept(const StmtVisitor* visitor) const -> void {
+auto PrintlnStmt::accept(StmtVisitor* visitor) -> void {
     return visitor->visit_printlnstmt(this);
 }
 
-auto PrintlnStmt::type() const -> StmtType {
+auto PrintlnStmt::type() -> StmtType {
     return StmtType::k_print;
 }
 
 
 // ExpressionStmt
-auto ExpressionStmt::create_object(const Expr* expr) -> ExpressionStmt* {
+auto ExpressionStmt::create_object(Expr* expr) -> ExpressionStmt* {
     return new ExpressionStmt { expr };
 }
 
-ExpressionStmt::ExpressionStmt(const Expr* expr) :
+ExpressionStmt::ExpressionStmt(Expr* expr) :
     expr { expr }
     {
     }
@@ -70,21 +70,21 @@ ExpressionStmt::~ExpressionStmt() {
     Expr::delete_object(expr);
 }
 
-auto ExpressionStmt::accept(const StmtVisitor* visitor) const -> void {
+auto ExpressionStmt::accept(StmtVisitor* visitor) -> void {
     return visitor->visit_expressionstmt(this);
 }
 
-auto ExpressionStmt::type() const -> StmtType {
+auto ExpressionStmt::type() -> StmtType {
     return StmtType::k_expression;
 }
 
 
 // VarStmt
-auto VarStmt::create_object(const Token* identifier, const Expr* expr) -> VarStmt* {
+auto VarStmt::create_object(Token* identifier, Expr* expr) -> VarStmt* {
     return new VarStmt { identifier, expr };
 }
 
-VarStmt::VarStmt(const Token* identifier, const Expr* expr) :
+VarStmt::VarStmt(Token* identifier, Expr* expr) :
     identifier { Token::create_object(*identifier) },
     expr { expr }
     {
@@ -95,21 +95,21 @@ VarStmt::~VarStmt() {
     Expr::delete_object(expr);
 }
 
-auto VarStmt::accept(const StmtVisitor* visitor) const -> void {
+auto VarStmt::accept(StmtVisitor* visitor) -> void {
     return visitor->visit_varstmt(this);
 }
 
-auto VarStmt::type() const -> StmtType {
+auto VarStmt::type() -> StmtType {
     return StmtType::k_var;
 }
 
 
 // ConstStmt
-auto ConstStmt::create_object(const Token* identifier, const Expr* expr) -> ConstStmt* {
+auto ConstStmt::create_object(Token* identifier, Expr* expr) -> ConstStmt* {
     return new ConstStmt { identifier, expr };
 }
 
-ConstStmt::ConstStmt(const Token* identifier, const Expr* expr) :
+ConstStmt::ConstStmt(Token* identifier, Expr* expr) :
     identifier { Token::create_object(*identifier) },
     expr { expr }
     {
@@ -120,42 +120,42 @@ ConstStmt::~ConstStmt() {
     Expr::delete_object(expr);
 }
 
-auto ConstStmt::accept(const StmtVisitor* visitor) const -> void {
+auto ConstStmt::accept(StmtVisitor* visitor) -> void {
     return visitor->visit_conststmt(this);
 }
 
-auto ConstStmt::type() const -> StmtType {
+auto ConstStmt::type() -> StmtType {
     return StmtType::k_const;
 }
 
 
 // BlockStmt
-auto BlockStmt::create_object(const std::vector<const Stmt*>& statements) -> BlockStmt* {
+auto BlockStmt::create_object(std::vector<Stmt*>& statements) -> BlockStmt* {
     return new BlockStmt { statements };
 }
 
-BlockStmt::BlockStmt(const std::vector<const Stmt*>& statements) :
+BlockStmt::BlockStmt(std::vector<Stmt*>& statements) :
     statements { statements }
     {
     }
 
 BlockStmt::~BlockStmt() {
-    for (const Stmt* stmt :statements) {
+    for (Stmt* stmt :statements) {
         Stmt::delete_object(stmt);
     }
 }
 
-auto BlockStmt::accept(const StmtVisitor* visitor) const -> void {
+auto BlockStmt::accept(StmtVisitor* visitor) -> void {
     return const_cast<StmtVisitor*>(visitor)->visit_blockstmt(this, Environment::create_object());
 }
 
-auto BlockStmt::type() const -> StmtType {
+auto BlockStmt::type() -> StmtType {
     return StmtType::k_block;
 }
 
 
 // IfStmt
-IfStmt::IfStmt(const std::vector<std::pair<const Expr*, const Stmt*>>& statements) :
+IfStmt::IfStmt(std::vector<std::pair<Expr*, Stmt*>>& statements) :
     statements { statements }
     {
     }
@@ -167,21 +167,21 @@ IfStmt::~IfStmt() {
     }
 }
 
-auto IfStmt::create_object(const std::vector<std::pair<const Expr*, const Stmt*>>& statements) -> IfStmt* {
+auto IfStmt::create_object(std::vector<std::pair<Expr*, Stmt*>>& statements) -> IfStmt* {
     return new IfStmt { statements };
 }
 
-auto IfStmt::accept(const StmtVisitor* visitor) const -> void {
+auto IfStmt::accept(StmtVisitor* visitor) -> void {
     return visitor->visit_ifstmt(this);
 }
 
-auto IfStmt::type() const -> StmtType {
+auto IfStmt::type() -> StmtType {
     return StmtType::k_if;
 }
 
 
 // ForStmt
-ForStmt::ForStmt(const Expr* condition, const Stmt* block_stmt) :
+ForStmt::ForStmt(Expr* condition, Stmt* block_stmt) :
     condition { condition },
     block_stmt { block_stmt }
     {
@@ -192,60 +192,60 @@ ForStmt::~ForStmt() {
     Stmt::delete_object(block_stmt);
 }
 
-auto ForStmt::create_object(const Expr* condition, const Stmt* block_stmt) -> ForStmt* {
+auto ForStmt::create_object(Expr* condition, Stmt* block_stmt) -> ForStmt* {
     return new ForStmt { condition, block_stmt };
 }
 
-auto ForStmt::accept(const StmtVisitor* visitor) const -> void {
+auto ForStmt::accept(StmtVisitor* visitor) -> void {
     return const_cast<StmtVisitor*>(visitor)->visit_forstmt(this);
 }
 
-auto ForStmt::type() const -> StmtType {
+auto ForStmt::type() -> StmtType {
     return StmtType::k_for;
 }
 
 
 // BreakStmt
-BreakStmt::BreakStmt(const uint32_t line) :
+BreakStmt::BreakStmt(uint32_t line) :
     line { line }
     {
     }
 
-auto BreakStmt::create_object(const uint32_t line) -> BreakStmt* {
+auto BreakStmt::create_object(uint32_t line) -> BreakStmt* {
     return new BreakStmt { line };
 }
 
-auto BreakStmt::accept(const StmtVisitor* visitor) const -> void {
+auto BreakStmt::accept(StmtVisitor* visitor) -> void {
     return visitor->visit_breakstmt(this);
 }
 
-auto BreakStmt::type() const -> StmtType {
+auto BreakStmt::type() -> StmtType {
     return StmtType::k_break;
 }
 
 
 // ContinueStmt
-ContinueStmt::ContinueStmt(const uint32_t line, const Expr* step_expr) :
+ContinueStmt::ContinueStmt(uint32_t line, Expr* step_expr) :
     line { line },
     step_expr { step_expr }
     {
     }
 
-auto ContinueStmt::create_object(const uint32_t line, const Expr* step_expr) -> ContinueStmt* {
+auto ContinueStmt::create_object(uint32_t line, Expr* step_expr) -> ContinueStmt* {
     return new ContinueStmt { line, step_expr };
 }
 
-auto ContinueStmt::accept(const StmtVisitor* visitor) const -> void {
+auto ContinueStmt::accept(StmtVisitor* visitor) -> void {
     return visitor->visit_continuestmt(this);
 }
 
-auto ContinueStmt::type() const -> StmtType {
+auto ContinueStmt::type() -> StmtType {
     return StmtType::k_continue;
 }
 
 
 // ReturnStmt
-ReturnStmt::ReturnStmt(const Token* token, const Expr* value) :
+ReturnStmt::ReturnStmt(Token* token, Expr* value) :
     token { token },
     value { value }
     {
@@ -255,14 +255,14 @@ ReturnStmt::~ReturnStmt() {
     Expr::delete_object(value);
 }
 
-auto ReturnStmt::create_object(const Token* token, const Expr* value) -> ReturnStmt* {
+auto ReturnStmt::create_object(Token* token, Expr* value) -> ReturnStmt* {
     return new ReturnStmt { token, value };
 }
 
-auto ReturnStmt::accept(const StmtVisitor* visitor) const -> void {
+auto ReturnStmt::accept(StmtVisitor* visitor) -> void {
     return visitor->visit_returnstmt(this);
 }
 
-auto ReturnStmt::type() const -> StmtType {
+auto ReturnStmt::type() -> StmtType {
     return StmtType::k_return;
 }

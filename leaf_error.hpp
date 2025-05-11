@@ -22,13 +22,13 @@ private:
     std::vector<std::string> m_messages{ };
 
 public:
-    auto has_errors() const -> bool;
-    auto messages() const -> const std::vector<std::string>&;
+    auto has_errors() -> bool;
+    auto messages() -> std::vector<std::string>&;
 
-    auto add_error(const Token& token, const uint32_t line, const std::string& message) -> void;
-    auto add_parse_error(const uint32_t line, const std::string& message) -> void;
-    auto runtime_error(const uint32_t line, const std::string& oper, const std::string& message) -> void;
-    auto runtime_error(const uint32_t line, const std::string& message) -> void;
+    auto add_error(Token& token, uint32_t line, const std::string& message) -> void;
+    auto add_parse_error(uint32_t line, const std::string& message) -> void;
+    auto runtime_error(uint32_t line, const std::string& oper, const std::string& message) -> void;
+    auto runtime_error(uint32_t line, const std::string& message) -> void;
 };
 
 #endif

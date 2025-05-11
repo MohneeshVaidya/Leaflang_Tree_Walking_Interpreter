@@ -4,7 +4,9 @@
 #include "leaf_error.hpp"
 #include "leaf_object.hpp"
 #include "leaf_function.hpp"
+#include "leaf_struct.hpp"
 #include "stmt.hpp"
+#include "token.hpp"
 #include "token_type.hpp"
 #include "tools/binary_operations.hpp"
 
@@ -35,24 +37,24 @@ Interpreter::~Interpreter() {
 
 
 // Private methods
-auto Interpreter::execute_stmt(const Stmt* stmt) const -> void {
+auto Interpreter::execute_stmt(Stmt* stmt) -> void {
     stmt->accept(this);
 }
 
-auto Interpreter::evaluate(const Expr* expr) const -> LeafObject* {
+auto Interpreter::evaluate(Expr* expr) -> LeafObject* {
     return expr->accept(this);
 }
 
 
 // Public methods
-auto Interpreter::execute(const std::vector<const Stmt*>& statements) const -> void {
-    for (const Stmt* stmt : statements) {
+auto Interpreter::execute(std::vector<Stmt*>& statements) -> void {
+    for (Stmt* stmt : statements) {
         execute_stmt(stmt);
     }
 }
 
-auto Interpreter::execute(const std::vector<const Expr*>& expressions) const -> LeafObject* {
-    for (const Expr* expr : expressions) {
+auto Interpreter::execute(std::vector<Expr*>& expressions) -> LeafObject* {
+    for (Expr* expr : expressions) {
         if (expr->type() != ExprType::k_null) {
             std::cout << evaluate(expr) << "\n";
         }
@@ -61,34 +63,34 @@ auto Interpreter::execute(const std::vector<const Expr*>& expressions) const -> 
 }
 
 
-auto Interpreter::visit_printstmt(const PrintStmt* stmt) const -> void {
-    const LeafObject* value { evaluate(stmt->expr) };
+auto Interpreter::visit_printstmt(PrintStmt* stmt) -> void {
+    LeafObject* value { evaluate(stmt->expr) };
     std::cout << value;
 }
 
-auto Interpreter::visit_printlnstmt(const PrintlnStmt* stmt) const -> void {
-    const LeafObject* value { evaluate(stmt->expr) };
+auto Interpreter::visit_printlnstmt(PrintlnStmt* stmt) -> void {
+    LeafObject* value { evaluate(stmt->expr) };
     std::cout << value << "\n";
 }
 
-auto Interpreter::visit_expressionstmt(const ExpressionStmt* stmt) const -> void {
+auto Interpreter::visit_expressionstmt(ExpressionStmt* stmt) -> void {
     evaluate(stmt->expr);
 }
 
-auto Interpreter::visit_varstmt(const VarStmt* stmt) const -> void {
+auto Interpreter::visit_varstmt(VarStmt* stmt) -> void {
     m_environment->insert_var(stmt->identifier, evaluate(stmt->expr));
 }
 
-auto Interpreter::visit_conststmt(const ConstStmt* stmt) const -> void {
+auto Interpreter::visit_conststmt(ConstStmt* stmt) -> void {
     m_environment->insert_const(stmt->identifier, evaluate(stmt->expr));
 }
 
-auto Interpreter::visit_blockstmt(const BlockStmt* stmt, Environment* environment) -> void {
+auto Interpreter::visit_blockstmt(BlockStmt* stmt, Environment* environment) -> void {
     environment->set_parent(m_environment);
     m_environment = environment;
 
     try {
-        for (const Stmt* statement : stmt->statements) {
+        for (Stmt* statement : stmt->statements) {
             execute_stmt(statement);
         }
     } catch (LeafObject* return_value) {
@@ -100,13 +102,13 @@ auto Interpreter::visit_blockstmt(const BlockStmt* stmt, Environment* environmen
     Environment::delete_object(environment);
 }
 
-auto Interpreter::visit_ifstmt(const IfStmt* stmt) const -> void {
+auto Interpreter::visit_ifstmt(IfStmt* stmt) -> void {
     for (auto statement : stmt->statements) {
         if (statement.first == nullptr) {
             execute_stmt(statement.second);
             break;
         }
-        const LeafObject* condition { evaluate(statement.first) };
+        LeafObject* condition { evaluate(statement.first) };
         if (condition->is_truthy()) {
             execute_stmt(statement.second);
             break;
@@ -114,15 +116,15 @@ auto Interpreter::visit_ifstmt(const IfStmt* stmt) const -> void {
     }
 }
 
-auto Interpreter::visit_forstmt(const ForStmt* stmt) -> void {
-    const BlockCtx prev_block_ctx { block_ctx };
-    block_ctx = BlockCtx::k_loop;
+auto Interpreter::visit_forstmt(ForStmt* stmt) -> void {
+    BlockCtx prev_block_ctx { m_block_ctx };
+    m_block_ctx = BlockCtx::k_loop;
     try {
         if (stmt->condition == nullptr) {
             while (true) {
                 try {
                     execute_stmt(stmt->block_stmt);
-                } catch (const Continue&) {
+                } catch (Continue&) {
                 }
             }
             return;
@@ -131,16 +133,16 @@ auto Interpreter::visit_forstmt(const ForStmt* stmt) -> void {
         while (evaluate(stmt->condition)->is_truthy()) {
             try {
                 execute_stmt(stmt->block_stmt);
-            } catch (const Continue&) {
+            } catch (Continue&) {
             }
         }
-    } catch (const Break&) {
+    } catch (Break&) {
     }
-    block_ctx = prev_block_ctx;
+    m_block_ctx = prev_block_ctx;
 }
 
-auto Interpreter::visit_breakstmt(const BreakStmt* stmt) const -> void {
-    if (block_ctx == BlockCtx::k_loop) {
+auto Interpreter::visit_breakstmt(BreakStmt* stmt) -> void {
+    if (m_block_ctx == BlockCtx::k_loop) {
         throw Break { };
         return;
     }
@@ -150,8 +152,8 @@ auto Interpreter::visit_breakstmt(const BreakStmt* stmt) const -> void {
     );
 }
 
-auto Interpreter::visit_continuestmt(const ContinueStmt* stmt) const -> void {
-    if (block_ctx == BlockCtx::k_loop) {
+auto Interpreter::visit_continuestmt(ContinueStmt* stmt) -> void {
+    if (m_block_ctx == BlockCtx::k_loop) {
         if (stmt->step_expr) {
             evaluate(stmt->step_expr);
         }
@@ -164,25 +166,29 @@ auto Interpreter::visit_continuestmt(const ContinueStmt* stmt) const -> void {
     );
 }
 
-auto Interpreter::visit_returnstmt(const ReturnStmt* stmt) const -> void {
-    if (func_ctx == FunctionCtx::k_function) {
+auto Interpreter::visit_returnstmt(ReturnStmt* stmt) -> void {
+    if (m_called_ctx == CalledCtx::k_function) {
         throw evaluate(stmt->value);
+    }
+    if (m_called_ctx == CalledCtx::k_constructor) {
+        LeafError::instance()->runtime_error(
+            stmt->token->line(), "'return' statement can not be used inside constructor."s);
     }
     LeafError::instance()->runtime_error(
         stmt->token->line(), "'return' statement can only be used within the context of a function."s);
 }
 
 
-auto Interpreter::visit_nullexpr(const NullExpr*) const -> LeafObject* {
+auto Interpreter::visit_nullexpr(NullExpr*) -> LeafObject* {
     return LeafNull::create_object();
 }
 
-auto Interpreter::visit_assignexpr(const AssignExpr* expr) const -> LeafObject* {
-    const Token* left { expr->left };
+auto Interpreter::visit_assignexpr(AssignExpr* expr) -> LeafObject* {
+    Token* left { expr->left };
     if (left->type() != k_identifier) {
         LeafError::instance()->runtime_error(expr->oper->line(), expr->oper->lexeme(), "Left hand operator of '=' must be a variable."s);
     }
-    const LeafObject* right { evaluate(expr->right) };
+    LeafObject* right { evaluate(expr->right) };
 
     if (m_environment->get_qualifier(left) == "const"s) {
         LeafError::instance()->runtime_error(
@@ -196,43 +202,43 @@ auto Interpreter::visit_assignexpr(const AssignExpr* expr) const -> LeafObject* 
     return const_cast<LeafObject*>(right);
 }
 
-auto Interpreter::visit_ternaryexpr(const TernaryExpr* expr) const -> LeafObject* {
-    const LeafObject* condition { evaluate(expr->condition) };
+auto Interpreter::visit_ternaryexpr(TernaryExpr* expr) -> LeafObject* {
+    LeafObject* condition { evaluate(expr->condition) };
     if (condition->is_truthy()) {
         return evaluate(expr->first);
     }
     return evaluate(expr->second);
 }
 
-auto Interpreter::visit_binaryexpr(const BinaryExpr* expr) const -> LeafObject* {
+auto Interpreter::visit_binaryexpr(BinaryExpr* expr) -> LeafObject* {
     auto left { evaluate(expr->left) };
     auto right { evaluate(expr->right) };
     return BinaryOperations::instance()->execute(expr->oper, left, right);
 }
 
-auto Interpreter::visit_unaryexpr(const UnaryExpr* expr) const -> LeafObject* {
+auto Interpreter::visit_unaryexpr(UnaryExpr* expr) -> LeafObject* {
     auto operand { evaluate(expr->operand) };
     if (expr->oper->lexeme() == "-") {
         if (operand->type() != ObjectType::k_number) {
             LeafError::instance()->runtime_error(expr->oper->line(), expr->oper->lexeme(), "Operand must be a number."s);
         }
-        return LeafNumber::create_object(-dynamic_cast<const LeafNumber*>(operand)->value());
+        return LeafNumber::create_object(-dynamic_cast<LeafNumber*>(operand)->value());
     } else {
         return LeafBool::create_object( !operand->is_truthy() );
     }
 }
 
-auto Interpreter::visit_exponentexpr(const ExponentExpr* expr) const -> LeafObject* {
+auto Interpreter::visit_exponentexpr(ExponentExpr* expr) -> LeafObject* {
     auto left { evaluate(expr->left) };
     auto right { evaluate(expr->right) };
     return BinaryOperations::instance()->execute(expr->oper, left, right);
 }
 
-auto Interpreter::visit_groupingexpr(const GroupingExpr* expr) const -> LeafObject* {
+auto Interpreter::visit_groupingexpr(GroupingExpr* expr) -> LeafObject* {
     return evaluate(expr->expression);
 }
 
-auto Interpreter::visit_primaryexpr(const PrimaryExpr* expr) const -> LeafObject* {
+auto Interpreter::visit_primaryexpr(PrimaryExpr* expr) -> LeafObject* {
     if (expr == nullptr) {
         return nullptr;
     }
@@ -253,19 +259,20 @@ auto Interpreter::visit_primaryexpr(const PrimaryExpr* expr) const -> LeafObject
     return nullptr;
 }
 
-auto Interpreter::visit_functionexpr(const FunctionExpr* expr) const -> LeafObject* {
+auto Interpreter::visit_functionexpr(FunctionExpr* expr) -> LeafObject* {
     return LeafFunction::create_object(expr->parameters, expr->block_stmt, m_environment->make_closure());
 }
 
-auto Interpreter::visit_callexpr(const CallExpr* expr) -> LeafObject* {
-    const FunctionCtx prev_ctx { func_ctx };
-    func_ctx = FunctionCtx::k_function;
-
-    const LeafObject* value { };
+auto Interpreter::visit_callexpr(CallExpr* expr) -> LeafObject* {
+    LeafObject* value { };
 
     if (expr->identifier) {
-        value = m_environment->get(expr->identifier);
-        if (value->type() != ObjectType::k_function) {
+        if (m_is_method) {
+            value = m_current_instance->value().at(expr->identifier->lexeme());
+        } else {
+            value = m_environment->get(expr->identifier);
+        }
+        if (value->type() != ObjectType::k_function && value->type() != ObjectType::k_struct) {
             LeafError::instance()->runtime_error(
                 expr->identifier->line(),
                 std::format("'{}' is not callable.", expr->identifier->lexeme()));
@@ -274,7 +281,33 @@ auto Interpreter::visit_callexpr(const CallExpr* expr) -> LeafObject* {
         value = evaluate(expr->expr);
     }
 
-    LeafFunction* casted_value { const_cast<LeafFunction*>(dynamic_cast<const LeafFunction*>(value)) };
+    CalledCtx prev_ctx { m_called_ctx };
+    LeafStructInstance* previous_instance { m_current_instance };
+
+    LeafFunction* casted_value { };
+    if (value->type() == ObjectType::k_struct) {
+        m_called_ctx = CalledCtx::k_constructor;
+
+        casted_value = m_environment->metaclass_get_method(expr->identifier, "__construct"s);
+        if (casted_value == nullptr) {
+            LeafError::instance()->runtime_error(
+                expr->identifier->line(),
+                std::format("No constructor is provided for struct '{}'", expr->identifier->lexeme())
+            );
+        }
+
+        LeafStruct* leaf_struct { dynamic_cast<LeafStruct*>(value) };
+
+        std::unordered_map<std::string, LeafObject*> fields { };
+        for (Token* field : leaf_struct->value()) {
+            fields.insert_or_assign(field->lexeme(), LeafNull::create_object());
+        }
+        m_current_instance = LeafStructInstance::create_object(leaf_struct->identifier, fields);
+
+    } else if (value->type() == ObjectType::k_function) {
+        m_called_ctx = CalledCtx::k_function;
+        casted_value = dynamic_cast<LeafFunction*>(value);
+    }
 
     if (casted_value->parameters.size() != expr->arguments.size()) {
         LeafError::instance()->runtime_error(
@@ -282,8 +315,82 @@ auto Interpreter::visit_callexpr(const CallExpr* expr) -> LeafObject* {
             std::format("Number of arguments does not match number of parameters for function '{}'.", expr->identifier->lexeme()));
     }
 
-    LeafObject* return_value { casted_value->call(expr->arguments, const_cast<Interpreter*>(this)) };
+    LeafObject* return_value { casted_value->call(expr->arguments, this) };
 
-    func_ctx = prev_ctx;
+    m_called_ctx = prev_ctx;
+    m_current_instance = previous_instance;
     return return_value;
+}
+
+auto Interpreter::visit_structexpr(StructExpr* expr) -> LeafObject* {
+    LeafStruct* leaf_struct { LeafStruct::create_object(expr->identifier, expr->fields) };
+    m_environment->insert_const(expr->identifier, leaf_struct);
+
+    for (FunctionExpr* func_expr : expr->methods) {
+        m_environment->metaclass_add_method(expr->identifier, func_expr->identifier->lexeme(), dynamic_cast<LeafFunction*>(evaluate(func_expr)));
+    }
+    return leaf_struct;
+}
+
+auto Interpreter::visit_getexpr(GetExpr* expr) -> LeafObject* {
+    if (expr->left) {
+        LeafObject* value { m_environment->get(expr->left) };
+        return value;
+    }
+
+    LeafObject* left { evaluate(expr->left_expr) };
+
+    std::string member { };
+    if (expr->right_expr == nullptr) {
+        member.assign("Field");
+    } else {
+        member.assign("Method");
+    }
+    if (left->type() != ObjectType::k_struct_instance) {
+        LeafError::instance()->runtime_error(
+            expr->right->line(),
+            std::format("{} '{}' can not be called on a non-struct value.", member, expr->right->lexeme())
+        );
+    }
+    LeafStructInstance* instance { dynamic_cast<LeafStructInstance*>(left) };
+    if (instance->value().contains(expr->right->lexeme()) == false) {
+        LeafError::instance()->runtime_error(
+            expr->right->line(),
+            std::format("{} '{}' does not exist on given struct value.", member, expr->right->lexeme()));
+    }
+
+    if (expr->right_expr == nullptr) {
+        return instance->value().at(expr->right->lexeme());
+    }
+
+    auto is_method_snap { m_is_method };
+    m_is_method = true;
+
+    auto current_instance_snap { m_current_instance };
+    m_current_instance = instance;
+
+    LeafObject* result { evaluate(expr->right_expr) };
+
+    m_current_instance = current_instance_snap;
+    m_is_method = is_method_snap;
+    return result;
+}
+
+auto Interpreter::visit_setexpr([[maybe_unused]] SetExpr* expr) -> LeafObject* {
+    LeafObject* value { evaluate(expr->left->left_expr) };
+    if (value->type() != ObjectType::k_struct_instance) {
+        LeafError::instance()->runtime_error(
+            expr->left->right->line(),
+            std::format("Field '{}' can not be called on non-struct value.", expr->left->right->lexeme()));
+    }
+    LeafStructInstance* instance { dynamic_cast<LeafStructInstance*>(value) };
+    if (instance->value().contains(expr->left->right->lexeme()) == false) {
+        LeafError::instance()->runtime_error(
+            expr->left->right->line(),
+            std::format("Field '{}' does not exist on given struct value.", expr->left->right->lexeme()));
+    }
+    LeafObject* value_to_assign { evaluate(expr->right) };
+    instance->value().insert_or_assign(
+        expr->left->right->lexeme(), value_to_assign);
+    return value_to_assign;
 }

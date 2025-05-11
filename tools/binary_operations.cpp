@@ -10,10 +10,10 @@ using namespace std::string_literals;
 using enum TokenType;
 
 // Initialize static variable m_instance
-const BinaryOperations* BinaryOperations::m_instance { nullptr };
+BinaryOperations* BinaryOperations::m_instance { nullptr };
 
 // Static methods
-auto BinaryOperations::instance() -> const BinaryOperations* {
+auto BinaryOperations::instance() -> BinaryOperations* {
     if (m_instance == nullptr) {
         m_instance = new BinaryOperations { };
     }
@@ -44,20 +44,20 @@ BinaryOperations::BinaryOperations() {
                     result = true;
                 }
                 if (left->type() == ObjectType::k_number) {
-                    auto casted_left  { dynamic_cast<const LeafNumber*>(left) };
-                    auto casted_right { dynamic_cast<const LeafNumber*>(right) };
+                    auto casted_left  { dynamic_cast<LeafNumber*>(left) };
+                    auto casted_right { dynamic_cast<LeafNumber*>(right) };
 
                     result = casted_left->value() == casted_right->value();
                 }
                 if (left->type() == ObjectType::k_string) {
-                    auto casted_left  { dynamic_cast<const LeafString*>(left) };
-                    auto casted_right { dynamic_cast<const LeafString*>(right) };
+                    auto casted_left  { dynamic_cast<LeafString*>(left) };
+                    auto casted_right { dynamic_cast<LeafString*>(right) };
 
                     result = casted_left->value() == casted_right->value();
                 }
                 if (left->type() == ObjectType::k_bool) {
-                    auto casted_left  { dynamic_cast<const LeafBool*>(left) };
-                    auto casted_right { dynamic_cast<const LeafBool*>(right) };
+                    auto casted_left  { dynamic_cast<LeafBool*>(left) };
+                    auto casted_right { dynamic_cast<LeafBool*>(right) };
 
                     result = casted_left->value() == casted_right->value();
                 }
@@ -74,20 +74,20 @@ BinaryOperations::BinaryOperations() {
                     result = false;
                 }
                 if (left->type() == ObjectType::k_number) {
-                    auto casted_left  { dynamic_cast<const LeafNumber*>(left) };
-                    auto casted_right { dynamic_cast<const LeafNumber*>(right) };
+                    auto casted_left  { dynamic_cast<LeafNumber*>(left) };
+                    auto casted_right { dynamic_cast<LeafNumber*>(right) };
 
                     result = casted_left->value() != casted_right->value();
                 }
                 if (left->type() == ObjectType::k_string) {
-                    auto casted_left  { dynamic_cast<const LeafString*>(left) };
-                    auto casted_right { dynamic_cast<const LeafString*>(right) };
+                    auto casted_left  { dynamic_cast<LeafString*>(left) };
+                    auto casted_right { dynamic_cast<LeafString*>(right) };
 
                     result = casted_left->value() != casted_right->value();
                 }
                 if (left->type() == ObjectType::k_bool) {
-                    auto casted_left  { dynamic_cast<const LeafBool*>(left) };
-                    auto casted_right { dynamic_cast<const LeafBool*>(right) };
+                    auto casted_left  { dynamic_cast<LeafBool*>(left) };
+                    auto casted_right { dynamic_cast<LeafBool*>(right) };
 
                     result = casted_left->value() != casted_right->value();
                 }
@@ -100,8 +100,8 @@ BinaryOperations::BinaryOperations() {
             expect_same_type(left, right);
             expect_type(left->type(), { ObjectType::k_number });
 
-            auto casted_left { dynamic_cast<const LeafNumber*>(left) };
-            auto casted_right { dynamic_cast<const LeafNumber*>(right) };
+            auto casted_left { dynamic_cast<LeafNumber*>(left) };
+            auto casted_right { dynamic_cast<LeafNumber*>(right) };
 
             return LeafBool::create_object(casted_left->value() < casted_right->value());
         }),
@@ -110,8 +110,8 @@ BinaryOperations::BinaryOperations() {
             expect_same_type(left, right);
             expect_type(left->type(), { ObjectType::k_number });
 
-            auto casted_left { dynamic_cast<const LeafNumber*>(left) };
-            auto casted_right { dynamic_cast<const LeafNumber*>(right) };
+            auto casted_left { dynamic_cast<LeafNumber*>(left) };
+            auto casted_right { dynamic_cast<LeafNumber*>(right) };
 
             return LeafBool::create_object(casted_left->value() <= casted_right->value());
         }),
@@ -120,8 +120,8 @@ BinaryOperations::BinaryOperations() {
             expect_same_type(left, right);
             expect_type(left->type(), { ObjectType::k_number });
 
-            auto casted_left { dynamic_cast<const LeafNumber*>(left) };
-            auto casted_right { dynamic_cast<const LeafNumber*>(right) };
+            auto casted_left { dynamic_cast<LeafNumber*>(left) };
+            auto casted_right { dynamic_cast<LeafNumber*>(right) };
 
             return LeafBool::create_object(casted_left->value() > casted_right->value());
         }),
@@ -130,8 +130,8 @@ BinaryOperations::BinaryOperations() {
             expect_same_type(left, right);
             expect_type(left->type(), { ObjectType::k_number });
 
-            auto casted_left { dynamic_cast<const LeafNumber*>(left) };
-            auto casted_right { dynamic_cast<const LeafNumber*>(right) };
+            auto casted_left { dynamic_cast<LeafNumber*>(left) };
+            auto casted_right { dynamic_cast<LeafNumber*>(right) };
 
             return LeafBool::create_object(casted_left->value() >= casted_right->value());
         }),
@@ -141,14 +141,14 @@ BinaryOperations::BinaryOperations() {
             expect_type(left->type(), { ObjectType::k_number, ObjectType::k_string });
 
             if (left->type() == ObjectType::k_number) {
-                auto casted_left { dynamic_cast<const LeafNumber*>(left) };
-                auto casted_right { dynamic_cast<const LeafNumber*>(right) };
+                auto casted_left { dynamic_cast<LeafNumber*>(left) };
+                auto casted_right { dynamic_cast<LeafNumber*>(right) };
 
                 return LeafNumber::create_object(casted_left->value() + casted_right->value());
             }
 
-            auto casted_left { dynamic_cast<const LeafString*>(left) };
-            auto casted_right { dynamic_cast<const LeafString*>(right) };
+            auto casted_left { dynamic_cast<LeafString*>(left) };
+            auto casted_right { dynamic_cast<LeafString*>(right) };
 
             return LeafString::create_object(casted_left->value() + casted_right->value());
         }),
@@ -157,8 +157,8 @@ BinaryOperations::BinaryOperations() {
             expect_same_type(left, right);
             expect_type(left->type(), { ObjectType::k_number });
 
-            auto casted_left { dynamic_cast<const LeafNumber*>(left) };
-            auto casted_right { dynamic_cast<const LeafNumber*>(right) };
+            auto casted_left { dynamic_cast<LeafNumber*>(left) };
+            auto casted_right { dynamic_cast<LeafNumber*>(right) };
 
             return LeafNumber::create_object(casted_left->value() - casted_right->value());
         }),
@@ -167,8 +167,8 @@ BinaryOperations::BinaryOperations() {
             expect_same_type(left, right);
             expect_type(left->type(), { ObjectType::k_number });
 
-            auto casted_left { dynamic_cast<const LeafNumber*>(left) };
-            auto casted_right { dynamic_cast<const LeafNumber*>(right) };
+            auto casted_left { dynamic_cast<LeafNumber*>(left) };
+            auto casted_right { dynamic_cast<LeafNumber*>(right) };
 
             return LeafNumber::create_object(casted_left->value() * casted_right->value());
         }),
@@ -177,8 +177,8 @@ BinaryOperations::BinaryOperations() {
             expect_same_type(left, right);
             expect_type(left->type(), { ObjectType::k_number });
 
-            auto casted_left { dynamic_cast<const LeafNumber*>(left) };
-            auto casted_right { dynamic_cast<const LeafNumber*>(right) };
+            auto casted_left { dynamic_cast<LeafNumber*>(left) };
+            auto casted_right { dynamic_cast<LeafNumber*>(right) };
 
             return LeafNumber::create_object(casted_left->value() / casted_right->value());
         }),
@@ -187,8 +187,8 @@ BinaryOperations::BinaryOperations() {
             expect_same_type(left, right);
             expect_type(left->type(), { ObjectType::k_number });
 
-            auto casted_left { dynamic_cast<const LeafNumber*>(left) };
-            auto casted_right { dynamic_cast<const LeafNumber*>(right) };
+            auto casted_left { dynamic_cast<LeafNumber*>(left) };
+            auto casted_right { dynamic_cast<LeafNumber*>(right) };
 
             return LeafNumber::create_object(static_cast<double>(static_cast<int64_t>(casted_left->value()) % static_cast<int64_t>(casted_right->value())));
         }),
@@ -197,8 +197,8 @@ BinaryOperations::BinaryOperations() {
             expect_same_type(left, right);
             expect_type(left->type(), { ObjectType::k_number });
 
-            auto casted_left { dynamic_cast<const LeafNumber*>(left) };
-            auto casted_right { dynamic_cast<const LeafNumber*>(right) };
+            auto casted_left { dynamic_cast<LeafNumber*>(left) };
+            auto casted_right { dynamic_cast<LeafNumber*>(right) };
 
             return LeafNumber::create_object(std::pow(casted_left->value(), casted_right->value()));
         }),
@@ -206,13 +206,13 @@ BinaryOperations::BinaryOperations() {
 }
 
 // Private methods
-auto BinaryOperations::expect_same_type(OperandType left, OperandType right) const -> void {
+auto BinaryOperations::expect_same_type(OperandType left, OperandType right) -> void {
     if (left->type() != right->type()) {
         throw ErrorCode::k_type_mismatch;
     }
 }
 
-auto BinaryOperations::expect_type(ObjectType type, std::initializer_list<ObjectType> expected) const -> void {
+auto BinaryOperations::expect_type(ObjectType type, std::initializer_list<ObjectType> expected) -> void {
     for (ObjectType expected_type : expected) {
         if (type == expected_type) {
             return;
@@ -222,14 +222,14 @@ auto BinaryOperations::expect_type(ObjectType type, std::initializer_list<Object
 }
 
 // Public methods
-auto BinaryOperations::execute(const Token* oper, OperandType left, OperandType right) const -> ReturnType {
+auto BinaryOperations::execute(Token* oper, OperandType left, OperandType right) -> ReturnType {
     if (left == nullptr || right == nullptr) {
         LeafError::instance()->runtime_error(oper->line(), oper->lexeme(), "Operands of binary operator must not be absent."s);
     }
 
     try {
         return m_operations_table.at(oper->type())(left, right);
-    } catch (const ErrorCode error_code) {
+    } catch (ErrorCode error_code) {
         if (error_code == ErrorCode::k_type_mismatch) {
             LeafError::instance()->runtime_error(oper->line(), oper->lexeme(), "Operands of binary operator must be of same type.");
         } else if (error_code == ErrorCode::k_invalid_type) {

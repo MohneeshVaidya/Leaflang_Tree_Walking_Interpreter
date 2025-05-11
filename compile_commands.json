@@ -298,5 +298,25 @@
     "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
     "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf_function.cpp",
     "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Weffc++",
+      "-Werror",
+      "-Wconversion",
+      "-Wsign-conversion",
+      "-o",
+      "leaf",
+      "leaf_struct.cpp"
+    ],
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf_struct.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
   }
 ]
