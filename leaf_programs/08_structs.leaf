@@ -1,0 +1,21 @@
+struct User {
+    fullname;
+    username;
+    email;
+    password;
+    age;
+
+    __construct() {
+    }
+};
+
+const user = User();
+println user;
+
+user.fullname = "Leaflang";
+user.username = "Tree_Walking_Interpreter";
+user.email    = "leaflang@gmail.com";
+user.password = "leaflang_the_tree_walking_interpreter";
+user.age      = 26.5;
+
+println user;

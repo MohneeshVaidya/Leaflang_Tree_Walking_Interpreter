@@ -1,0 +1,21 @@
+{
+    struct RandomStruct {
+        field1;
+        field2;
+        field3;
+
+        __construct() {
+
+        };
+    };
+
+    var instance = RandomStruct();
+    println instance;
+
+    println instance.field1 = instance.field2 = instance.field3 = "Computer science";
+
+    println instance;
+
+    instance = "Hello world";
+    println instance;
+}

@@ -1,100 +1,126 @@
-#include "Error.hpp"
-#include "Expr.hpp"
-#include "Lexer.hpp"
-#include "Parser.hpp"
-#include "Token.hpp"
+#include "interpreter.hpp"
+#include "leaf_error.hpp"
+#include "parser.hpp"
+#include "stmt.hpp"
+#include "tokenizer.hpp"
+#include "token.hpp"
+#include "tools/binary_operations.hpp"
 
-#include <fstream>
-#include <iostream>
 #include <cstdlib>
 #include <cstring>
+#include <format>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
 #include <string>
-#include <string_view>
 #include <vector>
 
-void run_repl();
-void run_file(std::string_view file_path);
-void run(std::string_view source_code);
+auto run_repl() -> void;
+auto run_file(const std::string& filepath) -> void;
+auto run(const std::string& source) -> void;
 
-void print_tokens(const std::vector<TokenPtr>& tokens);
+auto print_errors() -> void;
+auto print_tokens(std::vector<Token*>& tokens) -> void;
+
+auto cleanup() -> void;
 
 int main(int argc, char* argv[]) {
-    if (argc >= 3 || (argc == 2 && std::strcmp(argv[1], "--help") == 0)) {
-        std::cout << "Usage 1: ./leaf <fileName> (To interpret source file).\n";
-        std::cout << "Usage 2: ./leaf (To invoke REPL)\n";
-        std::exit(1);
+    if (argc > 2 || (argc > 1 && std::strcmp(argv[1], "--help") == 0)) {
+        std::cout << "Usage 1: ./leaf <fileName> (To execute a file.)\n";
+        std::cout << "Usage 2: ./leaf (To run Repl (Run eval print loop)).\n";
+        std::exit(0);
     }
+
+    std::atexit(cleanup);
 
     if (argc == 1) {
         run_repl();
-        std::exit(0);
     }
-    
-    run_file(argv[1]);
 
+    run_file(argv[1]);
     return 0;
 }
 
-void run_repl() {
-    std::string expression { };
+auto run_repl() -> void {
+    std::string source { };
 
     while (true) {
         std::cout << "Leaf > ";
-        std::getline(std::cin, expression, '\n');
-        if (expression == "exit") {
+        std::getline(std::cin, source, '\n');
+
+        if (source == "exit" || source == "exit;") {
             std::cout << "Exiting Repl.\n";
             std::exit(0);
         }
-        run(expression);
+
+        run(source);
     }
 }
 
-void run_file(std::string_view file_path) {
-    std::ifstream file { file_path.data() };
+auto run_file(const std::string& filepath) -> void {
+    std::ifstream file { filepath };
 
-    if (!file.is_open()) {
-        std::cerr << "Error: file '" << file_path << "' couldn't be opened, check if this file exists or not.\n";
-        std::exit(1);
+    if (file.is_open() == false) {
+        std::cerr << std::format("Not able to open the file {}.\n", filepath);
+        std::abort();
     }
 
-    std::string source_code { };
-    std::string line { };
+    std::string source { };
+    std::string line   { };
 
-    while (!file.eof()) {
+    while (file.eof() == false) {
         std::getline(file, line, '\n');
-
-        source_code.append(line);
-        source_code.push_back('\n');
+        source.append(line);
+        source.push_back('\n');
     }
 
-    run(source_code);
+    run(source);
 
     file.close();
 }
 
-void run(std::string_view source_code) {
-    Lexer lexer { source_code };
-    std::vector<TokenPtr> tokens { lexer.get_tokens() };
+auto run(const std::string& source) -> void {
+    Tokenizer tokenizer { source };
+    std::vector<Token*> tokens { tokenizer.tokenize().tokens() };
 
-    if (Error::get_instance()->has_errors) {
-        for (auto error : Error::get_instance()->errors) {
-            std::cerr << error << "\n";
-        }
-        return;
+    print_errors();
+
+    Parser parser { tokens };
+    std::vector<Stmt*> statements { parser.parse().statements() };
+
+    print_errors();
+
+    std::cout << std::boolalpha;
+    std::cout << std::setprecision(20);
+
+    try {
+        Interpreter interpreter { Environment::create_object(nullptr) };
+        interpreter.execute(statements);
+    } catch (const std::string& runtime_error) {
+        std::cerr << runtime_error << "\n";
+        std::exit(1);
     }
-
-    print_tokens(tokens);
-
-    // Parser parser { tokens };
-
-    // [[maybe_unused]]
-    // const std::vector<ExprPtr>& expressions { parser.parse() };
-
-    // std::cout << expressions.size() << "\n";
 }
 
-void print_tokens(const std::vector<TokenPtr>& tokens) {
-    for (TokenPtr token : tokens) {
+auto print_errors() -> void {
+    if (LeafError::instance()->has_errors()) {
+        for (const std::string& message : LeafError::instance()->messages()) {
+            std::cerr << message << "\n";
+        }
+        std::exit(1);
+    }
+}
+
+auto print_tokens(std::vector<Token*>& tokens) -> void {
+    for (Token* token : tokens) {
         std::cout << *token << "\n";
     }
+}
+
+auto cleanup() -> void {
+    std::cout << std::noboolalpha;
+    std::cout << std::setprecision(6);
+
+    LeafError::delete_instance();
+    BinaryOperations::delete_instance();
 }

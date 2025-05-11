@@ -1,7 +1,7 @@
 [
   {
     "arguments": [
-      "/usr/bin/c++",
+      "/usr/bin/g++",
       "-c",
       "-std=c++23",
       "-g",
@@ -15,13 +15,13 @@
       "leaf",
       "main.cpp"
     ],
-    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter",
-    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter/main.cpp",
-    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter/leaf"
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/main.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
   },
   {
     "arguments": [
-      "/usr/bin/c++",
+      "/usr/bin/g++",
       "-c",
       "-std=c++23",
       "-g",
@@ -33,15 +33,15 @@
       "-Wsign-conversion",
       "-o",
       "leaf",
-      "TokenType.cpp"
+      "token_type.cpp"
     ],
-    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter",
-    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter/TokenType.cpp",
-    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter/leaf"
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/token_type.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
   },
   {
     "arguments": [
-      "/usr/bin/c++",
+      "/usr/bin/g++",
       "-c",
       "-std=c++23",
       "-g",
@@ -53,15 +53,15 @@
       "-Wsign-conversion",
       "-o",
       "leaf",
-      "Lexer.cpp"
+      "token.cpp"
     ],
-    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter",
-    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter/Lexer.cpp",
-    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter/leaf"
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/token.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
   },
   {
     "arguments": [
-      "/usr/bin/c++",
+      "/usr/bin/g++",
       "-c",
       "-std=c++23",
       "-g",
@@ -73,15 +73,15 @@
       "-Wsign-conversion",
       "-o",
       "leaf",
-      "Token.cpp"
+      "tokenizer.cpp"
     ],
-    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter",
-    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter/Token.cpp",
-    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter/leaf"
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/tokenizer.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
   },
   {
     "arguments": [
-      "/usr/bin/c++",
+      "/usr/bin/g++",
       "-c",
       "-std=c++23",
       "-g",
@@ -93,15 +93,15 @@
       "-Wsign-conversion",
       "-o",
       "leaf",
-      "tools/Tools.cpp"
+      "tools/leaf_tools.cpp"
     ],
-    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter",
-    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter/tools/Tools.cpp",
-    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter/leaf"
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/tools/leaf_tools.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
   },
   {
     "arguments": [
-      "/usr/bin/c++",
+      "/usr/bin/g++",
       "-c",
       "-std=c++23",
       "-g",
@@ -113,15 +113,15 @@
       "-Wsign-conversion",
       "-o",
       "leaf",
-      "Error.cpp"
+      "leaf_error.cpp"
     ],
-    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter",
-    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter/Error.cpp",
-    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter/leaf"
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf_error.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
   },
   {
     "arguments": [
-      "/usr/bin/c++",
+      "/usr/bin/g++",
       "-c",
       "-std=c++23",
       "-g",
@@ -133,15 +133,15 @@
       "-Wsign-conversion",
       "-o",
       "leaf",
-      "Expr.cpp"
+      "leaf_object.cpp"
     ],
-    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter",
-    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter/Expr.cpp",
-    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter/leaf"
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf_object.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
   },
   {
     "arguments": [
-      "/usr/bin/c++",
+      "/usr/bin/g++",
       "-c",
       "-std=c++23",
       "-g",
@@ -153,10 +153,170 @@
       "-Wsign-conversion",
       "-o",
       "leaf",
-      "Parser.cpp"
+      "expr.cpp"
     ],
-    "directory": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter",
-    "file": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter/Parser.cpp",
-    "output": "/home/mohneeshv/mohneeshv/programming/c++/projects/leaflang/Leaflang_TreeWalkingInterpreter/leaf"
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/expr.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Weffc++",
+      "-Werror",
+      "-Wconversion",
+      "-Wsign-conversion",
+      "-o",
+      "leaf",
+      "stmt.cpp"
+    ],
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/stmt.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Weffc++",
+      "-Werror",
+      "-Wconversion",
+      "-Wsign-conversion",
+      "-o",
+      "leaf",
+      "parser.cpp"
+    ],
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/parser.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Weffc++",
+      "-Werror",
+      "-Wconversion",
+      "-Wsign-conversion",
+      "-o",
+      "leaf",
+      "expr_printer.cpp"
+    ],
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/expr_printer.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Weffc++",
+      "-Werror",
+      "-Wconversion",
+      "-Wsign-conversion",
+      "-o",
+      "leaf",
+      "interpreter.cpp"
+    ],
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/interpreter.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Weffc++",
+      "-Werror",
+      "-Wconversion",
+      "-Wsign-conversion",
+      "-o",
+      "leaf",
+      "tools/binary_operations.cpp"
+    ],
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/tools/binary_operations.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Weffc++",
+      "-Werror",
+      "-Wconversion",
+      "-Wsign-conversion",
+      "-o",
+      "leaf",
+      "environment.cpp"
+    ],
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/environment.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Weffc++",
+      "-Werror",
+      "-Wconversion",
+      "-Wsign-conversion",
+      "-o",
+      "leaf",
+      "leaf_function.cpp"
+    ],
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf_function.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Weffc++",
+      "-Werror",
+      "-Wconversion",
+      "-Wsign-conversion",
+      "-o",
+      "leaf",
+      "leaf_struct.cpp"
+    ],
+    "directory": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter",
+    "file": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf_struct.cpp",
+    "output": "/home/mohneeshv/mohneeshv/programming/c_plus_plus/projects/leaflang/leaflang_tree_walking_interpreter/leaf"
   }
 ]
