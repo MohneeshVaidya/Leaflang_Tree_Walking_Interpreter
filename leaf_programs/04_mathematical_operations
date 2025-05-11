@@ -1,0 +1,21 @@
+// Leaf supports following mathematical operations
+
+// Addition         -> +    (Also used to concatenate strings)
+// Subtraction      -> -
+// Division         -> /
+// Multiplication   -> *
+// Modulo           -> %
+// pow              -> **
+
+
+var a = 12;
+var b = 5;
+
+println a + b;      // Prints: 17
+println a - b;      // Prints: 7
+println a / b;      // Prints: 2.399999...
+println a * b;      // Prints: 60
+println a % b;      // Prints: 2 (Digits after decimal point will be dropped)
+
+// Bonus -> String concatenation
+println "Hello " + "World" + "!";   // Prints: Hello World!

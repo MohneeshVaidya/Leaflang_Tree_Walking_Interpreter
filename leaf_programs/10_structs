@@ -1,0 +1,83 @@
+struct User {
+    fullname;
+    username;
+    email;
+    password;
+    age;
+    address;
+
+    __construct() {
+        // This method is required because you can create an instance only if it present otherwise it will throw a RuntimeError.
+    };
+};
+
+struct Address {
+    village;
+    city;
+    district;
+    state;
+    country;
+
+    __construct() {};
+};
+
+const user = User();
+
+user.fullname = "Mohneesh Vaidya";
+user.username = "Mohneesh_Vaidya";
+user.email    = "myemail@gmail.com";
+user.password = "this_is_my_password";
+user.age      = 26;
+
+user.address  = Address();
+user.address.village = "My Village";
+user.address.city    = "My City";
+user.address.district = "My District";
+user.address.state = "My State";
+user.address.country = "My Country";
+
+println user;
+
+// It will print
+// User {
+//     fullname : Mohneesh Vaidya
+//     username : Mohneesh_Vaidya
+//     email    : myemail@gmail.com
+//     password : this_is_my_password
+//     age      : 26
+//     address  : Address {
+//     village  : ...You got the idea right ?
+//     }
+// }
+
+
+
+// Assigning functions to fields
+
+struct BinaryOperations {
+    add;
+    sub;
+    mul;
+    div;
+    mod;
+    pow;
+
+    __construct() {
+    };
+};
+
+const binaryOperations = BinaryOperations();
+
+binaryOperations.add = function (a, b) { return a + b; };
+binaryOperations.sub = function (a, b) { return a - b; };
+binaryOperations.mul = function (a, b) { return a * b; };
+binaryOperations.div = function (a, b) { return a / b; };
+binaryOperations.mod = function (a, b) { return a % b; };
+binaryOperations.pow = function (a, b) { return a ** b; };
+
+println binaryOperations.add(10, 5);    // 15
+println binaryOperations.sub(10, 5);    // 5
+println binaryOperations.mul(10, 5);    // 50
+println binaryOperations.div(10, 5);    // 2
+println binaryOperations.mod(10, 5);    // 0
+println binaryOperations.pow(10, 5);    // 100000

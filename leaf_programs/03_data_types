@@ -1,0 +1,6 @@
+// Leaf supports following datatypes
+// number
+// string
+// boolean
+// null
+// user defined structs
