@@ -1,0 +1,14 @@
+const value = 5;
+
+if value < 5 {
+    println "Value is less than 5";
+}
+elseif value == 5 {
+    println "Value is equal to 5";
+}
+elseif value == 6 {
+    println "Value is equal to 6";
+}
+else {
+    println "Value is greater than 6";
+}

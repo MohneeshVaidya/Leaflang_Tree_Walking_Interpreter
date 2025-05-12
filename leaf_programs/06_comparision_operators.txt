@@ -1,0 +1,17 @@
+// Leaf supports following comparision operators
+// Equality                 -> ==
+// Not equal                -> !=
+// Less than                -> <
+// Less than equal to       -> <=
+// Greater than             -> >
+// Greater than equal to    -> >=
+
+println 1 == 1;     // Prints: true
+println 1 != 2;     // Prints: true
+println 5 < 6;      // Prints: true
+println 6 <= 5;     // Prints: false
+println 5 > 6;      // Prints: false
+println 5 >= 6;     // Prints: false
+
+// Bonus operator   -> Ternary operator (? :)
+println 5 <= 6 ? "Print one" : "Print two";     // Prints: Print one

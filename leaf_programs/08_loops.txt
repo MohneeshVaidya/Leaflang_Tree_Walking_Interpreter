@@ -1,0 +1,78 @@
+// Leaf only supports for loops.
+// But these for loops are very powerful and support different forms for different behaviours.
+// Leaf supports ->
+// Infinite for loops
+// While like for loops
+// Standard for loops
+
+
+var i = 1;
+
+println "Infinite for loop";
+
+for {
+
+    if i > 10 {
+        break;      // break statement is used to break out of closest surrounding loop.
+    }
+
+    print "\t";
+    println i;
+    i = i + 1;
+}
+
+println "\n";
+
+
+println "While like for loop";
+
+i = 1;
+
+for i <= 10 {
+    print "\t";
+    println i;
+    i = i + 1;
+}
+
+println "\n";
+
+
+println "Standard for loop";
+
+for i = 1; i >= 1 and i < 11; i = i + 1 {
+    print "\t";
+    println i;
+}
+
+println "\n";
+
+
+println "Standard for loop with counter declaration";
+
+for var i = 1; i < 11; i = i + 2 {
+    print "\t";
+    println i;
+}
+
+println "\n";
+
+
+println "continue keyword is used to jump to next iteration of closest surrounding loop";
+
+for i = 0; i < 11; i = i + 1 {
+    if i % 2 == 0 {
+        continue;
+    }
+
+    print "\t";
+    println i;
+
+    for var j = 11; j < 22; j = j + 1 {
+        if j % 2 == 1 {
+            continue;
+        }
+
+        print "\t\t";
+        println j;
+    }
+}
