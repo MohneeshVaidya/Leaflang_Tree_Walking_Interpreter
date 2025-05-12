@@ -382,8 +382,6 @@ auto Parser::assign() -> Expr* {
             Token* oper { peek_prev_token() };
             Expr* expr { assign() };
             return AssignExpr::create_object(identifier, oper, expr);
-        } else if (match_token({ k_dot })) {
-            return get(GetExpr::create_object(identifier, nullptr, nullptr, nullptr));
         }
         move_current_left();
     } else if (match_token({ k_function })) {
@@ -578,6 +576,9 @@ auto Parser::primary() -> Expr* {
     if (match_prev_token({ k_identifier })) {
         if (match_token({ k_left_paren })) {
             return call(token);
+        }
+        if (match_token({ k_dot })) {
+            return get(GetExpr::create_object(token, nullptr, nullptr, nullptr));
         }
         return PrimaryExpr::create_object(token);
     }
