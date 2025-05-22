@@ -1,0 +1,13 @@
+const fullname = "Mohneesh Vaidya"
+const username = "Warrior_Vegito"
+const email    = "warrior.vegito.007@gmail.com"
+const password = "warrior_vegito_is_great"
+const age      = 26
+
+println fullname;
+println username;
+println email;
+println password;
+println age;
+
+println 1 + 2 - 3 * 4 / 5 % 6 ** (7 * 123 - (8));
