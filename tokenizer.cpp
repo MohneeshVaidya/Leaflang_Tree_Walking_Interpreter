@@ -1,9 +1,11 @@
 #include "tokenizer.hpp"
+#include "error.hpp"
 #include "token_type.hpp"
 #include "token.hpp"
 
 #include <cctype>
 #include <cstdint>
+#include <format>
 #include <string_view>
 #include <vector>
 
@@ -249,13 +251,10 @@ static auto prepare(char ch) -> void {
 static auto number() -> void {
     char ch { peek_character() };
     while (true) {
-        if (std::isspace(ch)) {
-            break;
-        } else if (ch == '.' || std::isdigit(ch)) {
+        if (ch == '.' || std::isdigit(ch)) {
             advance_end();
             ch = peek_character();
         } else {
-            // emit error
             break;
         }
     }
@@ -271,12 +270,16 @@ static auto string() -> void {
         }
         if (ch == '\n') {
             line()++;
+            break;
         }
         advance_end();
         ch = peek_character();
     }
-    if (ch == '\0') {
-        // emit error
+    if (ch == '\0' || ch == '\n') {
+        error::add(
+            tokens().back(),
+            std::format("after token '{}' - a string must have terminating '\"'.", tokens().back()->lexeme)
+        );
     }
     add_token(TOKEN_STRING);
     advance_end();

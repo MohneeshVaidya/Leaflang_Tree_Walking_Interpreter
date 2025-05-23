@@ -1,3 +1,6 @@
+#include "error.hpp"
+#include "expr.hpp"
+#include "parser.hpp"
 #include "tokenizer.hpp"
 #include "token.hpp"
 
@@ -61,13 +64,19 @@ auto run_file(std::string_view path) -> void {
 }
 
 auto run(std::string_view source) -> void {
+    error::init();
+
     std::vector<Token*>& tokens { tokenizer::get_tokens(source) };
 
-    for (Token* token : tokens) {
-        std::cout << token << "\n";
+    if (error::has_errors()) {
+        error::print();
+    } else {
+        [[maybe_unused]] std::vector<Expr*>& stmts { parser::get_stmts(tokens) };
     }
 
+    error::reset();
     tokenizer::reset();
+    parser::reset();
 }
 
 auto cleanup() -> void {

@@ -1,13 +1,29 @@
-const fullname = "Mohneesh Vaidya"
-const username = "Warrior_Vegito"
-const email    = "warrior.vegito.007@gmail.com"
-const password = "warrior_vegito_is_great"
-const age      = 26
+class User {
+    fullname
+    username
+    email
+    password
+    age
 
-println fullname;
-println username;
-println email;
-println password;
-println age;
+    __make(fullname, username, email, password) {
+        this.fullname = fullname
+        this.username = username
+        this.email    = email
+        this.password = password
+    }
 
-println 1 + 2 - 3 * 4 / 5 % 6 ** (7 * 123 - (8));
+    __dest() {
+        println "bye bye"
+    }
+}
+
+const user = User(
+    "Mohneesh Vaidya",
+    "Warrior_Vegito",
+    "warrior.vegito.007@gmail.com",
+    "warriorvegitoisgreat",
+    26,
+);
+
+print user
+println "\n"
