@@ -3,6 +3,7 @@
 
 #include "object.hpp"
 #include "token.hpp"
+#include <vector>
 
 enum class ExprType {
     EXPR_TERNARY,
@@ -15,13 +16,14 @@ enum class ExprType {
     EXPR_NIL,
 };
 
+struct ExprVisitor;
+
 struct Expr {
     static auto dest(Expr* expr) -> void;
 
-    virtual ~Expr();
-    virtual auto type() -> ExprType;
-    virtual auto evaluate() -> Object*;
-    virtual auto print() -> void;
+    virtual ~Expr() = default;
+    virtual auto type() -> ExprType = 0;
+    virtual auto accept(ExprVisitor* visitor) -> Object* = 0;
 };
 
 struct TernaryExpr : public Expr {
@@ -34,8 +36,7 @@ struct TernaryExpr : public Expr {
     static auto make(Expr* condition, Expr* first, Expr* second) -> TernaryExpr*;
 
     virtual auto type() -> ExprType override;
-    virtual auto evaluate() -> Object* override;
-    virtual auto print() -> void override;
+    virtual auto accept(ExprVisitor* visitor) -> Object* override;
 
 private:
     TernaryExpr(Expr* condition, Expr* first, Expr* second);
@@ -53,8 +54,7 @@ struct BinaryExpr : public Expr {
     static auto make(Token* oper, Expr* left, Expr* right) -> BinaryExpr*;
 
     virtual auto type() -> ExprType override;
-    virtual auto evaluate() -> Object* override;
-    virtual auto print() -> void override;
+    virtual auto accept(ExprVisitor* visitor) -> Object* override;
 
 private:
     BinaryExpr(Token* oper, Expr* left, Expr* right);
@@ -71,8 +71,7 @@ struct UnaryExpr : public Expr {
     static auto make(Token* oper, Expr* expr) -> UnaryExpr*;
 
     virtual auto type() -> ExprType override;
-    virtual auto evaluate() -> Object* override;
-    virtual auto print() -> void override;
+    virtual auto accept(ExprVisitor* visitor) -> Object* override;
 
 private:
     UnaryExpr(Token* oper, Expr* expr);
@@ -90,8 +89,7 @@ struct ExponentExpr : public Expr {
     static auto make(Token* oper, Expr* left, Expr* right) -> ExponentExpr*;
 
     virtual auto type() -> ExprType override;
-    virtual auto evaluate() -> Object* override;
-    virtual auto print() -> void override;
+    virtual auto accept(ExprVisitor* visitor) -> Object* override;
 
 private:
     ExponentExpr(Token* oper, Expr* left, Expr* right);
@@ -105,8 +103,7 @@ struct LiteralExpr: public Expr {
     static auto make(Token* value) -> LiteralExpr*;
 
     virtual auto type() -> ExprType override;
-    virtual auto evaluate() -> Object* override;
-    virtual auto print() -> void override;
+    virtual auto accept(ExprVisitor* visitor) -> Object* override;
 
 private:
     LiteralExpr(Token* vaue);
@@ -120,8 +117,7 @@ struct IdentifierExpr : public Expr {
     static auto make(Token* name) -> IdentifierExpr*;
 
     virtual auto type() -> ExprType override;
-    virtual auto evaluate() -> Object* override;
-    virtual auto print() -> void override;
+    virtual auto accept(ExprVisitor* visitor) -> Object* override;
 
 private:
     IdentifierExpr(Token* name);
@@ -138,8 +134,7 @@ struct GroupingExpr : public Expr {
     static auto make(Token* left_paren, Expr* expr) -> GroupingExpr*;
 
     virtual auto type() -> ExprType override;
-    virtual auto evaluate() -> Object* override;
-    virtual auto print() -> void override;
+    virtual auto accept(ExprVisitor* visitor) -> Object* override;
 
 private:
     GroupingExpr(Token* left_paren, Expr* expr);
@@ -151,13 +146,27 @@ struct NilExpr : public Expr {
     static auto make() -> NilExpr*;
 
     virtual auto type() -> ExprType override;
-    virtual auto evaluate() -> Object* override;
-    virtual auto print() -> void override;
+    virtual auto accept(ExprVisitor* visitor) -> Object* override;
 
 private:
     NilExpr() = default;
     NilExpr(NilExpr&) = default;
     auto operator = (NilExpr&) -> NilExpr& = default;
+};
+
+
+// struct ExprVisitor
+struct ExprVisitor {
+    virtual ~ExprVisitor() = default;
+    virtual auto execute(std::vector<Expr*>& stmts) -> void = 0;
+    virtual auto visit_ternaryexpr(TernaryExpr* expr) -> Object* = 0;
+    virtual auto visit_binaryexpr(BinaryExpr* expr) -> Object* = 0;
+    virtual auto visit_unaryexpr(UnaryExpr* expr) -> Object* = 0;
+    virtual auto visit_exponentexpr(ExponentExpr* expr) -> Object* = 0;
+    virtual auto visit_literalexpr(LiteralExpr* expr) -> Object* = 0;
+    virtual auto visit_identifierexpr(IdentifierExpr* expr) -> Object* = 0;
+    virtual auto visit_groupingexpr(GroupingExpr* expr) -> Object* = 0;
+    virtual auto visit_nilexpr(NilExpr* expr) -> Object* = 0;
 };
 
 #endif

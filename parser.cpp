@@ -135,7 +135,7 @@ static auto match_prev_token(std::initializer_list<TokenType> types) -> bool {
 }
 
 static auto expect_token(TokenType type, uint32_t line, std::string_view message) -> Token* {
-    Token* token { peek_token() };
+    Token* token { get_token() };
     if (token->type != type) {
         error::add_parse_error(
             type,

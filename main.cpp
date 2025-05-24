@@ -1,6 +1,7 @@
 #include "error.hpp"
 #include "expr.hpp"
 #include "parser.hpp"
+#include "printer.hpp"
 #include "tokenizer.hpp"
 #include "token.hpp"
 
@@ -71,7 +72,14 @@ auto run(std::string_view source) -> void {
     if (error::has_errors()) {
         error::print();
     } else {
-        [[maybe_unused]] std::vector<Expr*>& stmts { parser::get_stmts(tokens) };
+        std::vector<Expr*>& stmts { parser::get_stmts(tokens) };
+
+        if (error::has_errors()) {
+            error::print();
+        } else {
+            Printer printer { };
+            printer.execute(stmts);
+        }
     }
 
     error::reset();

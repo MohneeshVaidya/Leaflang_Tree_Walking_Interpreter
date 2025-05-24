@@ -2,13 +2,13 @@
 
 using enum ExprType;
 
-// class Expr
+// struct Expr
 auto Expr::dest(Expr* expr) -> void {
     delete expr;
 }
 
 
-// class TernaryExpr
+// struct TernaryExpr
 TernaryExpr::TernaryExpr(Expr* condition, Expr* first, Expr* second) :
     condition{ condition },
     first{ first },
@@ -26,16 +26,16 @@ auto TernaryExpr::make(Expr* condition, Expr* first, Expr* second) -> TernaryExp
     return new TernaryExpr{ condition, first, second };
 }
 
-auto TernaryExpr::evaluate() -> Object* {
-    throw 1;
-}
-
 auto TernaryExpr::type() -> ExprType {
     return EXPR_TERNARY;
 }
 
+auto TernaryExpr::accept(ExprVisitor* visitor) -> Object* {
+    return visitor->visit_ternaryexpr(this);
+}
 
-// class BinaryExpr
+
+// struct BinaryExpr
 BinaryExpr::BinaryExpr(Token* oper, Expr* left, Expr* right) :
     oper{ oper },
     left{ left },
@@ -52,16 +52,16 @@ auto BinaryExpr::make(Token* oper, Expr* left, Expr* right) -> BinaryExpr* {
     return new BinaryExpr{ oper, left, right };
 }
 
-auto BinaryExpr::evaluate() -> Object* {
-    throw 1;
-}
-
 auto BinaryExpr::type() -> ExprType {
     return EXPR_BINARY;
 }
 
+auto BinaryExpr::accept(ExprVisitor* visitor) -> Object* {
+    return visitor->visit_binaryexpr(this);
+}
 
-// class UnaryExpr
+
+// struct UnaryExpr
 UnaryExpr::UnaryExpr(Token* oper, Expr* expr) :
     oper{ oper },
     expr{ expr }
@@ -76,16 +76,16 @@ auto UnaryExpr::make(Token* oper, Expr* expr) -> UnaryExpr* {
     return new UnaryExpr{ oper, expr };
 }
 
-auto UnaryExpr::evaluate() -> Object* {
-    throw 1;
-}
-
 auto UnaryExpr::type() -> ExprType {
     return EXPR_UNARY;
 }
 
+auto UnaryExpr::accept(ExprVisitor* visitor) -> Object* {
+    return visitor->visit_unaryexpr(this);
+}
 
-// class ExponentExpr
+
+// struct ExponentExpr
 ExponentExpr::ExponentExpr(Token* oper, Expr* left, Expr* right) :
     oper{ oper },
     left{ left },
@@ -102,16 +102,16 @@ auto ExponentExpr::make(Token* oper, Expr* left, Expr* right) -> ExponentExpr* {
     return new ExponentExpr{ oper, left, right };
 }
 
-auto ExponentExpr::evaluate() -> Object* {
-    throw 1;
-}
-
 auto ExponentExpr::type() -> ExprType {
     return EXPR_EXPONENT;
 }
 
+auto ExponentExpr::accept(ExprVisitor* visitor) -> Object* {
+    return visitor->visit_exponentexpr(this);
+}
 
-// class LiteralExpr
+
+// struct LiteralExpr
 LiteralExpr::LiteralExpr(Token* value) :
     value { value }
     {
@@ -121,16 +121,16 @@ auto LiteralExpr::make(Token* value) -> LiteralExpr* {
     return new LiteralExpr { value };
 }
 
-auto LiteralExpr::evaluate() -> Object* {
-    throw 1;
-}
-
 auto LiteralExpr::type() -> ExprType {
     return EXPR_LITERAL;
 }
 
+auto LiteralExpr::accept(ExprVisitor* visitor) -> Object* {
+    return visitor->visit_literalexpr(this);
+}
 
-// class IdentifierExpr
+
+// struct IdentifierExpr
 IdentifierExpr::IdentifierExpr(Token* name) :
     name{ name }
     {
@@ -140,16 +140,16 @@ auto IdentifierExpr::make(Token* name) -> IdentifierExpr* {
     return new IdentifierExpr{ name };
 }
 
-auto IdentifierExpr::evaluate() -> Object* {
-    throw 1;
-}
-
 auto IdentifierExpr::type() -> ExprType {
     return EXPR_IDENTIFIER;
 }
 
+auto IdentifierExpr::accept(ExprVisitor* visitor) -> Object* {
+    return visitor->visit_identifierexpr(this);
+}
 
-// class GroupingExpr
+
+// struct GroupingExpr
 GroupingExpr::GroupingExpr(Token* left_paren, Expr* expr) :
     left_paren{ left_paren },
     expr{ expr }
@@ -164,24 +164,24 @@ auto GroupingExpr::make(Token* left_paren, Expr* expr) -> GroupingExpr* {
     return new GroupingExpr{ left_paren, expr };
 }
 
-auto GroupingExpr::evaluate() -> Object* {
-    throw 1;
-}
-
 auto GroupingExpr::type() -> ExprType {
     return EXPR_GROUPING;
 }
 
+auto GroupingExpr::accept(ExprVisitor* visitor) -> Object* {
+    return visitor->visit_groupingexpr(this);
+}
 
-// class NilExpr
+
+// struct NilExpr
 auto NilExpr::make() -> NilExpr* {
     return new NilExpr{ };
 }
 
-auto NilExpr::evaluate() -> Object* {
-    throw 1;
-}
-
 auto NilExpr::type() -> ExprType {
     return EXPR_NIL;
+}
+
+auto NilExpr::accept(ExprVisitor* visitor) -> Object* {
+    return visitor->visit_nilexpr(this);
 }
