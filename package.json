@@ -1,0 +1,18 @@
+{
+    "name": "tree-walking-interpreter",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "repl": "NODE_ENV=production tsx --watch main.ts",
+        "file": "NODE_ENV=production tsx "
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "packageManager": "pnpm@10.11.0",
+    "devDependencies": {
+        "@types/node": "^22.15.29"
+    }
+}
