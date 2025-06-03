@@ -5,11 +5,11 @@ import tokenType, { type TokenType } from "./tokenType"
 
 export default class Tokenizer {
     private constructor(
-        private source: string = "",
-        private tokens: Token[] = [],
-        private start: number = 0,
-        private end: number = 0,
-        private line: number = 1
+        private _source: string = "",
+        private _tokens: Token[] = [],
+        private _start: number = 0,
+        private _end: number = 0,
+        private _line: number = 1
     ) {}
 
     static createInstance() {
@@ -17,7 +17,7 @@ export default class Tokenizer {
     }
 
     getTokens(source: string) {
-        this.source = source
+        this._source = source
 
         while (true) {
             const char = this.getChar()
@@ -27,17 +27,17 @@ export default class Tokenizer {
             }
             this.prepare(char)
         }
-        return this.tokens
+        return this._tokens
     }
 
     // private helpers
     private isAtEnd() {
-        return this.end >= this.source.length
+        return this._end >= this._source.length
     }
 
     private advance() {
         if (!this.isAtEnd()) {
-            ++this.end
+            ++this._end
         }
     }
 
@@ -46,21 +46,21 @@ export default class Tokenizer {
             return ""
         }
         this.advance()
-        return this.source[this.end - 1]
+        return this._source[this._end - 1]
     }
 
     private peekChar() {
         if (this.isAtEnd()) {
             return ""
         }
-        return this.source[this.end]
+        return this._source[this._end]
     }
 
     private peekNextChar() {
-        if (this.end + 1 >= this.source.length) {
+        if (this._end + 1 >= this._source.length) {
             return ""
         }
-        return this.source[this.end + 1]
+        return this._source[this._end + 1]
     }
 
     private match(...targets: string[]) {
@@ -82,14 +82,14 @@ export default class Tokenizer {
             }
             this.advance()
         }
-        this.start = this.end
+        this._start = this._end
     }
 
     private skipComment() {
         while (true) {
             const char = this.peekChar()
             if (char === "\n") {
-                ++this.line
+                ++this._line
                 break
             } else if (char === "") {
                 break
@@ -99,7 +99,7 @@ export default class Tokenizer {
     }
 
     private string() {
-        this.start = this.end
+        this._start = this._end
 
         while (true) {
             const char = this.peekChar()
@@ -108,7 +108,7 @@ export default class Tokenizer {
             }
             if (char === "" || char === "\n") {
                 LeafError.getInstance().addLexicalError(
-                    this.line,
+                    this._line,
                     "a string must end with '\"';"
                 )
                 return
@@ -117,14 +117,14 @@ export default class Tokenizer {
         }
         this.addToken(tokenType.STRING)
         this.advance()
-        this.start = this.end
+        this._start = this._end
     }
 
     private fmtString() {
-        this.start = this.end
+        this._start = this._end
 
         const getFmtStrTokens = () => {
-            const i = this.end
+            const i = this._end
             let val = 1
             while (val > 0) {
                 switch (this.peekChar()) {
@@ -135,10 +135,10 @@ export default class Tokenizer {
                         --val
                         break
                     case "\n":
-                        this.line++
+                        this._line++
                     case "":
                         LeafError.getInstance().addLexicalError(
-                            this.line,
+                            this._line,
                             "a string must end with '\"';"
                         )
                         throw 1
@@ -146,7 +146,7 @@ export default class Tokenizer {
                 this.advance()
             }
             return Tokenizer.createInstance().getTokens(
-                this.source.slice(i, this.end - 1)
+                this._source.slice(i, this._end - 1)
             )
         }
 
@@ -159,13 +159,13 @@ export default class Tokenizer {
             }
             if (char === "" || char === "\n") {
                 LeafError.getInstance().addLexicalError(
-                    this.line,
+                    this._line,
                     "a string must end with '\"';"
                 )
                 return
             }
             if (char === "$" && this.peekNextChar() === "{") {
-                this.end += 2
+                this._end += 2
                 try {
                     tokens.push(getFmtStrTokens())
                 } catch (_) {
@@ -177,7 +177,7 @@ export default class Tokenizer {
         }
         this.addFmtStrToken(tokens)
         this.advance()
-        this.start = this.end
+        this._start = this._end
     }
 
     private number() {
@@ -287,7 +287,7 @@ export default class Tokenizer {
                 break
             case "\n":
                 this.addToken(tokenType.NEWLINE)
-                this.line++
+                this._line++
                 break
             case "?":
                 this.addToken(tokenType.QUESTION)
@@ -296,30 +296,30 @@ export default class Tokenizer {
     }
 
     private addToken(type: TokenType) {
-        this.tokens.push(
+        this._tokens.push(
             Token.createInstance(
                 type,
-                this.source.slice(this.start, this.end),
-                this.line
+                this._source.slice(this._start, this._end),
+                this._line
             )
         )
-        this.start = this.end
+        this._start = this._end
     }
 
     private addFmtStrToken(tokens: Token[][]) {
-        this.tokens.push(
+        this._tokens.push(
             Token.createInstance(
                 tokenType.FMT_STRING,
-                this.source.slice(this.start, this.end),
-                this.line,
+                this._source.slice(this._start, this._end),
+                this._line,
                 tokens
             )
         )
-        this.start = this.end
+        this._start = this._end
     }
 
     private addIdentifierToken() {
-        const lexeme = this.source.slice(this.start, this.end)
+        const lexeme = this._source.slice(this._start, this._end)
         switch (lexeme) {
             case "print":
                 this.addToken(tokenType.PRINT)

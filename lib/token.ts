@@ -2,10 +2,10 @@ import { type TokenType } from "./tokenType"
 
 export default class Token {
     private constructor(
-        private type: TokenType,
-        private lexeme: string,
-        private line: number,
-        private fmtStrTokens?: Token[][]
+        private _type: TokenType,
+        private _lexeme: string,
+        private _line: number,
+        private _fmtStrTokens?: Token[][]
     ) {}
 
     private static instance: Token
@@ -19,27 +19,27 @@ export default class Token {
         return new Token(type, lexeme, line, fmtStrTokens)
     }
 
-    getType() {
-        return this.type
+    type() {
+        return this._type
     }
 
-    getLexeme() {
-        return this.lexeme
+    lexeme() {
+        return this._lexeme
     }
 
-    getLine() {
-        return this.line
+    line() {
+        return this._line
     }
 
-    getTokens() {
-        return this.fmtStrTokens
+    tokens() {
+        return this._fmtStrTokens
     }
 
     toString(): string {
         return `Token{
-    type   = ${this.type}
-    lexeme = ${this.lexeme}
-    line   = ${this.line}
+    type   = ${this._type}
+    lexeme = ${this._lexeme}
+    line   = ${this._line}
 }`
     }
 }
