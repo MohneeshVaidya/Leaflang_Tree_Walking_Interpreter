@@ -1,4 +1,6 @@
 import LeafError from "./lib/error"
+import Interpreter from "./lib/interpreter"
+import Parser from "./lib/parser"
 import Token from "./lib/token"
 import Tokenizer from "./lib/tokenizer"
 import utils from "./lib/utils"
@@ -22,7 +24,6 @@ const main = async (argc: number, argv: string[]) => {
         printHelp()
         exit(1)
     }
-
     if (argc === 1) {
         await runRepl()
         exit(0)
@@ -60,7 +61,14 @@ const run = (source: string) => {
         exit(1)
     }
 
-    printTokens(tokens)
+    const stmts = Parser.createInstance().getStmts(tokens)
+
+    if (LeafError.getInstance().hasErrors()) {
+        printErrors(LeafError.getInstance().errors())
+        exit(1)
+    }
+
+    Interpreter.createInstance().execute(stmts)
 }
 
 const printErrors = (errors: string[]) => {

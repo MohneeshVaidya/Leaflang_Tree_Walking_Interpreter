@@ -5,7 +5,7 @@
     "main": "index.js",
     "type": "module",
     "scripts": {
-        "repl": "NODE_ENV=production tsx --watch main.ts",
+        "repl": "NODE_ENV=production tsx main.ts",
         "file": "NODE_ENV=production tsx "
     },
     "keywords": [],

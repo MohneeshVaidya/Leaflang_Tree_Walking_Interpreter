@@ -4,6 +4,26 @@ export default interface IExpr {
     accept<T>(visitor: IExprVisitor<T>): T
 }
 
+export class AssignExpr implements IExpr {
+    constructor(private _identifier: Token, private _expr: IExpr) {}
+
+    static createInstance(identifier: Token, expr: IExpr) {
+        return new AssignExpr(identifier, expr)
+    }
+
+    identifier() {
+        return this._identifier
+    }
+
+    expr() {
+        return this._expr
+    }
+
+    accept<T>(visitor: IExprVisitor<T>): T {
+        return visitor.visitAssignExpr(this)
+    }
+}
+
 export class TernaryExpr implements IExpr {
     private constructor(
         private _condition: IExpr,
@@ -176,7 +196,22 @@ export class IdentifierExpr implements IExpr {
     }
 }
 
+export class NilExpr implements IExpr {
+    private constructor() {}
+
+    static createInstance() {
+        return new NilExpr()
+    }
+
+    accept<T>(visitor: IExprVisitor<T>): T {
+        return visitor.visitNilExpr(this)
+    }
+}
+
 export interface IExprVisitor<T> {
+    execute(exprs: IExpr[]): void
+
+    visitAssignExpr(expr: AssignExpr): T
     visitTernaryExpr(expr: TernaryExpr): T
     visitBinaryExpr(expr: BinaryExpr): T
     visitExponentExpr(expr: ExponentExpr): T
@@ -184,4 +219,5 @@ export interface IExprVisitor<T> {
     visitGroupingExpr(expr: GroupingExpr): T
     visitLiteralExpr(expr: LiteralExpr): T
     visitIdentifierExpr(expr: IdentifierExpr): T
+    visitNilExpr(expr: NilExpr): T
 }

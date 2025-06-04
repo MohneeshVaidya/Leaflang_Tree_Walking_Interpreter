@@ -1,4 +1,5 @@
 import { createInterface } from "node:readline/promises"
+import IObj from "./object"
 
 const reader = createInterface({
     input: process.stdin,
@@ -36,10 +37,15 @@ const isAlphaNumeric = (char: string) => {
     return isAlphabetic(char) || isNumeric(char)
 }
 
+const isTruthy = (value: IObj) => {
+    return !!value.value()
+}
+
 export default {
     readInput,
     isSpace,
     isNumeric,
     isAlphabetic,
     isAlphaNumeric,
+    isTruthy,
 }
