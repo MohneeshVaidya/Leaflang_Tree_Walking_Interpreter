@@ -1,6 +1,7 @@
 import LeafError from "./error"
 import type IExpr from "./expr"
 import {
+    AssignExpr,
     BinaryExpr,
     ExponentExpr,
     GroupingExpr,
@@ -33,7 +34,7 @@ export default class Parser {
     }
 
     private isAtEnd() {
-        return this._current >= this._tokens.length
+        return this._current >= this._tokens.length - 1
     }
 
     private advance() {
@@ -84,7 +85,17 @@ export default class Parser {
     }
 
     private expression(): IExpr {
-        return this.ternaryExpr()
+        return this.assignExpr()
+    }
+
+    private assignExpr(): IExpr {
+        const left = this.ternaryExpr()
+        if (this.match(tokenType.EQUAL)) {
+            const oper = this.peekPrev()
+            const right = this.assignExpr()
+            return AssignExpr.createInstance(oper, left, right)
+        }
+        return left
     }
 
     private ternaryExpr(): IExpr {
@@ -198,7 +209,7 @@ export default class Parser {
     private primaryExpr(): IExpr {
         const token = this.get()
 
-        if (this.matchPrev(tokenType.LEFT_BRACE)) {
+        if (this.matchPrev(tokenType.LEFT_PAREN)) {
             return this.groupingExpr()
         }
 
@@ -222,7 +233,7 @@ export default class Parser {
 
     private groupingExpr(): IExpr {
         const leftParen = this.peekPrev()
-        const expr = this.ternaryExpr()
+        const expr = this.expression()
         this.expect(
             tokenType.RIGHT_PAREN,
             leftParen.line(),

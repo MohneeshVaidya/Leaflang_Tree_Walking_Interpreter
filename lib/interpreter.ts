@@ -1,6 +1,8 @@
 import binaryOperation from "./binaryOperation"
+import Environment from "./environment"
 import LeafError from "./error"
 import IExpr, {
+    AssignExpr,
     BinaryExpr,
     ExponentExpr,
     GroupingExpr,
@@ -16,7 +18,7 @@ import tokenType from "./tokenType"
 import utils from "./utils"
 
 export default class Interpreter implements IExprVisitor<IObj> {
-    private constructor() {}
+    private constructor(private _environment = Environment.createInstance()) {}
 
     static createInstance() {
         return new Interpreter()
@@ -30,6 +32,12 @@ export default class Interpreter implements IExprVisitor<IObj> {
 
     private evaluate(expr: IExpr) {
         return expr.accept(this)
+    }
+
+    visitAssignExpr(expr: AssignExpr): IObj {
+        const value = this.evaluate(expr.right())
+        this._environment.set(expr.left().token(), value)
+        return value
     }
 
     visitTernaryExpr(expr: TernaryExpr): IObj {
@@ -92,7 +100,7 @@ export default class Interpreter implements IExprVisitor<IObj> {
     }
 
     visitIdentifierExpr(expr: IdentifierExpr): IObj {
-        throw new Error("method not implemented.")
+        return this._environment.get(expr.token())
     }
 
     visitNilExpr(expr: NilExpr): IObj {

@@ -5,18 +5,26 @@ export default interface IExpr {
 }
 
 export class AssignExpr implements IExpr {
-    constructor(private _identifier: Token, private _expr: IExpr) {}
+    constructor(
+        private _oper: Token,
+        private _left: IdentifierExpr,
+        private _right: IExpr
+    ) {}
 
-    static createInstance(identifier: Token, expr: IExpr) {
-        return new AssignExpr(identifier, expr)
+    static createInstance(oper: Token, left: IExpr, right: IExpr) {
+        return new AssignExpr(oper, left as IdentifierExpr, right)
     }
 
-    identifier() {
-        return this._identifier
+    oper() {
+        return this._oper
     }
 
-    expr() {
-        return this._expr
+    left() {
+        return this._left
+    }
+
+    right() {
+        return this._right
     }
 
     accept<T>(visitor: IExprVisitor<T>): T {
