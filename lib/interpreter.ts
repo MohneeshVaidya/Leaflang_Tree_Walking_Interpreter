@@ -14,22 +14,119 @@ import IExpr, {
     UnaryExpr,
 } from "./expr"
 import IObj, { ObjBool, ObjNil, ObjNumber, ObjString } from "./object"
+import IStmt, {
+    BlockStmt,
+    BreakStmt,
+    ConstStmt,
+    ContinueStmt,
+    ExprStmt,
+    ForStmt,
+    FuncStmt,
+    IfStmt,
+    InfiniteForStmt,
+    IStmtVisitor,
+    LetForStmt,
+    LetStmt,
+    PrintlnStmt,
+    PrintStmt,
+    ReturnStmt,
+    WhileForStmt,
+} from "./stmt"
 import tokenType from "./tokenType"
 import utils from "./utils"
 
-export default class Interpreter implements IExprVisitor<IObj> {
+export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
     private constructor(private _environment = Environment.createInstance()) {}
 
     static createInstance() {
         return new Interpreter()
     }
 
-    execute(exprs: IExpr[]): void {
-        exprs.forEach((expr) => {
-            console.log(this.evaluate(expr).value())
+    execute(stmts: IStmt[]): void {
+        stmts.forEach((stmt) => {
+            this.executeStmt(stmt)
         })
     }
 
+    // statement visitor functions
+    private executeStmt(stmt: IStmt): void {
+        stmt.accept(this)
+    }
+
+    visitPrintStmt(stmt: PrintStmt): void {
+        process.stdout.write(`${this.evaluate(stmt.expr()).value()}`)
+    }
+
+    visitPrintlnStmt(stmt: PrintlnStmt): void {
+        console.log(this.evaluate(stmt.expr()).value())
+    }
+
+    visitLetStmt(stmt: LetStmt): void {
+        this._environment.insertLet(
+            stmt.identifier(),
+            this.evaluate(stmt.expr())
+        )
+    }
+
+    visitConstStmt(stmt: ConstStmt): void {
+        this._environment.insertConst(
+            stmt.identifier(),
+            this.evaluate(stmt.expr())
+        )
+    }
+
+    visitBlockStmt(stmt: BlockStmt): void {
+        const environment = Environment.createInstance(this._environment)
+        this._environment = environment
+
+        stmt.stmts().forEach((stmt) => {
+            this.executeStmt(stmt)
+        })
+
+        this._environment = this._environment.parent() as Environment
+    }
+
+    visitIfStmt(stmt: IfStmt): void {
+        throw new Error("Method not implemented.")
+    }
+
+    visitInfiniteForStmt(stmt: InfiniteForStmt): void {
+        throw new Error("Method not implemented.")
+    }
+
+    visitWhileForStmt(stmt: WhileForStmt): void {
+        throw new Error("Method not implemented.")
+    }
+
+    visitForStmt(stmt: ForStmt): void {
+        throw new Error("Method not implemented.")
+    }
+
+    visitLetForStmt(stmt: LetForStmt): void {
+        throw new Error("Method not implemented.")
+    }
+
+    visitBreakStmt(stmt: BreakStmt): void {
+        throw new Error("Method not implemented.")
+    }
+
+    visitContinueStmt(stmt: ContinueStmt): void {
+        throw new Error("Method not implemented.")
+    }
+
+    visitFuncStmt(stmt: FuncStmt): void {
+        throw new Error("Method not implemented.")
+    }
+
+    visitReturnStmt(stmt: ReturnStmt): void {
+        throw new Error("Method not implemented.")
+    }
+
+    visitExprStmt(stmt: ExprStmt): void {
+        this.evaluate(stmt.expr())
+    }
+
+    // expression visitor functions
     private evaluate(expr: IExpr) {
         return expr.accept(this)
     }

@@ -11,13 +11,21 @@ import {
     TernaryExpr,
     UnaryExpr,
 } from "./expr"
+import IStmt, {
+    BlockStmt,
+    ConstStmt,
+    ExprStmt,
+    LetStmt,
+    PrintlnStmt,
+    PrintStmt,
+} from "./stmt"
 import Token from "./token"
 import tokenType, { TokenType } from "./tokenType"
 
 export default class Parser {
     private constructor(
         private _tokens: Token[],
-        private _stmts: IExpr[],
+        private _stmts: IStmt[],
         private _current: number
     ) {}
 
@@ -28,7 +36,7 @@ export default class Parser {
     getStmts(tokens: Token[]) {
         this._tokens = tokens
         while (!this.isAtEnd()) {
-            this._stmts.push(this.expression())
+            this._stmts.push(this.statement())
         }
         return this._stmts
     }
@@ -72,7 +80,7 @@ export default class Parser {
             return this.peekPrev()
         }
         LeafError.getInstance().addParsingError(line, msg)
-        throw new Error("synchronize")
+        throw new Error(msg)
     }
 
     private peekPrev() {
@@ -84,6 +92,86 @@ export default class Parser {
         return tokenTypes.includes(type)
     }
 
+    // statements
+    private statement(): IStmt {
+        if (this.match(tokenType.PRINT)) return this.printStmt()
+        if (this.match(tokenType.PRINTLN)) return this.printlnStmt()
+        if (this.match(tokenType.LET)) return this.letStmt()
+        if (this.match(tokenType.CONST)) return this.constStmt()
+        if (this.match(tokenType.LEFT_BRACE)) return this.blockStmt()
+        return this.expressionStmt()
+    }
+
+    private printStmt(): IStmt {
+        const line = this.peekPrev().line()
+        const expr = this.expression()
+        this.expect(tokenType.SEMICOLON, line, "a statement must end with ';'")
+        return PrintStmt.createInstance(expr)
+    }
+
+    private printlnStmt(): IStmt {
+        const line = this.peekPrev().line()
+        const expr = this.expression()
+        this.expect(tokenType.SEMICOLON, line, "a statement must end with ';'")
+        return PrintlnStmt.createInstance(expr)
+    }
+
+    private letStmt(): IStmt {
+        const line = this.peekPrev().line()
+        const identifier = this.expect(
+            tokenType.IDENTIFIER,
+            line,
+            "a name is expected after let keyword (name should not be a keyword provided by language)"
+        )
+        if (this.match(tokenType.SEMICOLON)) {
+            return LetStmt.createInstance(identifier, NilExpr.createInstance())
+        }
+        this.expect(
+            tokenType.EQUAL,
+            line,
+            `'=' is required after '${identifier.lexeme()}'`
+        )
+        const expr = this.expression()
+
+        this.expect(tokenType.SEMICOLON, line, "a statement must end with ';'")
+
+        return LetStmt.createInstance(identifier, expr)
+    }
+
+    private constStmt(): IStmt {
+        const line = this.peekPrev().line()
+        const identifier = this.expect(
+            tokenType.IDENTIFIER,
+            line,
+            "a name is expected after const keyword (name should not be a keyword provided by language)"
+        )
+        this.expect(
+            tokenType.EQUAL,
+            line,
+            `a constant declaration requires an initializer`
+        )
+        const expr = this.expression()
+
+        this.expect(tokenType.SEMICOLON, line, "a statement must end with ';'")
+
+        return ConstStmt.createInstance(identifier, expr)
+    }
+
+    private blockStmt(): IStmt {
+        const stmts: IStmt[] = []
+        while (!this.match(tokenType.RIGHT_BRACE)) {
+            stmts.push(this.statement())
+        }
+        return BlockStmt.createInstance(stmts)
+    }
+
+    private expressionStmt(): IStmt {
+        const stmt = ExprStmt.createInstance(this.expression())
+        this.expect(tokenType.SEMICOLON, 0, "a statement must end with ';'")
+        return stmt
+    }
+
+    // expressions
     private expression(): IExpr {
         return this.assignExpr()
     }

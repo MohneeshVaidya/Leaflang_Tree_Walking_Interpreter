@@ -1,0 +1,11 @@
+let myName = "warrior_vegito";
+{
+    const myName = "Mohneesh Vaidya";
+    println myName;
+    {
+        let myName = "Gogeta";
+        myName = nil;
+        println myName;
+    }
+}
+println myName;

@@ -1,17 +1,18 @@
 import { createInterface } from "node:readline/promises"
 import IObj from "./object"
 
-const reader = createInterface({
-    input: process.stdin,
-    output: process.stdout,
-})
-
 const readInput = async (text: string) => {
-    return reader.question(text)
+    const reader = createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    })
+    const input = await reader.question(text)
+    reader.close()
+    return input
 }
 
 const isSpace = (char: string) => {
-    return [" ", "\t", "\r"].includes(char)
+    return [" ", "\t", "\r", "\n"].includes(char)
 }
 
 const isNumeric = (char: string) => {

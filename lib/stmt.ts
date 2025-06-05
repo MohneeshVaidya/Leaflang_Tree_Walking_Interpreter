@@ -109,19 +109,141 @@ export class IfStmt implements IStmt {
     }
 }
 
+export class InfiniteForStmt implements IStmt {
+    private constructor(private _stmts: BlockStmt) {}
+
+    static createInstance(stmts: BlockStmt) {
+        return new InfiniteForStmt(stmts)
+    }
+
+    stmts() {
+        return this._stmts
+    }
+
+    accept(visitor: IStmtVisitor): void {
+        visitor.visitInfiniteForStmt(this)
+    }
+}
+
+export class WhileForStmt implements IStmt {
+    private constructor(private _condition: IExpr, private _stmts: BlockStmt) {}
+
+    static createInstance(condition: IExpr, stmts: BlockStmt) {
+        return new WhileForStmt(condition, stmts)
+    }
+
+    condition() {
+        return this._condition
+    }
+
+    stmts() {
+        return this._stmts
+    }
+
+    accept(visitor: IStmtVisitor): void {
+        visitor.visitWhileForStmt(this)
+    }
+}
+
 export class ForStmt implements IStmt {
+    private constructor(
+        private _init: IExpr,
+        private _condition: IExpr,
+        private _step: IExpr,
+        private _stmts: BlockStmt
+    ) {}
+
+    static createInstance(
+        init: IExpr,
+        condition: IExpr,
+        step: IExpr,
+        stmts: BlockStmt
+    ) {
+        return new ForStmt(init, condition, step, stmts)
+    }
+
+    init() {
+        return this._init
+    }
+
+    condition() {
+        return this._condition
+    }
+
+    step() {
+        return this._step
+    }
+
+    stmts() {
+        return this._stmts
+    }
+
     accept(visitor: IStmtVisitor): void {
         visitor.visitForStmt(this)
     }
 }
 
+export class LetForStmt implements IStmt {
+    private constructor(
+        private _init: LetStmt,
+        private _condition: IExpr,
+        private _step: IExpr,
+        private _stmts: BlockStmt
+    ) {}
+
+    static createInstance(
+        init: LetStmt,
+        condition: IExpr,
+        step: IExpr,
+        stmts: BlockStmt
+    ) {
+        return new LetForStmt(init, condition, step, stmts)
+    }
+
+    init() {
+        return this._init
+    }
+
+    condition() {
+        return this._condition
+    }
+
+    step() {
+        return this._step
+    }
+
+    stmts() {
+        return this._stmts
+    }
+
+    accept(visitor: IStmtVisitor): void {
+        visitor.visitLetForStmt(this)
+    }
+}
+
 export class BreakStmt implements IStmt {
+    private constructor() {}
+
+    static createInstance() {
+        return new BreakStmt()
+    }
+
     accept(visitor: IStmtVisitor): void {
         visitor.visitBreakStmt(this)
     }
 }
 
 export class ContinueStmt implements IStmt {
+    private constructor(private _step: IExpr) {}
+
+    static createInstance(step: IExpr) {
+        return new ContinueStmt(step)
+    }
+
+    step() {
+        return this._step
+    }
+
     accept(visitor: IStmtVisitor): void {
         visitor.visitContinueStmt(this)
     }
@@ -140,6 +262,16 @@ export class ReturnStmt implements IStmt {
 }
 
 export class ExprStmt implements IStmt {
+    private constructor(private _expr: IExpr) {}
+
+    static createInstance(expr: IExpr) {
+        return new ExprStmt(expr)
+    }
+
+    expr() {
+        return this._expr
+    }
+
     accept(visitor: IStmtVisitor): void {
         visitor.visitExprStmt(this)
     }
@@ -154,7 +286,10 @@ export interface IStmtVisitor {
     visitConstStmt(stmt: ConstStmt): void
     visitBlockStmt(stmt: BlockStmt): void
     visitIfStmt(stmt: IfStmt): void
+    visitInfiniteForStmt(stmt: InfiniteForStmt): void
+    visitWhileForStmt(stmt: WhileForStmt): void
     visitForStmt(stmt: ForStmt): void
+    visitLetForStmt(stmt: LetForStmt): void
     visitBreakStmt(stmt: BreakStmt): void
     visitContinueStmt(stmt: ContinueStmt): void
     visitFuncStmt(stmt: FuncStmt): void

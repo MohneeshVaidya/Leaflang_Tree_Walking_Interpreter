@@ -39,6 +39,7 @@ const printHelp = () => {
 
 const runRepl = async () => {
     while (true) {
+        console.log()
         const source = await utils.readInput("leaf > ")
         if (source === "exit") {
             console.log("Exiting Repl")

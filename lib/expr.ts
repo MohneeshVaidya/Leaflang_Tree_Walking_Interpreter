@@ -217,8 +217,6 @@ export class NilExpr implements IExpr {
 }
 
 export interface IExprVisitor<T> {
-    execute(exprs: IExpr[]): void
-
     visitAssignExpr(expr: AssignExpr): T
     visitTernaryExpr(expr: TernaryExpr): T
     visitBinaryExpr(expr: BinaryExpr): T

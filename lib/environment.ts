@@ -24,6 +24,10 @@ export default class Environment {
         )
     }
 
+    parent() {
+        return this._parent
+    }
+
     setParent(parent: Environment) {
         this._parent = parent
     }
@@ -32,7 +36,7 @@ export default class Environment {
         if (this.hasIdentifier(identifier)) {
             LeafError.getInstance().throwRunTimeError(
                 identifier.line(),
-                `name '${identifier.lexeme()}' re-declared in same scope;`
+                `name '${identifier.lexeme()}' re-declared in same scope`
             )
         }
         this._table.set("let_" + identifier.lexeme(), value)
@@ -42,7 +46,7 @@ export default class Environment {
         if (this.hasIdentifier(identifier)) {
             LeafError.getInstance().throwRunTimeError(
                 identifier.line(),
-                `name '${identifier.lexeme()}' re-declared in same scope;`
+                `name '${identifier.lexeme()}' re-declared in same scope`
             )
         }
         this._table.set("const_" + identifier.lexeme(), value)
@@ -56,14 +60,14 @@ export default class Environment {
         if (this._table.has("const_" + identifier.lexeme())) {
             LeafError.getInstance().throwRunTimeError(
                 identifier.line(),
-                `const '${identifier.lexeme()}' can not be re-assigned a value;`
+                `const '${identifier.lexeme()}' can not be re-assigned a value`
             )
         }
 
         if (this._parent === null) {
             LeafError.getInstance().throwRunTimeError(
                 identifier.line(),
-                `name '${identifier.lexeme()}' is used before declaration;`
+                `name '${identifier.lexeme()}' is used before declaration`
             )
         } else {
             this._parent.set(identifier, value)
@@ -79,7 +83,7 @@ export default class Environment {
         if (this._parent === null) {
             LeafError.getInstance().throwRunTimeError(
                 identifier.line(),
-                `name '${identifier.lexeme()}' is used before declaration;`
+                `name '${identifier.lexeme()}' is used before declaration`
             )
             throw ""
         } else {

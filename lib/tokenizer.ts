@@ -20,7 +20,7 @@ export default class Tokenizer {
         this._source = source
 
         while (true) {
-            const char = this.getChar()
+            const char = this.get()
             if (char === "") {
                 this.addToken(tokenType.EOF)
                 break
@@ -41,7 +41,7 @@ export default class Tokenizer {
         }
     }
 
-    private getChar() {
+    private get() {
         if (this.isAtEnd()) {
             return ""
         }
@@ -49,22 +49,26 @@ export default class Tokenizer {
         return this._source[this._end - 1]
     }
 
-    private peekChar() {
+    private peek() {
         if (this.isAtEnd()) {
             return ""
         }
         return this._source[this._end]
     }
 
-    private peekNextChar() {
+    private peekNext() {
         if (this._end + 1 >= this._source.length) {
             return ""
         }
         return this._source[this._end + 1]
     }
 
+    private peekPrev() {
+        return this._source[this._end - 1]
+    }
+
     private match(...targets: string[]) {
-        const char = this.peekChar()
+        const char = this.peek()
         for (let target of targets) {
             if (char === target) {
                 this.advance()
@@ -75,10 +79,16 @@ export default class Tokenizer {
     }
 
     private skipws() {
+        if (this.peekPrev() === "\n") {
+            ++this._line
+        }
         while (true) {
-            const char = this.peekChar()
+            const char = this.peek()
             if (!utils.isSpace(char)) {
                 break
+            }
+            if (char === "\n") {
+                ++this._line
             }
             this.advance()
         }
@@ -87,7 +97,7 @@ export default class Tokenizer {
 
     private skipComment() {
         while (true) {
-            const char = this.peekChar()
+            const char = this.peek()
             if (char === "\n") {
                 ++this._line
                 break
@@ -102,7 +112,7 @@ export default class Tokenizer {
         this._start = this._end
 
         while (true) {
-            const char = this.peekChar()
+            const char = this.peek()
             if (char === '"') {
                 break
             }
@@ -127,7 +137,7 @@ export default class Tokenizer {
             const i = this._end
             let val = 1
             while (val > 0) {
-                switch (this.peekChar()) {
+                switch (this.peek()) {
                     case "{":
                         ++val
                         break
@@ -153,7 +163,7 @@ export default class Tokenizer {
         const tokens: Token[][] = []
 
         while (true) {
-            const char = this.peekChar()
+            const char = this.peek()
             if (char === '"') {
                 break
             }
@@ -164,7 +174,7 @@ export default class Tokenizer {
                 )
                 return
             }
-            if (char === "$" && this.peekNextChar() === "{") {
+            if (char === "$" && this.peekNext() === "{") {
                 this._end += 2
                 try {
                     tokens.push(getFmtStrTokens())
@@ -182,7 +192,7 @@ export default class Tokenizer {
 
     private number() {
         while (true) {
-            const char = this.peekChar()
+            const char = this.peek()
             if (!(utils.isNumeric(char) || char === ".")) {
                 break
             }
@@ -193,7 +203,7 @@ export default class Tokenizer {
 
     private identifier() {
         while (true) {
-            const char = this.peekChar()
+            const char = this.peek()
             if (!utils.isAlphaNumeric(char)) {
                 break
             }
@@ -284,10 +294,6 @@ export default class Tokenizer {
                 break
             case ".":
                 this.addToken(tokenType.DOT)
-                break
-            case "\n":
-                this.addToken(tokenType.NEWLINE)
-                this._line++
                 break
             case "?":
                 this.addToken(tokenType.QUESTION)
