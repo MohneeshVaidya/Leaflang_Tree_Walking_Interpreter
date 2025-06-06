@@ -9,3 +9,11 @@ let myName = "warrior_vegito";
     }
 }
 println myName;
+
+if false {
+    println "if block is executed";
+}
+
+if 1 + 2 <= 2 {
+    println "if block is executed";
+}

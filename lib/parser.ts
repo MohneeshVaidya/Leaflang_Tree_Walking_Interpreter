@@ -15,6 +15,7 @@ import IStmt, {
     BlockStmt,
     ConstStmt,
     ExprStmt,
+    IfStmt,
     LetStmt,
     PrintlnStmt,
     PrintStmt,
@@ -99,6 +100,7 @@ export default class Parser {
         if (this.match(tokenType.LET)) return this.letStmt()
         if (this.match(tokenType.CONST)) return this.constStmt()
         if (this.match(tokenType.LEFT_BRACE)) return this.blockStmt()
+        if (this.match(tokenType.IF)) return this.ifStmt()
         return this.expressionStmt()
     }
 
@@ -163,6 +165,48 @@ export default class Parser {
             stmts.push(this.statement())
         }
         return BlockStmt.createInstance(stmts)
+    }
+
+    private ifStmt(): IStmt {
+        const line = this.peekPrev().line()
+
+        const stmtTable: [IExpr, BlockStmt][] = []
+
+        const condition = this.expression()
+        this.expect(
+            tokenType.LEFT_BRACE,
+            line,
+            "'{' is expected after condition expression of 'if'"
+        )
+        stmtTable.push([condition, this.blockStmt() as BlockStmt])
+
+        while (this.match(tokenType.ELSEIF)) {
+            const line = this.peekPrev().line()
+            const condition = this.expression()
+            this.expect(
+                tokenType.LEFT_BRACE,
+                line,
+                "'{' is expected after condition expression of 'elseif'"
+            )
+            stmtTable.push([condition, this.blockStmt() as BlockStmt])
+        }
+
+        if (this.match(tokenType.ELSE)) {
+            const line = this.peekPrev().line()
+            this.expect(
+                tokenType.LEFT_BRACE,
+                line,
+                "'{' is expected after 'else' keyword"
+            )
+            stmtTable.push([
+                LiteralExpr.createInstance(
+                    Token.createInstance(tokenType.TRUE, "true", 0)
+                ),
+                this.blockStmt() as BlockStmt,
+            ])
+        }
+
+        return IfStmt.createInstance(stmtTable)
     }
 
     private expressionStmt(): IStmt {

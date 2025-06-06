@@ -87,7 +87,13 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
     }
 
     visitIfStmt(stmt: IfStmt): void {
-        throw new Error("Method not implemented.")
+        stmt.stmtTable().find(([condition, block]) => {
+            if (utils.isTruthy(this.evaluate(condition))) {
+                this.visitBlockStmt(block)
+                return true
+            }
+            return false
+        })
     }
 
     visitInfiniteForStmt(stmt: InfiniteForStmt): void {
