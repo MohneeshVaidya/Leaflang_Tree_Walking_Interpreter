@@ -43,6 +43,7 @@ enum BlockCtx {
 }
 
 const breakStmt = "breakStmt"
+const continueStmt = "continueStmt"
 
 export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
     private constructor(
@@ -127,13 +128,13 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
 
     visitInfiniteForStmt(stmt: InfiniteForStmt): void {
         while (true) {
-            this.executeStmt(stmt.stmts())
+            this.continueWrapper(stmt.stmts())
         }
     }
 
     visitWhileForStmt(stmt: WhileForStmt): void {
         while (utils.isTruthy(this.evaluate(stmt.condition()))) {
-            this.executeStmt(stmt.stmts())
+            this.continueWrapper(stmt.stmts())
         }
     }
 
@@ -143,7 +144,7 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
             utils.isTruthy(this.evaluate(stmt.condition()));
             this.evaluate(stmt.step())
         ) {
-            this.executeStmt(stmt.stmts())
+            this.continueWrapper(stmt.stmts())
         }
     }
 
@@ -157,7 +158,7 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
                 utils.isTruthy(this.evaluate(stmt.condition()));
                 this.evaluate(stmt.step())
             ) {
-                this.executeStmt(stmt.stmts())
+                this.continueWrapper(stmt.stmts())
             }
         } catch (err) {
             this._environment = this._environment.parent() as Environment
@@ -178,7 +179,13 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
     }
 
     visitContinueStmt(stmt: ContinueStmt): void {
-        throw new Error("Method not implemented.")
+        if (this._blockCtx !== BlockCtx.FOR) {
+            LeafError.getInstance().throwRunTimeError(
+                stmt.keyword().line(),
+                "'continue' can only be used inside a loop"
+            )
+        }
+        throw new Error(continueStmt)
     }
 
     visitFuncStmt(stmt: FuncStmt): void {
@@ -269,5 +276,16 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
 
     visitNilExpr(expr: NilExpr): IObj {
         return ObjNil.createInstance()
+    }
+
+    // private helper functions
+    private continueWrapper(stmt: BlockStmt) {
+        try {
+            this.visitBlockStmt(stmt)
+        } catch (err) {
+            if ((err as Error).message !== continueStmt) {
+                throw err
+            }
+        }
     }
 }

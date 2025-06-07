@@ -254,14 +254,14 @@ export class BreakStmt implements IStmt {
 }
 
 export class ContinueStmt implements IStmt {
-    private constructor(private _step: IExpr) {}
+    private constructor(private _keyword: Token) {}
 
-    static createInstance(step: IExpr) {
-        return new ContinueStmt(step)
+    static createInstance(keyword: Token) {
+        return new ContinueStmt(keyword)
     }
 
-    step() {
-        return this._step
+    keyword() {
+        return this._keyword
     }
 
     accept(visitor: IStmtVisitor): void {

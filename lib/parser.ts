@@ -15,6 +15,7 @@ import IStmt, {
     BlockStmt,
     BreakStmt,
     ConstStmt,
+    ContinueStmt,
     ExprStmt,
     ForStmt,
     ForWrapperStmt,
@@ -109,6 +110,7 @@ export default class Parser {
         if (this.match(tokenType.IF)) return this.ifStmt()
         if (this.match(tokenType.FOR)) return this.forStmt()
         if (this.match(tokenType.BREAK)) return this.breakStmt()
+        if (this.match(tokenType.CONTINUE)) return this.continueStmt()
         return this.expressionStmt()
     }
 
@@ -307,6 +309,16 @@ export default class Parser {
 
     private breakStmt(): IStmt {
         const stmt = BreakStmt.createInstance(this.peekPrev())
+        this.expect(
+            tokenType.SEMICOLON,
+            stmt.keyword().line(),
+            "a statement must end with ';'"
+        )
+        return stmt
+    }
+
+    private continueStmt(): IStmt {
+        const stmt = ContinueStmt.createInstance(this.peekPrev())
         this.expect(
             tokenType.SEMICOLON,
             stmt.keyword().line(),
