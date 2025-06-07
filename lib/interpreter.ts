@@ -21,6 +21,7 @@ import IStmt, {
     ContinueStmt,
     ExprStmt,
     ForStmt,
+    ForWrapperStmt,
     FuncStmt,
     IfStmt,
     InfiniteForStmt,
@@ -35,8 +36,19 @@ import IStmt, {
 import tokenType from "./tokenType"
 import utils from "./utils"
 
+enum BlockCtx {
+    NONE,
+    IF,
+    FOR,
+}
+
+const breakStmt = "breakStmt"
+
 export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
-    private constructor(private _environment = Environment.createInstance()) {}
+    private constructor(
+        private _environment = Environment.createInstance(),
+        private _blockCtx = BlockCtx.NONE
+    ) {}
 
     static createInstance() {
         return new Interpreter()
@@ -79,41 +91,90 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
         const environment = Environment.createInstance(this._environment)
         this._environment = environment
 
-        stmt.stmts().forEach((stmt) => {
-            this.executeStmt(stmt)
-        })
-
+        try {
+            stmt.stmts().forEach((stmt) => {
+                this.executeStmt(stmt)
+            })
+        } catch (err) {
+            this._environment = this._environment.parent() as Environment
+            throw err
+        }
         this._environment = this._environment.parent() as Environment
     }
 
     visitIfStmt(stmt: IfStmt): void {
         stmt.stmtTable().find(([condition, block]) => {
             if (utils.isTruthy(this.evaluate(condition))) {
-                this.visitBlockStmt(block)
+                this.executeStmt(block)
                 return true
             }
             return false
         })
     }
 
+    visitForWrapperStmt(stmt: ForWrapperStmt): void {
+        const prevBlockCtx = this._blockCtx
+        this._blockCtx = BlockCtx.FOR
+        try {
+            this.executeStmt(stmt.forStmt())
+        } catch (err) {
+            if ((err as Error).message !== breakStmt) {
+                throw err
+            }
+        }
+        this._blockCtx = prevBlockCtx
+    }
+
     visitInfiniteForStmt(stmt: InfiniteForStmt): void {
-        throw new Error("Method not implemented.")
+        while (true) {
+            this.executeStmt(stmt.stmts())
+        }
     }
 
     visitWhileForStmt(stmt: WhileForStmt): void {
-        throw new Error("Method not implemented.")
+        while (utils.isTruthy(this.evaluate(stmt.condition()))) {
+            this.executeStmt(stmt.stmts())
+        }
     }
 
     visitForStmt(stmt: ForStmt): void {
-        throw new Error("Method not implemented.")
+        for (
+            this.evaluate(stmt.init());
+            utils.isTruthy(this.evaluate(stmt.condition()));
+            this.evaluate(stmt.step())
+        ) {
+            this.executeStmt(stmt.stmts())
+        }
     }
 
     visitLetForStmt(stmt: LetForStmt): void {
-        throw new Error("Method not implemented.")
+        const environment = Environment.createInstance(this._environment)
+        this._environment = environment
+
+        try {
+            for (
+                this.executeStmt(stmt.init());
+                utils.isTruthy(this.evaluate(stmt.condition()));
+                this.evaluate(stmt.step())
+            ) {
+                this.executeStmt(stmt.stmts())
+            }
+        } catch (err) {
+            this._environment = this._environment.parent() as Environment
+            if ((err as Error).message !== breakStmt) {
+                throw err
+            }
+        }
     }
 
     visitBreakStmt(stmt: BreakStmt): void {
-        throw new Error("Method not implemented.")
+        if (this._blockCtx !== BlockCtx.FOR) {
+            LeafError.getInstance().throwRunTimeError(
+                stmt.keyword().line(),
+                "'break' can only be used inside a loop"
+            )
+        }
+        throw new Error(breakStmt)
     }
 
     visitContinueStmt(stmt: ContinueStmt): void {

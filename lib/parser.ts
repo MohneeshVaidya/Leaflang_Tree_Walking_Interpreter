@@ -13,12 +13,18 @@ import {
 } from "./expr"
 import IStmt, {
     BlockStmt,
+    BreakStmt,
     ConstStmt,
     ExprStmt,
+    ForStmt,
+    ForWrapperStmt,
     IfStmt,
+    InfiniteForStmt,
+    LetForStmt,
     LetStmt,
     PrintlnStmt,
     PrintStmt,
+    WhileForStmt,
 } from "./stmt"
 import Token from "./token"
 import tokenType, { TokenType } from "./tokenType"
@@ -101,6 +107,8 @@ export default class Parser {
         if (this.match(tokenType.CONST)) return this.constStmt()
         if (this.match(tokenType.LEFT_BRACE)) return this.blockStmt()
         if (this.match(tokenType.IF)) return this.ifStmt()
+        if (this.match(tokenType.FOR)) return this.forStmt()
+        if (this.match(tokenType.BREAK)) return this.breakStmt()
         return this.expressionStmt()
     }
 
@@ -207,6 +215,104 @@ export default class Parser {
         }
 
         return IfStmt.createInstance(stmtTable)
+    }
+
+    private forStmt(): IStmt {
+        const getSemiColonNum = (line: number) => {
+            let num = 0
+            let idx = this._current
+            while (
+                idx < this._tokens.length - 1 &&
+                this._tokens[idx].type() !== tokenType.LEFT_BRACE &&
+                num < 3
+            ) {
+                if (this._tokens[idx].type() === tokenType.SEMICOLON) ++num
+                ++idx
+            }
+            if (idx >= this._tokens.length || num >= 3) {
+                LeafError.getInstance().throwRunTimeError(
+                    line,
+                    "'for' statement is incomplete"
+                )
+            }
+            return num
+        }
+
+        const infiniteFor = () => {
+            const stmts = this.blockStmt() as BlockStmt
+            return InfiniteForStmt.createInstance(stmts)
+        }
+
+        const whileFor = (line: number) => {
+            const condition = this.expression()
+            this.expect(
+                tokenType.LEFT_BRACE,
+                line,
+                "'{' is expected after condition expression of 'for'"
+            )
+            const stmts = this.blockStmt() as BlockStmt
+            return WhileForStmt.createInstance(condition, stmts)
+        }
+
+        const stdFor = (line: number) => {
+            const init = this.expressionStmt() as ExprStmt
+            const condition = this.expressionStmt() as ExprStmt
+            const step = this.expression()
+            this.expect(
+                tokenType.LEFT_BRACE,
+                line,
+                "'{' is expected after step expression of 'for' statement"
+            )
+            const stmts = this.blockStmt() as BlockStmt
+            return ForStmt.createInstance(
+                init.expr(),
+                condition.expr(),
+                step,
+                stmts
+            )
+        }
+
+        const letFor = (line: number) => {
+            const init = this.letStmt() as LetStmt
+            const condition = this.expressionStmt() as ExprStmt
+            const step = this.expression()
+            this.expect(
+                tokenType.LEFT_BRACE,
+                line,
+                "'{' is expected after step expression of 'for' statement"
+            )
+            const stmts = this.blockStmt() as BlockStmt
+            return LetForStmt.createInstance(
+                init,
+                condition.expr(),
+                step,
+                stmts
+            )
+        }
+
+        const line = this.peekPrev().line()
+        if (this.match(tokenType.LEFT_BRACE)) {
+            return ForWrapperStmt.createInstance(infiniteFor())
+        }
+
+        const num = getSemiColonNum(line)
+
+        if (num === 0) {
+            return ForWrapperStmt.createInstance(whileFor(line))
+        } else if (this.match(tokenType.LET)) {
+            return ForWrapperStmt.createInstance(letFor(line))
+        }
+        return ForWrapperStmt.createInstance(stdFor(line))
+    }
+
+    private breakStmt(): IStmt {
+        const stmt = BreakStmt.createInstance(this.peekPrev())
+        this.expect(
+            tokenType.SEMICOLON,
+            stmt.keyword().line(),
+            "a statement must end with ';'"
+        )
+        return stmt
     }
 
     private expressionStmt(): IStmt {

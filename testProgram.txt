@@ -1,19 +1,24 @@
-let myName = "warrior_vegito";
-{
-    const myName = "Mohneesh Vaidya";
-    println myName;
-    {
-        let myName = "Gogeta";
-        myName = nil;
-        println myName;
+for let i = 1; i <= 10; i = i + 1 {
+    if i == 6 {
+        break;
     }
-}
-println myName;
 
-if false {
-    println "if block is executed";
+    for let j = 1; j <= 10; j = j + 1 {
+        if j == 6 {
+            break;
+        }
+        print i;
+        print " ";
+        println j;
+    }
+
+    println "oh";
+    let j;
 }
 
-if 1 + 2 <= 2 {
-    println "if block is executed";
+let i;
+
+for let i = 0; i < 10; i = i + 1 {
+    println i;
+    i = i + 0;
 }

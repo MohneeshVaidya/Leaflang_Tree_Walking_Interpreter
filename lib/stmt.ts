@@ -109,6 +109,22 @@ export class IfStmt implements IStmt {
     }
 }
 
+export class ForWrapperStmt implements IStmt {
+    private constructor(private _forStmt: IStmt) {}
+
+    static createInstance(forStmt: IStmt) {
+        return new ForWrapperStmt(forStmt)
+    }
+
+    forStmt() {
+        return this._forStmt
+    }
+
+    accept(visitor: IStmtVisitor): void {
+        visitor.visitForWrapperStmt(this)
+    }
+}
+
 export class InfiniteForStmt implements IStmt {
     private constructor(private _stmts: BlockStmt) {}
 
@@ -222,10 +238,14 @@ export class LetForStmt implements IStmt {
 }
 
 export class BreakStmt implements IStmt {
-    private constructor() {}
+    private constructor(private _keyword: Token) {}
 
-    static createInstance() {
-        return new BreakStmt()
+    static createInstance(keyword: Token) {
+        return new BreakStmt(keyword)
+    }
+
+    keyword() {
+        return this._keyword
     }
 
     accept(visitor: IStmtVisitor): void {
@@ -286,6 +306,7 @@ export interface IStmtVisitor {
     visitConstStmt(stmt: ConstStmt): void
     visitBlockStmt(stmt: BlockStmt): void
     visitIfStmt(stmt: IfStmt): void
+    visitForWrapperStmt(stmt: ForWrapperStmt): void
     visitInfiniteForStmt(stmt: InfiniteForStmt): void
     visitWhileForStmt(stmt: WhileForStmt): void
     visitForStmt(stmt: ForStmt): void
