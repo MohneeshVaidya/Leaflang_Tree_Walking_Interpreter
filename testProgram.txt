@@ -22,3 +22,24 @@ for let i = 0; i < 10; i = i + 1 {
     println i;
     i = i + 0;
 }
+
+println "";
+println "";
+println "";
+
+for {
+    for {
+        for {
+            for {
+                println 1;
+                break;
+            }
+                println 2;
+                break;
+        }
+                println 3;
+                break;
+    }
+                println 4;
+                break;
+}
