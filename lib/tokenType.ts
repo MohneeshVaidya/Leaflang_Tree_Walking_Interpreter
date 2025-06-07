@@ -44,6 +44,7 @@ const LESSER: TokenType = "TOKEN_LESSER"
 const LESSER_EQUAL: TokenType = "TOKEN_LESSER_EQUAL"
 const GREATER: TokenType = "TOKEN_GREATER"
 const GREATER_EQUAL: TokenType = "TOKEN_GREATER_EQUAL"
+const EQUAL_GREATER: TokenType = "EQUAL_GREATER"
 
 const SEMICOLON: TokenType = "TOKEN_SEMICOLON"
 const COLON: TokenType = "TOKEN_COLON"
@@ -100,6 +101,7 @@ export default {
     LESSER_EQUAL,
     GREATER,
     GREATER_EQUAL,
+    EQUAL_GREATER,
 
     SEMICOLON,
     COLON,

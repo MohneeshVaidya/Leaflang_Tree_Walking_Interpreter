@@ -1,10 +1,13 @@
 import binaryOperation from "./binaryOperation"
+import Callable, { LeafFunction, ReturnValue } from "./callable"
 import Environment from "./environment"
 import LeafError from "./error"
 import IExpr, {
     AssignExpr,
     BinaryExpr,
+    CallExpr,
     ExponentExpr,
+    FuncExpr,
     GroupingExpr,
     IdentifierExpr,
     IExprVisitor,
@@ -33,13 +36,19 @@ import IStmt, {
     ReturnStmt,
     WhileForStmt,
 } from "./stmt"
+import Token from "./token"
 import tokenType from "./tokenType"
 import utils from "./utils"
 
 enum BlockCtx {
     NONE,
-    IF,
     FOR,
+}
+
+enum CallableCtx {
+    NONE,
+    FUNCT,
+    METHOD,
 }
 
 const breakStmt = "breakStmt"
@@ -48,11 +57,20 @@ const continueStmt = "continueStmt"
 export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
     private constructor(
         private _environment = Environment.createInstance(),
-        private _blockCtx = BlockCtx.NONE
+        private _blockCtx = BlockCtx.NONE,
+        private _callableCtx = CallableCtx.NONE
     ) {}
 
     static createInstance() {
         return new Interpreter()
+    }
+
+    environment() {
+        return this._environment
+    }
+
+    setEnvironment(environment: Environment) {
+        this._environment = environment
     }
 
     execute(stmts: IStmt[]): void {
@@ -189,11 +207,24 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
     }
 
     visitFuncStmt(stmt: FuncStmt): void {
-        throw new Error("Method not implemented.")
+        this._environment.insertConst(
+            stmt.name() as Token,
+            LeafFunction.createInstance(
+                stmt.expr().parameters(),
+                stmt.expr().stmts(),
+                this._environment
+            )
+        )
     }
 
     visitReturnStmt(stmt: ReturnStmt): void {
-        throw new Error("Method not implemented.")
+        if (this._callableCtx === CallableCtx.NONE) {
+            LeafError.getInstance().throwRunTimeError(
+                stmt.keyword().line(),
+                "'return' statement can only be used inside a function"
+            )
+        }
+        throw ReturnValue.createInstance(this.evaluate(stmt.value()))
     }
 
     visitExprStmt(stmt: ExprStmt): void {
@@ -201,7 +232,7 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
     }
 
     // expression visitor functions
-    private evaluate(expr: IExpr) {
+    evaluate(expr: IExpr) {
         return expr.accept(this)
     }
 
@@ -250,6 +281,37 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
         throw 0
     }
 
+    visitFuncExpr(expr: FuncExpr): IObj {
+        return LeafFunction.createInstance(
+            expr.parameters(),
+            expr.stmts(),
+            this._environment
+        )
+    }
+
+    visitCallExpr(expr: CallExpr): IObj {
+        const caller = this.evaluate(expr.caller())
+
+        if (!(caller instanceof Callable)) {
+            LeafError.getInstance().throwRunTimeError(
+                this.getCallLine(expr),
+                "expression is not callable"
+            )
+        }
+
+        const prevCtx = this._callableCtx
+        this._callableCtx = CallableCtx.FUNCT
+
+        const value = (caller as unknown as Callable).call(
+            expr.args(),
+            this,
+            expr
+        )
+
+        this._callableCtx = prevCtx
+        return value
+    }
+
     visitGroupingExpr(expr: GroupingExpr): IObj {
         return this.evaluate(expr.expr())
     }
@@ -278,7 +340,7 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
         return ObjNil.createInstance()
     }
 
-    // private helper functions
+    // helper functions
     private continueWrapper(stmt: BlockStmt) {
         try {
             this.visitBlockStmt(stmt)
@@ -287,5 +349,12 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
                 throw err
             }
         }
+    }
+
+    getCallLine(expr: IExpr) {
+        if (expr instanceof IdentifierExpr) {
+            return expr.token().line()
+        }
+        return this.getCallLine((expr as CallExpr).caller())
     }
 }

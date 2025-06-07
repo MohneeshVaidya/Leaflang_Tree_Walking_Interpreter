@@ -1,4 +1,4 @@
-import IExpr from "./expr"
+import IExpr, { FuncExpr } from "./expr"
 import Token from "./token"
 
 export default interface IStmt {
@@ -270,14 +270,42 @@ export class ContinueStmt implements IStmt {
 }
 
 export class FuncStmt implements IStmt {
+    private constructor(private _name: Token, private _expr: FuncExpr) {}
+
+    static createInstance(name: Token, expr: FuncExpr) {
+        return new FuncStmt(name, expr)
+    }
+
+    name() {
+        return this._name
+    }
+
+    expr() {
+        return this._expr
+    }
+
     accept(visitor: IStmtVisitor): void {
         visitor.visitFuncStmt(this)
     }
 }
 
 export class ReturnStmt implements IStmt {
+    private constructor(private _keyword: Token, private _value: IExpr) {}
+
+    static createInstance(keyword: Token, value: IExpr) {
+        return new ReturnStmt(keyword, value)
+    }
+
+    keyword() {
+        return this._keyword
+    }
+
+    value() {
+        return this._value
+    }
+
     accept(visitor: IStmtVisitor): void {
-        visitor.visitFuncStmt(this)
+        visitor.visitReturnStmt(this)
     }
 }
 

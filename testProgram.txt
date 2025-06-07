@@ -1,15 +1,78 @@
-for let i = 1; i <= 20; i = i + 1 {
-    
-    if i % 2 == 0 {
-        continue;
-    }
-    
-    for let j = 1; j <= 20; j = j + 1 {
+func addNums(a) {
+    return func(b) {
+        return func(c) {
+            return func(d) {
+                return a + b + c + d;
+            };
+        };
+    };
+}
 
-        if j % 2 == 1 {
-            continue;
-        }
+println addNums(1)(2)(3)(4);
+println "";
+println "";
 
-        println i + " " + j;
+
+func binaryOperation(operation, a, b) {
+    return operation(a, b);
+}
+
+println binaryOperation(func(a, b) { return a + b; }, 20, 5);
+println binaryOperation(func(a, b) { return a - b; }, 20, 5);
+println binaryOperation(func(a, b) { return a * b; }, 20, 5);
+println binaryOperation(func(a, b) { return a / b; }, 20, 5);
+println binaryOperation(func(a, b) { return a % b; }, 20, 6);
+println binaryOperation(func(a, b) { return a ** b; }, 10, 5);
+
+println "";
+
+println binaryOperation((a, b) => { return a + b; }, 20, 5);
+println binaryOperation((a, b) => { return a - b; }, 20, 5);
+println binaryOperation((a, b) => { return a * b; }, 20, 5);
+println binaryOperation((a, b) => { return a / b; }, 20, 5);
+println binaryOperation((a, b) => { return a % b; }, 20, 6);
+println binaryOperation((a, b) => { return a ** b; }, 10, 5);
+
+
+const addNums2 =
+    (a) =>
+        (b) =>
+            (c) =>
+                (a + b + c);
+
+println addNums2(3)(5)(7);
+
+func getOperation(op) {
+    if op == "+" {
+        return (a, b) => a + b;
+    
+    } elseif op == "-" {
+        return (a, b) => a - b;
+
+    } elseif op == "/" {
+        return (a, b) => a / b;
+        
+    } elseif op == "%" {
+        return (a, b) => { return a % b; };
+
+    } elseif op == "*" {
+        return (a, b) => a * b;
+
+    } elseif op == "**" {
+        return (a, b) => { return a ** b; };
+    
+    } else {
+        return (a, b) => nil;
     }
 }
+
+println "";
+println "";
+
+println getOperation("+")(10, 11);
+println getOperation("-")(10, 11);
+println getOperation("/")(10, 11);
+println getOperation("*")(10, 11);
+println getOperation("%")(10, 11);
+println getOperation("**")(10, 11);
+println getOperation("++")(10, 11);

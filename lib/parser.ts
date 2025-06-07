@@ -3,7 +3,9 @@ import type IExpr from "./expr"
 import {
     AssignExpr,
     BinaryExpr,
+    CallExpr,
     ExponentExpr,
+    FuncExpr,
     GroupingExpr,
     IdentifierExpr,
     LiteralExpr,
@@ -19,12 +21,14 @@ import IStmt, {
     ExprStmt,
     ForStmt,
     ForWrapperStmt,
+    FuncStmt,
     IfStmt,
     InfiniteForStmt,
     LetForStmt,
     LetStmt,
     PrintlnStmt,
     PrintStmt,
+    ReturnStmt,
     WhileForStmt,
 } from "./stmt"
 import Token from "./token"
@@ -49,6 +53,7 @@ export default class Parser {
         return this._stmts
     }
 
+    // private helper methods
     private isAtEnd() {
         return this._current >= this._tokens.length - 1
     }
@@ -100,6 +105,52 @@ export default class Parser {
         return tokenTypes.includes(type)
     }
 
+    private getParameters() {
+        if (this.match(tokenType.RIGHT_PAREN)) {
+            return []
+        }
+        const parameters: Token[] = [this.get()]
+        while (
+            this.match(tokenType.COMMA) &&
+            !this.match(tokenType.RIGHT_PAREN)
+        ) {
+            parameters.push(this.get())
+        }
+        this.match(tokenType.RIGHT_PAREN)
+        return parameters
+    }
+
+    private getArguments() {
+        const args: IExpr[] = []
+        while (!this.match(tokenType.RIGHT_PAREN)) {
+            args.push(this.expression())
+            this.match(tokenType.COMMA)
+        }
+        return args
+    }
+
+    private isArrow() {
+        const current = this._current
+        while (
+            ![tokenType.RIGHT_PAREN, tokenType.EOF].includes(this.peek().type())
+        ) {
+            this.advance()
+        }
+        if (tokenType.EOF === this.peek().type()) {
+            this._current = current
+            return false
+        }
+
+        this.advance()
+        if (this.peek().type() === tokenType.EQUAL_GREATER) {
+            this._current = current
+            return true
+        }
+
+        this._current = current
+        return false
+    }
+
     // statements
     private statement(): IStmt {
         if (this.match(tokenType.PRINT)) return this.printStmt()
@@ -111,6 +162,8 @@ export default class Parser {
         if (this.match(tokenType.FOR)) return this.forStmt()
         if (this.match(tokenType.BREAK)) return this.breakStmt()
         if (this.match(tokenType.CONTINUE)) return this.continueStmt()
+        if (this.match(tokenType.FUNC)) return this.funcStmt()
+        if (this.match(tokenType.RETURN)) return this.returnStmt()
         return this.expressionStmt()
     }
 
@@ -327,6 +380,46 @@ export default class Parser {
         return stmt
     }
 
+    private funcStmt(): IStmt {
+        const line = this.peekPrev().line()
+        const name = this.expect(
+            tokenType.IDENTIFIER,
+            line,
+            "a name is expected after 'func' keyword (name should not be any built in keyword)"
+        )
+        this.expect(
+            tokenType.LEFT_PAREN,
+            line,
+            "'(' is expected after func's name"
+        )
+        const parameters = this.getParameters()
+        this.expect(
+            tokenType.LEFT_BRACE,
+            line,
+            "'{' is expected after parameter list"
+        )
+        return FuncStmt.createInstance(
+            name,
+            FuncExpr.createInstance(parameters, this.blockStmt() as BlockStmt)
+        )
+    }
+
+    private returnStmt(): IStmt {
+        const keyword = this.peekPrev()
+
+        if (this.match(tokenType.SEMICOLON)) {
+            return ReturnStmt.createInstance(keyword, NilExpr.createInstance())
+        }
+
+        const stmt = ReturnStmt.createInstance(keyword, this.expression())
+        this.expect(
+            tokenType.SEMICOLON,
+            keyword.line(),
+            "a statement must end with ';'"
+        )
+        return stmt
+    }
+
     private expressionStmt(): IStmt {
         const stmt = ExprStmt.createInstance(this.expression())
         this.expect(tokenType.SEMICOLON, 0, "a statement must end with ';'")
@@ -459,7 +552,14 @@ export default class Parser {
     private primaryExpr(): IExpr {
         const token = this.get()
 
+        if (this.matchPrev(tokenType.FUNC)) {
+            return this.funcExpr()
+        }
+
         if (this.matchPrev(tokenType.LEFT_PAREN)) {
+            if (this.isArrow()) {
+                return this.arrowFunc()
+            }
             return this.groupingExpr()
         }
 
@@ -475,10 +575,64 @@ export default class Parser {
         }
 
         if (this.matchPrev(tokenType.IDENTIFIER)) {
+            if (this.match(tokenType.LEFT_PAREN)) {
+                return this.callExpr(IdentifierExpr.createInstance(token))
+            }
             return IdentifierExpr.createInstance(token)
         }
 
         return NilExpr.createInstance()
+    }
+
+    private funcExpr(): IExpr {
+        const line = this.peekPrev().line()
+        this.expect(
+            tokenType.LEFT_PAREN,
+            line,
+            "'(' is expected after func's name"
+        )
+        const parameters = this.getParameters()
+        this.expect(
+            tokenType.LEFT_BRACE,
+            line,
+            "'{' is expected after parameter list"
+        )
+        return FuncExpr.createInstance(
+            parameters,
+            this.blockStmt() as BlockStmt
+        )
+    }
+
+    private arrowFunc(): IExpr {
+        const line = this.peekPrev().line()
+
+        const parameters = this.getParameters()
+
+        this.match(tokenType.EQUAL_GREATER)
+
+        if (!this.match(tokenType.LEFT_BRACE)) {
+            const returnStmt = ReturnStmt.createInstance(
+                Token.createInstance(tokenType.RETURN, "return", line),
+                this.expression()
+            )
+            return FuncExpr.createInstance(
+                parameters,
+                BlockStmt.createInstance([returnStmt])
+            )
+        }
+        return FuncExpr.createInstance(
+            parameters,
+            this.blockStmt() as BlockStmt
+        )
+    }
+
+    private callExpr(expr: IExpr): IExpr {
+        const args = this.getArguments()
+
+        if (this.match(tokenType.LEFT_PAREN)) {
+            return this.callExpr(CallExpr.createInstance(expr, args))
+        }
+        return CallExpr.createInstance(expr, args)
     }
 
     private groupingExpr(): IExpr {

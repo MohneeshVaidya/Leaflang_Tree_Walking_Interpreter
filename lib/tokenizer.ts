@@ -246,6 +246,8 @@ export default class Tokenizer {
             case "=":
                 if (this.match("=")) {
                     this.addToken(tokenType.EQUAL_EQUAL)
+                } else if (this.match(">")) {
+                    this.addToken(tokenType.EQUAL_GREATER)
                 } else {
                     this.addToken(tokenType.EQUAL)
                 }

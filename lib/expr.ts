@@ -1,3 +1,4 @@
+import { BlockStmt } from "./stmt"
 import Token from "./token"
 
 export default interface IExpr {
@@ -152,6 +153,49 @@ export class UnaryExpr implements IExpr {
     }
 }
 
+export class FuncExpr implements IExpr {
+    private constructor(
+        private _parameters: Token[],
+        private _stmts: BlockStmt
+    ) {}
+
+    static createInstance(parameters: Token[], stmts: BlockStmt) {
+        return new FuncExpr(parameters, stmts)
+    }
+
+    parameters() {
+        return this._parameters
+    }
+
+    stmts() {
+        return this._stmts
+    }
+
+    accept<T>(visitor: IExprVisitor<T>): T {
+        return visitor.visitFuncExpr(this)
+    }
+}
+
+export class CallExpr implements IExpr {
+    private constructor(private _caller: IExpr, private _args: IExpr[]) {}
+
+    static createInstance(caller: IExpr, args: IExpr[]) {
+        return new CallExpr(caller, args)
+    }
+
+    caller() {
+        return this._caller
+    }
+
+    args() {
+        return this._args
+    }
+
+    accept<T>(visitor: IExprVisitor<T>): T {
+        return visitor.visitCallExpr(this)
+    }
+}
+
 export class GroupingExpr implements IExpr {
     private constructor(private _leftParen: Token, private _expr: IExpr) {}
 
@@ -222,6 +266,8 @@ export interface IExprVisitor<T> {
     visitBinaryExpr(expr: BinaryExpr): T
     visitExponentExpr(expr: ExponentExpr): T
     visitUnaryExpr(expr: UnaryExpr): T
+    visitFuncExpr(expr: FuncExpr): T
+    visitCallExpr(expr: CallExpr): T
     visitGroupingExpr(expr: GroupingExpr): T
     visitLiteralExpr(expr: LiteralExpr): T
     visitIdentifierExpr(expr: IdentifierExpr): T
