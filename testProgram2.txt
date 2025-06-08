@@ -1,0 +1,78 @@
+func addNums(a) {
+    return func(b) {
+        return func(c) {
+            return func(d) {
+                return a + b + c + d;
+            };
+        };
+    };
+}
+
+println addNums(1)(2)(3)(4);
+println "";
+println "";
+
+
+func binaryOperation(operation, a, b) {
+    return operation(a, b);
+}
+
+println binaryOperation(func(a, b) { return a + b; }, 20, 5);
+println binaryOperation(func(a, b) { return a - b; }, 20, 5);
+println binaryOperation(func(a, b) { return a * b; }, 20, 5);
+println binaryOperation(func(a, b) { return a / b; }, 20, 5);
+println binaryOperation(func(a, b) { return a % b; }, 20, 6);
+println binaryOperation(func(a, b) { return a ** b; }, 10, 5);
+
+println "";
+
+println binaryOperation((a, b) => { return a + b; }, 20, 5);
+println binaryOperation((a, b) => { return a - b; }, 20, 5);
+println binaryOperation((a, b) => { return a * b; }, 20, 5);
+println binaryOperation((a, b) => { return a / b; }, 20, 5);
+println binaryOperation((a, b) => { return a % b; }, 20, 6);
+println binaryOperation((a, b) => { return a ** b; }, 10, 5);
+
+
+const addNums2 =
+    (a) =>
+        (b) =>
+            (c) =>
+                (a + b + c);
+
+println addNums2(3)(5)(7);
+
+func getOperation(op) {
+    if op == "+" {
+        return (a, b) => a + b;
+    
+    } elseif op == "-" {
+        return (a, b) => a - b;
+
+    } elseif op == "/" {
+        return (a, b) => a / b;
+        
+    } elseif op == "%" {
+        return (a, b) => { return a % b; };
+
+    } elseif op == "*" {
+        return (a, b) => a * b;
+
+    } elseif op == "**" {
+        return (a, b) => { return a ** b; };
+    
+    } else {
+        return (a, b) => nil;
+    }
+}
+
+println "";
+println "";
+
+println getOperation("+")(10, 11);
+println getOperation("-")(10, 11);
+println getOperation("/")(10, 11);
+println getOperation("*")(10, 11);
+println getOperation("%")(10, 11);
+println getOperation("**")(10, 11);
+println getOperation("++")(10, 11);

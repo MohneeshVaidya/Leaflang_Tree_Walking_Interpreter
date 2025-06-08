@@ -1,11 +1,13 @@
 import binaryOperation from "./binaryOperation"
 import Callable, { LeafFunction, ReturnValue } from "./callable"
+import LeafClass, { LeafInstance } from "./class"
 import Environment from "./environment"
 import LeafError from "./error"
 import IExpr, {
     AssignExpr,
     BinaryExpr,
     CallExpr,
+    ClassExpr,
     ExponentExpr,
     FuncExpr,
     GroupingExpr,
@@ -20,6 +22,7 @@ import IObj, { ObjBool, ObjNil, ObjNumber, ObjString } from "./object"
 import IStmt, {
     BlockStmt,
     BreakStmt,
+    ClassStmt,
     ConstStmt,
     ContinueStmt,
     ExprStmt,
@@ -49,6 +52,7 @@ enum CallableCtx {
     NONE,
     FUNCT,
     METHOD,
+    MAKE,
 }
 
 const breakStmt = "breakStmt"
@@ -209,11 +213,7 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
     visitFuncStmt(stmt: FuncStmt): void {
         this._environment.insertConst(
             stmt.name() as Token,
-            LeafFunction.createInstance(
-                stmt.expr().parameters(),
-                stmt.expr().stmts(),
-                this._environment
-            )
+            this.evaluate(stmt.expr())
         )
     }
 
@@ -225,6 +225,10 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
             )
         }
         throw ReturnValue.createInstance(this.evaluate(stmt.value()))
+    }
+
+    visitClassStmt(stmt: ClassStmt): void {
+        this._environment.insertConst(stmt.name(), this.evaluate(stmt.expr()))
     }
 
     visitExprStmt(stmt: ExprStmt): void {
@@ -293,6 +297,10 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
         const caller = this.evaluate(expr.caller())
 
         if (!(caller instanceof Callable)) {
+            if (caller instanceof LeafClass) {
+                return this.callMake(caller, expr)
+            }
+
             LeafError.getInstance().throwRunTimeError(
                 this.getCallLine(expr),
                 "expression is not callable"
@@ -310,6 +318,19 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
 
         this._callableCtx = prevCtx
         return value
+    }
+
+    visitClassExpr(expr: ClassExpr): IObj {
+        return LeafClass.createInstance(
+            expr.fields(),
+            Array.from(expr.methods().entries()).reduce(
+                (prev, [key, value]) => {
+                    prev.set(key, this.evaluate(value))
+                    return prev
+                },
+                new Map()
+            )
+        )
     }
 
     visitGroupingExpr(expr: GroupingExpr): IObj {
@@ -356,5 +377,19 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
             return expr.token().line()
         }
         return this.getCallLine((expr as CallExpr).caller())
+    }
+
+    private callMake(leafClass: LeafClass, expr: CallExpr): IObj {
+        if (!leafClass.methods().has("__make")) {
+            const table = new Map()
+
+            leafClass.fields().forEach((field) => {
+                table.set(field, ObjNil.createInstance())
+            })
+            return LeafInstance.createInstance(table)
+        }
+
+        const make = leafClass.methods().get("__make") as LeafFunction
+        return make.call(expr.args(), this, expr)
     }
 }

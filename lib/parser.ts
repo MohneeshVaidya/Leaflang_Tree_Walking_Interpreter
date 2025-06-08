@@ -4,6 +4,7 @@ import {
     AssignExpr,
     BinaryExpr,
     CallExpr,
+    ClassExpr,
     ExponentExpr,
     FuncExpr,
     GroupingExpr,
@@ -16,6 +17,7 @@ import {
 import IStmt, {
     BlockStmt,
     BreakStmt,
+    ClassStmt,
     ConstStmt,
     ContinueStmt,
     ExprStmt,
@@ -164,6 +166,7 @@ export default class Parser {
         if (this.match(tokenType.CONTINUE)) return this.continueStmt()
         if (this.match(tokenType.FUNC)) return this.funcStmt()
         if (this.match(tokenType.RETURN)) return this.returnStmt()
+        if (this.match(tokenType.CLASS)) return this.classStmt()
         return this.expressionStmt()
     }
 
@@ -418,6 +421,52 @@ export default class Parser {
             "a statement must end with ';'"
         )
         return stmt
+    }
+
+    private classStmt(): IStmt {
+        const line = this.peekPrev().line()
+
+        const name = this.expect(
+            tokenType.IDENTIFIER,
+            line,
+            "a name is expected after 'class' keyword (name should not be any built in keyword)"
+        )
+        this.expect(
+            tokenType.LEFT_BRACE,
+            line,
+            "'{' is expected after class name"
+        )
+
+        const fields: Set<string> = new Set()
+        const methods: Map<string, FuncExpr> = new Map()
+
+        while (!this.match(tokenType.RIGHT_BRACE)) {
+            if (this.match(tokenType.MAKE)) {
+                methods.set(
+                    this.peekPrev().lexeme(),
+                    this.funcExpr() as FuncExpr
+                )
+                continue
+            }
+
+            const identifier = this.expect(
+                tokenType.IDENTIFIER,
+                line,
+                "name is expected inside the body of class"
+            )
+
+            if (this.match(tokenType.COMMA)) {
+                fields.add(identifier.lexeme())
+                continue
+            }
+
+            methods.set(this.peekPrev().lexeme(), this.funcExpr() as FuncExpr)
+        }
+
+        return ClassStmt.createInstance(
+            name,
+            ClassExpr.createInstance(fields, methods)
+        )
     }
 
     private expressionStmt(): IStmt {

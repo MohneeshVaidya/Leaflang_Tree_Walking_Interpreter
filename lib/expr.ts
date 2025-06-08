@@ -196,6 +196,29 @@ export class CallExpr implements IExpr {
     }
 }
 
+export class ClassExpr implements IExpr {
+    private constructor(
+        private _fields: Set<string>,
+        private _methods: Map<string, FuncExpr>
+    ) {}
+
+    static createInstance(fields: Set<string>, methods: Map<string, FuncExpr>) {
+        return new ClassExpr(fields, methods)
+    }
+
+    fields() {
+        return this._fields
+    }
+
+    methods() {
+        return this._methods
+    }
+
+    accept<T>(visitor: IExprVisitor<T>): T {
+        return visitor.visitClassExpr(this)
+    }
+}
+
 export class GroupingExpr implements IExpr {
     private constructor(private _leftParen: Token, private _expr: IExpr) {}
 
@@ -268,6 +291,7 @@ export interface IExprVisitor<T> {
     visitUnaryExpr(expr: UnaryExpr): T
     visitFuncExpr(expr: FuncExpr): T
     visitCallExpr(expr: CallExpr): T
+    visitClassExpr(expr: ClassExpr): T
     visitGroupingExpr(expr: GroupingExpr): T
     visitLiteralExpr(expr: LiteralExpr): T
     visitIdentifierExpr(expr: IdentifierExpr): T

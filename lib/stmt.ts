@@ -1,4 +1,4 @@
-import IExpr, { FuncExpr } from "./expr"
+import IExpr, { ClassExpr, FuncExpr } from "./expr"
 import Token from "./token"
 
 export default interface IStmt {
@@ -309,6 +309,26 @@ export class ReturnStmt implements IStmt {
     }
 }
 
+export class ClassStmt implements IStmt {
+    private constructor(private _name: Token, private _expr: ClassExpr) {}
+
+    static createInstance(name: Token, expr: ClassExpr) {
+        return new ClassStmt(name, expr)
+    }
+
+    name() {
+        return this._name
+    }
+
+    expr() {
+        return this._expr
+    }
+
+    accept(visitor: IStmtVisitor): void {
+        visitor.visitClassStmt(this)
+    }
+}
+
 export class ExprStmt implements IStmt {
     private constructor(private _expr: IExpr) {}
 
@@ -343,5 +363,6 @@ export interface IStmtVisitor {
     visitContinueStmt(stmt: ContinueStmt): void
     visitFuncStmt(stmt: FuncStmt): void
     visitReturnStmt(stmt: ReturnStmt): void
+    visitClassStmt(stmt: ClassStmt): void
     visitExprStmt(stmt: ExprStmt): void
 }

@@ -6,11 +6,14 @@ import IObj, { ObjNil } from "./object"
 import { BlockStmt } from "./stmt"
 import Token from "./token"
 
+export type FunctionType = "function" | "make" | "method"
+
 export default abstract class Callable {
     protected constructor(
         protected _parameters: Token[],
         protected _stmts: BlockStmt,
-        protected _closure: Environment
+        protected _closure: Environment,
+        protected _type: FunctionType = "function"
     ) {}
 
     parameters() {
@@ -23,6 +26,14 @@ export default abstract class Callable {
 
     closure() {
         return this._closure
+    }
+
+    type() {
+        return this._type
+    }
+
+    setType(type: FunctionType) {
+        this._type = type
     }
 
     call(args: IExpr[], interpreter: Interpreter, expr: IExpr): IObj {
