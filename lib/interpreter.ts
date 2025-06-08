@@ -1,5 +1,5 @@
 import binaryOperation from "./binaryOperation"
-import Callable, { LeafFunction, ReturnValue } from "./callable"
+import Callable, { LeafFunction, LeafMethod, ReturnValue } from "./callable"
 import LeafClass, { LeafInstance } from "./class"
 import Environment from "./environment"
 import LeafError from "./error"
@@ -325,7 +325,14 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
             expr.fields(),
             Array.from(expr.methods().entries()).reduce(
                 (prev, [key, value]) => {
-                    prev.set(key, this.evaluate(value))
+                    prev.set(
+                        key,
+                        LeafMethod.createInstance(
+                            value.parameters(),
+                            value.stmts(),
+                            this._environment
+                        )
+                    )
                     return prev
                 },
                 new Map()
@@ -380,7 +387,7 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
     }
 
     private callMake(leafClass: LeafClass, expr: CallExpr): IObj {
-        if (!leafClass.methods().has("__make")) {
+        if (!leafClass.methods().has("constructor")) {
             const table = new Map()
 
             leafClass.fields().forEach((field) => {
@@ -389,7 +396,7 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
             return LeafInstance.createInstance(table)
         }
 
-        const make = leafClass.methods().get("__make") as LeafFunction
+        const make = leafClass.methods().get("constructor") as LeafMethod
         return make.call(expr.args(), this, expr)
     }
 }

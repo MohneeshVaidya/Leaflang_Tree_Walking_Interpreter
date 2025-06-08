@@ -377,8 +377,8 @@ export default class Tokenizer {
             case "extends":
                 this.addToken(tokenType.EXTENDS)
                 break
-            case "__make":
-                this.addToken(tokenType.MAKE)
+            case "constructor":
+                this.addToken(tokenType.CONSTRUCTOR)
                 break
             case "and":
                 this.addToken(tokenType.AND)

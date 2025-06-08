@@ -1,15 +1,15 @@
-import { LeafFunction } from "./callable"
+import { LeafMethod } from "./callable"
 import IObj from "./object"
 
 export default class LeafClass implements IObj {
     private constructor(
         private _fields: Set<string>,
-        private _methods: Map<string, LeafFunction>
+        private _methods: Map<string, LeafMethod>
     ) {}
 
     static createInstance(
         fields: Set<string>,
-        methods: Map<string, LeafFunction>
+        methods: Map<string, LeafMethod>
     ) {
         return new LeafClass(fields, methods)
     }

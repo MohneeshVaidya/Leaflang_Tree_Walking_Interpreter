@@ -1,3 +1,4 @@
+import { LeafInstance } from "./class"
 import Environment from "./environment"
 import LeafError from "./error"
 import IExpr from "./expr"
@@ -6,14 +7,11 @@ import IObj, { ObjNil } from "./object"
 import { BlockStmt } from "./stmt"
 import Token from "./token"
 
-export type FunctionType = "function" | "make" | "method"
-
 export default abstract class Callable {
     protected constructor(
         protected _parameters: Token[],
         protected _stmts: BlockStmt,
-        protected _closure: Environment,
-        protected _type: FunctionType = "function"
+        protected _closure: Environment
     ) {}
 
     parameters() {
@@ -28,15 +26,14 @@ export default abstract class Callable {
         return this._closure
     }
 
-    type() {
-        return this._type
-    }
+    abstract call(args: IExpr[], interpreter: Interpreter, expr: IExpr): IObj
 
-    setType(type: FunctionType) {
-        this._type = type
-    }
-
-    call(args: IExpr[], interpreter: Interpreter, expr: IExpr): IObj {
+    // helper methods
+    protected execSharedCallCode(
+        args: IExpr[],
+        interpreter: Interpreter,
+        expr: IExpr
+    ) {
         if (args.length !== this.parameters().length) {
             LeafError.getInstance().throwRunTimeError(
                 interpreter.getCallLine(expr),
@@ -55,20 +52,7 @@ export default abstract class Callable {
                 .insertLet(this._parameters[idx], argsEvaluated[idx])
         })
 
-        try {
-            interpreter.execute(this._stmts.stmts())
-
-            interpreter.setEnvironment(prevEnvironment)
-
-            return ObjNil.createInstance()
-        } catch (err) {
-            interpreter.setEnvironment(prevEnvironment)
-
-            if (err instanceof ReturnValue) {
-                return err.value()
-            }
-            throw err
-        }
+        return prevEnvironment
     }
 }
 
@@ -87,6 +71,64 @@ export class LeafFunction extends Callable implements IObj {
         environment: Environment
     ) {
         return new LeafFunction(parameters, stmts, environment)
+    }
+
+    call(args: IExpr[], interpreter: Interpreter, expr: IExpr): IObj {
+        const prevEnvironment = this.execSharedCallCode(args, interpreter, expr)
+
+        try {
+            interpreter.execute(this._stmts.stmts())
+
+            interpreter.setEnvironment(prevEnvironment)
+
+            return ObjNil.createInstance()
+        } catch (err) {
+            interpreter.setEnvironment(prevEnvironment)
+
+            if (err instanceof ReturnValue) {
+                return err.value()
+            }
+            throw err
+        }
+    }
+
+    value() {
+        return `func (${this._parameters
+            .map((parameter) => parameter.lexeme())
+            .join(", ")}) { }`
+    }
+}
+
+export class LeafMethod extends Callable implements IObj {
+    private _instance: LeafInstance
+    private _type: "method" | "make"
+
+    private constructor(
+        parameters: Token[],
+        stmts: BlockStmt,
+        environment: Environment
+    ) {
+        super(parameters, stmts, environment)
+    }
+
+    static createInstance(
+        parameters: Token[],
+        stmts: BlockStmt,
+        environment: Environment
+    ) {
+        return new LeafMethod(parameters, stmts, environment)
+    }
+
+    instance() {
+        return this._instance
+    }
+
+    setInstance(instance: LeafInstance) {
+        this._instance = instance
+    }
+
+    call(args: IExpr[], interpreter: Interpreter, expr: IExpr): IObj {
+        const prevEnvironment = this.execSharedCallCode(args, interpreter, expr)
     }
 
     value() {

@@ -13,7 +13,7 @@ const CONTINUE: TokenType = "TOKEN_CONTINUE"
 const FUNC: TokenType = "TOKEN_FUNC"
 const RETURN: TokenType = "TOKEN_RETURN"
 const CLASS: TokenType = "TOKEN_CLASS"
-const MAKE: TokenType = "TOKEN_MAKE"
+const CONSTRUCTOR: TokenType = "TOKEN_CONSTRUCTOR"
 const EXTENDS: TokenType = "TOKEN_EXTENDS"
 const THIS: TokenType = "TOKEN_THIS"
 const SUPER: TokenType = "TOKEN_SUPER"
@@ -70,7 +70,7 @@ export default {
     FUNC,
     RETURN,
     CLASS,
-    MAKE,
+    CONSTRUCTOR,
     EXTENDS,
     THIS,
     SUPER,

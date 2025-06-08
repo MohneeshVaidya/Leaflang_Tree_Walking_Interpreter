@@ -441,7 +441,7 @@ export default class Parser {
         const methods: Map<string, FuncExpr> = new Map()
 
         while (!this.match(tokenType.RIGHT_BRACE)) {
-            if (this.match(tokenType.MAKE)) {
+            if (this.match(tokenType.CONSTRUCTOR)) {
                 methods.set(
                     this.peekPrev().lexeme(),
                     this.funcExpr() as FuncExpr
