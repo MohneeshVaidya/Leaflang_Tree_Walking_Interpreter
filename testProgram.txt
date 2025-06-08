@@ -4,11 +4,10 @@ class User {
     email,
     password,
     age,
-
-    //constructor() {
-    //}
 }
 
 const mohneesh = User();
 
 println mohneesh;
+
+println mohneesh.fullname;

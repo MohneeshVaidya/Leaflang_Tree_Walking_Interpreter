@@ -10,6 +10,7 @@ import IExpr, {
     ClassExpr,
     ExponentExpr,
     FuncExpr,
+    GetExpr,
     GroupingExpr,
     IdentifierExpr,
     IExprVisitor,
@@ -320,8 +321,39 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
         return value
     }
 
+    visitGetExpr(expr: GetExpr): IObj {
+        const caller = this.evaluate(expr.caller())
+
+        if (!(caller instanceof LeafInstance)) {
+            LeafError.getInstance().throwRunTimeError(
+                expr.name().line(),
+                `'${expr
+                    .name()
+                    .lexeme()}' can not be called on non class instance`
+            )
+        } else {
+            if (caller.fields().has(expr.name().lexeme())) {
+                return caller.fields().get(expr.name().lexeme()) as IObj
+            }
+
+            const leafClass = this._environment.get(
+                caller.className()
+            ) as LeafClass
+
+            if (leafClass.methods().has(expr.name().lexeme())) {
+                return caller.fields().get(expr.name().lexeme()) as IObj
+            }
+        }
+
+        throw LeafError.getInstance().throwRunTimeError(
+            this.getCallLine(expr),
+            `name '${expr.name().lexeme()}' isn't defined on caller`
+        )
+    }
+
     visitClassExpr(expr: ClassExpr): IObj {
         return LeafClass.createInstance(
+            expr.name(),
             expr.fields(),
             Array.from(expr.methods().entries()).reduce(
                 (prev, [key, value]) => {
@@ -383,7 +415,7 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
         if (expr instanceof IdentifierExpr) {
             return expr.token().line()
         }
-        return this.getCallLine((expr as CallExpr).caller())
+        return this.getCallLine((expr as CallExpr | GetExpr).caller())
     }
 
     private callMake(leafClass: LeafClass, expr: CallExpr): IObj {
@@ -393,7 +425,7 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
             leafClass.fields().forEach((field) => {
                 table.set(field, ObjNil.createInstance())
             })
-            return LeafInstance.createInstance(table)
+            return LeafInstance.createInstance(leafClass.name(), table)
         }
 
         const make = leafClass.methods().get("constructor") as LeafMethod

@@ -7,6 +7,7 @@ import {
     ClassExpr,
     ExponentExpr,
     FuncExpr,
+    GetExpr,
     GroupingExpr,
     IdentifierExpr,
     LiteralExpr,
@@ -95,7 +96,18 @@ export default class Parser {
             return this.peekPrev()
         }
         LeafError.getInstance().addParsingError(line, msg)
-        throw new Error(msg)
+        throw new Error(`Line ${line} - ${msg}`)
+    }
+
+    private expectAny(types: TokenType[], line: number, msg: string) {
+        for (let type of types) {
+            if (type === this.peek().type()) {
+                this.advance()
+                return this.peekPrev()
+            }
+        }
+        LeafError.getInstance().addParsingError(line, msg)
+        throw new Error(`Line ${line} - ${msg}`)
     }
 
     private peekPrev() {
@@ -465,7 +477,7 @@ export default class Parser {
 
         return ClassStmt.createInstance(
             name,
-            ClassExpr.createInstance(fields, methods)
+            ClassExpr.createInstance(name, fields, methods)
         )
     }
 
@@ -626,6 +638,8 @@ export default class Parser {
         if (this.matchPrev(tokenType.IDENTIFIER)) {
             if (this.match(tokenType.LEFT_PAREN)) {
                 return this.callExpr(IdentifierExpr.createInstance(token))
+            } else if (this.match(tokenType.DOT)) {
+                return this.getExpr(IdentifierExpr.createInstance(token))
             }
             return IdentifierExpr.createInstance(token)
         }
@@ -678,10 +692,32 @@ export default class Parser {
     private callExpr(expr: IExpr): IExpr {
         const args = this.getArguments()
 
+        const callExpr = CallExpr.createInstance(expr, args)
+
         if (this.match(tokenType.LEFT_PAREN)) {
-            return this.callExpr(CallExpr.createInstance(expr, args))
+            return this.callExpr(callExpr)
+        } else if (this.match(tokenType.DOT)) {
+            return this.getExpr(callExpr)
         }
-        return CallExpr.createInstance(expr, args)
+        return callExpr
+    }
+
+    private getExpr(expr: IExpr): IExpr {
+        const line = this.peekPrev().line()
+        const name = this.expectAny(
+            [tokenType.CONSTRUCTOR, tokenType.IDENTIFIER],
+            line,
+            "a name is expected after '.'"
+        )
+
+        const getExpr = GetExpr.createInstance(expr, name)
+
+        if (this.match(tokenType.LEFT_PAREN)) {
+            return this.callExpr(getExpr)
+        } else if (this.match(tokenType.DOT)) {
+            return this.getExpr(getExpr)
+        }
+        return getExpr
     }
 
     private groupingExpr(): IExpr {
