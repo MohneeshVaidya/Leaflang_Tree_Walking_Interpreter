@@ -12,7 +12,9 @@ import {
     IdentifierExpr,
     LiteralExpr,
     NilExpr,
+    SetExpr,
     TernaryExpr,
+    ThisExpr,
     UnaryExpr,
 } from "./expr"
 import IStmt, {
@@ -95,8 +97,7 @@ export default class Parser {
         if (this.get().type() === type) {
             return this.peekPrev()
         }
-        LeafError.getInstance().addParsingError(line, msg)
-        throw new Error(`Line ${line} - ${msg}`)
+        throw LeafError.getInstance().makeParsingError(line, msg)
     }
 
     private expectAny(types: TokenType[], line: number, msg: string) {
@@ -106,8 +107,7 @@ export default class Parser {
                 return this.peekPrev()
             }
         }
-        LeafError.getInstance().addParsingError(line, msg)
-        throw new Error(`Line ${line} - ${msg}`)
+        throw LeafError.getInstance().makeParsingError(line, msg)
     }
 
     private peekPrev() {
@@ -300,7 +300,7 @@ export default class Parser {
                 ++idx
             }
             if (idx >= this._tokens.length || num >= 3) {
-                LeafError.getInstance().throwRunTimeError(
+                throw LeafError.getInstance().makeParsingError(
                     line,
                     "'for' statement is incomplete"
                 )
@@ -397,6 +397,11 @@ export default class Parser {
 
     private funcStmt(): IStmt {
         const line = this.peekPrev().line()
+
+        if (this.peek().type() === tokenType.LEFT_PAREN) {
+            --this._current
+            return this.expressionStmt()
+        }
         const name = this.expect(
             tokenType.IDENTIFIER,
             line,
@@ -494,8 +499,15 @@ export default class Parser {
 
     private assignExpr(): IExpr {
         const left = this.ternaryExpr()
+
         if (this.match(tokenType.EQUAL)) {
             const oper = this.peekPrev()
+            if (left instanceof ThisExpr) {
+                throw LeafError.getInstance().makeRuntimeError(
+                    oper.line(),
+                    "'this' can not be assigned a value"
+                )
+            }
             const right = this.assignExpr()
             return AssignExpr.createInstance(oper, left, right)
         }
@@ -644,6 +656,18 @@ export default class Parser {
             return IdentifierExpr.createInstance(token)
         }
 
+        if (this.matchPrev(tokenType.THIS)) {
+            if (this.match(tokenType.LEFT_PAREN)) {
+                throw LeafError.getInstance().makeRuntimeError(
+                    token.line(),
+                    "'this' is not callable"
+                )
+            } else if (this.match(tokenType.DOT)) {
+                return this.getExpr(ThisExpr.createInstance(token))
+            }
+            return ThisExpr.createInstance(token)
+        }
+
         return NilExpr.createInstance()
     }
 
@@ -660,10 +684,16 @@ export default class Parser {
             line,
             "'{' is expected after parameter list"
         )
-        return FuncExpr.createInstance(
+        const funcExpr = FuncExpr.createInstance(
             parameters,
             this.blockStmt() as BlockStmt
         )
+
+        if (this.match(tokenType.LEFT_PAREN)) {
+            return this.callExpr(funcExpr)
+        }
+
+        return funcExpr
     }
 
     private arrowFunc(): IExpr {
@@ -683,16 +713,31 @@ export default class Parser {
                 BlockStmt.createInstance([returnStmt])
             )
         }
-        return FuncExpr.createInstance(
+        const funcExpr = FuncExpr.createInstance(
             parameters,
             this.blockStmt() as BlockStmt
         )
+
+        if (this.match(tokenType.LEFT_PAREN)) {
+            return this.callExpr(funcExpr)
+        }
+
+        return funcExpr
     }
 
     private callExpr(expr: IExpr): IExpr {
+        const line = this.peekPrev().line()
+
         const args = this.getArguments()
 
-        const callExpr = CallExpr.createInstance(expr, args)
+        if (this.match(tokenType.EQUAL)) {
+            throw LeafError.getInstance().makeRuntimeError(
+                this.peekPrev().line(),
+                "function call can not be assigned a value"
+            )
+        }
+
+        const callExpr = CallExpr.createInstance(expr, args, line)
 
         if (this.match(tokenType.LEFT_PAREN)) {
             return this.callExpr(callExpr)
@@ -710,7 +755,11 @@ export default class Parser {
             "a name is expected after '.'"
         )
 
-        const getExpr = GetExpr.createInstance(expr, name)
+        if (this.match(tokenType.EQUAL)) {
+            return SetExpr.createInstance(expr, name, this.expression())
+        }
+
+        const getExpr = GetExpr.createInstance(expr, name, line)
 
         if (this.match(tokenType.LEFT_PAREN)) {
             return this.callExpr(getExpr)

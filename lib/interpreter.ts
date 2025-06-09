@@ -16,7 +16,9 @@ import IExpr, {
     IExprVisitor,
     LiteralExpr,
     NilExpr,
+    SetExpr,
     TernaryExpr,
+    ThisExpr,
     UnaryExpr,
 } from "./expr"
 import IObj, { ObjBool, ObjNil, ObjNumber, ObjString } from "./object"
@@ -51,15 +53,15 @@ enum BlockCtx {
 
 enum CallableCtx {
     NONE,
-    FUNCT,
-    METHOD,
-    MAKE,
+    FUNC,
 }
 
 const breakStmt = "breakStmt"
 const continueStmt = "continueStmt"
 
 export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
+    private _instance: LeafInstance
+
     private constructor(
         private _environment = Environment.createInstance(),
         private _blockCtx = BlockCtx.NONE,
@@ -76,6 +78,14 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
 
     setEnvironment(environment: Environment) {
         this._environment = environment
+    }
+
+    instance() {
+        return this._instance
+    }
+
+    setInstance(instance: LeafInstance) {
+        this._instance = instance
     }
 
     execute(stmts: IStmt[]): void {
@@ -193,7 +203,7 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
 
     visitBreakStmt(stmt: BreakStmt): void {
         if (this._blockCtx !== BlockCtx.FOR) {
-            LeafError.getInstance().throwRunTimeError(
+            throw LeafError.getInstance().makeRuntimeError(
                 stmt.keyword().line(),
                 "'break' can only be used inside a loop"
             )
@@ -203,7 +213,7 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
 
     visitContinueStmt(stmt: ContinueStmt): void {
         if (this._blockCtx !== BlockCtx.FOR) {
-            LeafError.getInstance().throwRunTimeError(
+            throw LeafError.getInstance().makeRuntimeError(
                 stmt.keyword().line(),
                 "'continue' can only be used inside a loop"
             )
@@ -220,7 +230,7 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
 
     visitReturnStmt(stmt: ReturnStmt): void {
         if (this._callableCtx === CallableCtx.NONE) {
-            LeafError.getInstance().throwRunTimeError(
+            throw LeafError.getInstance().makeRuntimeError(
                 stmt.keyword().line(),
                 "'return' statement can only be used inside a function"
             )
@@ -279,11 +289,10 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
         if (expr_ instanceof ObjNumber) {
             return ObjNumber.createInstance(-expr_.value())
         }
-        LeafError.getInstance().throwRunTimeError(
+        throw LeafError.getInstance().makeRuntimeError(
             oper.line(),
             "operand of unary '-' can only be a number;"
         )
-        throw 0
     }
 
     visitFuncExpr(expr: FuncExpr): IObj {
@@ -299,23 +308,21 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
 
         if (!(caller instanceof Callable)) {
             if (caller instanceof LeafClass) {
-                return this.callMake(caller, expr)
+                return this.callClass(caller, expr)
             }
 
-            LeafError.getInstance().throwRunTimeError(
+            throw LeafError.getInstance().makeRuntimeError(
                 this.getCallLine(expr),
                 "expression is not callable"
             )
         }
 
         const prevCtx = this._callableCtx
-        this._callableCtx = CallableCtx.FUNCT
+        this._callableCtx = CallableCtx.FUNC
 
-        const value = (caller as unknown as Callable).call(
-            expr.args(),
-            this,
-            expr
-        )
+        const func = caller as LeafFunction
+
+        const value = func.call(expr.args(), this, expr)
 
         this._callableCtx = prevCtx
         return value
@@ -325,7 +332,7 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
         const caller = this.evaluate(expr.caller())
 
         if (!(caller instanceof LeafInstance)) {
-            LeafError.getInstance().throwRunTimeError(
+            throw LeafError.getInstance().makeRuntimeError(
                 expr.name().line(),
                 `'${expr
                     .name()
@@ -341,14 +348,49 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
             ) as LeafClass
 
             if (leafClass.methods().has(expr.name().lexeme())) {
-                return caller.fields().get(expr.name().lexeme()) as IObj
+                const method = leafClass
+                    .methods()
+                    .get(expr.name().lexeme()) as LeafMethod
+                method.setInstance(caller)
+                return method as IObj
             }
         }
 
-        throw LeafError.getInstance().throwRunTimeError(
+        throw LeafError.getInstance().makeRuntimeError(
             this.getCallLine(expr),
             `name '${expr.name().lexeme()}' isn't defined on caller`
         )
+    }
+
+    visitSetExpr(expr: SetExpr): IObj {
+        const caller = this.evaluate(expr.caller())
+
+        if (!(caller instanceof LeafInstance)) {
+            throw LeafError.getInstance().makeRuntimeError(
+                expr.identifier().line(),
+                `'${expr
+                    .identifier()
+                    .lexeme()}' can not be called on non class instance`
+            )
+        }
+
+        const instance = caller as LeafInstance
+
+        if (!instance.fields().has(expr.identifier().lexeme())) {
+            throw LeafError.getInstance().makeRuntimeError(
+                expr.identifier().line(),
+                `field '${expr
+                    .identifier()
+                    .lexeme()}' does not exist on instance of class'${instance
+                    .className()
+                    .lexeme()}'`
+            )
+        }
+
+        const right = this.evaluate(expr.right())
+        instance.fields().set(expr.identifier().lexeme(), right)
+
+        return right
     }
 
     visitClassExpr(expr: ClassExpr): IObj {
@@ -370,6 +412,16 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
                 new Map()
             )
         )
+    }
+
+    visitThisExpr(expr: ThisExpr): IObj {
+        if (this._callableCtx === CallableCtx.NONE) {
+            throw LeafError.getInstance().makeRuntimeError(
+                expr.keyword().line(),
+                "'this' can not be used outside of a function or method"
+            )
+        }
+        return this._instance
     }
 
     visitGroupingExpr(expr: GroupingExpr): IObj {
@@ -415,20 +467,27 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
         if (expr instanceof IdentifierExpr) {
             return expr.token().line()
         }
-        return this.getCallLine((expr as CallExpr | GetExpr).caller())
+        return (expr as CallExpr | GetExpr).line()
     }
 
-    private callMake(leafClass: LeafClass, expr: CallExpr): IObj {
+    private callClass(leafClass: LeafClass, expr: CallExpr): IObj {
         if (!leafClass.methods().has("constructor")) {
-            const table = new Map()
-
-            leafClass.fields().forEach((field) => {
-                table.set(field, ObjNil.createInstance())
-            })
-            return LeafInstance.createInstance(leafClass.name(), table)
+            return LeafInstance.createInstance(
+                leafClass.name(),
+                utils.makeInstanceFieldsTable(leafClass.fields())
+            )
         }
 
-        const make = leafClass.methods().get("constructor") as LeafMethod
-        return make.call(expr.args(), this, expr)
+        const prevCtx = this._callableCtx
+        this._callableCtx = CallableCtx.FUNC
+
+        const method = leafClass.methods().get("constructor") as LeafMethod
+        method.setType("constructor")
+        method.setClassName(leafClass)
+
+        const value = method.call(expr.args(), this, expr)
+
+        this._callableCtx = prevCtx
+        return value
     }
 }

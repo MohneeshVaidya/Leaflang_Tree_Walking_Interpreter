@@ -177,10 +177,14 @@ export class FuncExpr implements IExpr {
 }
 
 export class CallExpr implements IExpr {
-    private constructor(private _caller: IExpr, private _args: IExpr[]) {}
+    private constructor(
+        private _caller: IExpr,
+        private _args: IExpr[],
+        private _line: number
+    ) {}
 
-    static createInstance(caller: IExpr, args: IExpr[]) {
-        return new CallExpr(caller, args)
+    static createInstance(caller: IExpr, args: IExpr[], line: number) {
+        return new CallExpr(caller, args, line)
     }
 
     caller() {
@@ -191,16 +195,24 @@ export class CallExpr implements IExpr {
         return this._args
     }
 
+    line() {
+        return this._line
+    }
+
     accept<T>(visitor: IExprVisitor<T>): T {
         return visitor.visitCallExpr(this)
     }
 }
 
 export class GetExpr implements IExpr {
-    private constructor(private _caller: IExpr, private _name: Token) {}
+    private constructor(
+        private _caller: IExpr,
+        private _name: Token,
+        private _line: number
+    ) {}
 
-    static createInstance(caller: IExpr, name: Token) {
-        return new GetExpr(caller, name)
+    static createInstance(caller: IExpr, name: Token, line: number) {
+        return new GetExpr(caller, name, line)
     }
 
     caller() {
@@ -211,14 +223,40 @@ export class GetExpr implements IExpr {
         return this._name
     }
 
+    line() {
+        return this._line
+    }
+
     accept<T>(visitor: IExprVisitor<T>): T {
         return visitor.visitGetExpr(this)
     }
 }
 
 export class SetExpr implements IExpr {
+    private constructor(
+        private _caller: IExpr,
+        private _identifier: Token,
+        private _right: IExpr
+    ) {}
+
+    static createInstance(caller: IExpr, identifier: Token, right: IExpr) {
+        return new SetExpr(caller, identifier, right)
+    }
+
+    caller() {
+        return this._caller
+    }
+
+    identifier() {
+        return this._identifier
+    }
+
+    right() {
+        return this._right
+    }
+
     accept<T>(visitor: IExprVisitor<T>): T {
-        throw new Error("Method not implemented.")
+        return visitor.visitSetExpr(this)
     }
 }
 
@@ -251,6 +289,22 @@ export class ClassExpr implements IExpr {
 
     accept<T>(visitor: IExprVisitor<T>): T {
         return visitor.visitClassExpr(this)
+    }
+}
+
+export class ThisExpr implements IExpr {
+    constructor(private _keyword: Token) {}
+
+    static createInstance(keyword: Token) {
+        return new ThisExpr(keyword)
+    }
+
+    keyword() {
+        return this._keyword
+    }
+
+    accept<T>(visitor: IExprVisitor<T>): T {
+        return visitor.visitThisExpr(this)
     }
 }
 
@@ -327,7 +381,9 @@ export interface IExprVisitor<T> {
     visitFuncExpr(expr: FuncExpr): T
     visitCallExpr(expr: CallExpr): T
     visitGetExpr(expr: GetExpr): T
+    visitSetExpr(expr: SetExpr): T
     visitClassExpr(expr: ClassExpr): T
+    visitThisExpr(expr: ThisExpr): T
     visitGroupingExpr(expr: GroupingExpr): T
     visitLiteralExpr(expr: LiteralExpr): T
     visitIdentifierExpr(expr: IdentifierExpr): T

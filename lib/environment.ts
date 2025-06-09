@@ -34,7 +34,7 @@ export default class Environment {
 
     insertLet(identifier: Token, value: IObj) {
         if (this.hasIdentifier(identifier)) {
-            LeafError.getInstance().throwRunTimeError(
+            throw LeafError.getInstance().makeRuntimeError(
                 identifier.line(),
                 `name '${identifier.lexeme()}' re-declared in same scope`
             )
@@ -44,7 +44,7 @@ export default class Environment {
 
     insertConst(identifier: Token, value: IObj) {
         if (this.hasIdentifier(identifier)) {
-            LeafError.getInstance().throwRunTimeError(
+            throw LeafError.getInstance().makeRuntimeError(
                 identifier.line(),
                 `name '${identifier.lexeme()}' re-declared in same scope`
             )
@@ -58,14 +58,14 @@ export default class Environment {
         }
 
         if (this._table.has("const_" + identifier.lexeme())) {
-            LeafError.getInstance().throwRunTimeError(
+            throw LeafError.getInstance().makeRuntimeError(
                 identifier.line(),
                 `const '${identifier.lexeme()}' can not be re-assigned a value`
             )
         }
 
         if (this._parent === null) {
-            LeafError.getInstance().throwRunTimeError(
+            throw LeafError.getInstance().makeRuntimeError(
                 identifier.line(),
                 `name '${identifier.lexeme()}' is used before declaration`
             )
@@ -81,11 +81,10 @@ export default class Environment {
         }
 
         if (this._parent === null) {
-            LeafError.getInstance().throwRunTimeError(
+            throw LeafError.getInstance().makeRuntimeError(
                 identifier.line(),
                 `name '${identifier.lexeme()}' is used before declaration`
             )
-            throw ""
         } else {
             return this._parent.get(identifier)
         }

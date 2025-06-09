@@ -28,16 +28,16 @@ export default class LeafError {
         this.addError("lexical_error", `[near line ${line}] - ${msg}`)
     }
 
-    addParsingError(line: number, msg: string) {
-        this.addError("parsing_error", `[near line ${line}] - ${msg}`)
+    makeParsingError(line: number, msg: string) {
+        return new Error(`parsing_error: [near line ${line}] - ${msg}`)
+    }
+
+    makeRuntimeError(line: number, msg: string) {
+        return new Error(`runtime_error: [near line ${line}] - ${msg}`)
     }
 
     private addError(type: string, msg: string) {
         this._hasErrors = true
         this._errors.push(`${type}: ${msg}`)
-    }
-
-    throwRunTimeError(line: number, msg: string) {
-        throw new Error(`runtime_error: [near line ${line}] - ${msg}`)
     }
 }

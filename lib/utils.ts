@@ -1,5 +1,5 @@
 import { createInterface } from "node:readline/promises"
-import IObj from "./object"
+import IObj, { ObjNil } from "./object"
 
 const readInput = async (text: string) => {
     const reader = createInterface({
@@ -42,6 +42,14 @@ const isTruthy = (value: IObj) => {
     return !!value.value()
 }
 
+const makeInstanceFieldsTable = (fields: Set<string>) => {
+    const table: Map<string, IObj> = new Map()
+    fields.forEach((field) => {
+        table.set(field, ObjNil.createInstance())
+    })
+    return table
+}
+
 export default {
     readInput,
     isSpace,
@@ -49,4 +57,5 @@ export default {
     isAlphabetic,
     isAlphaNumeric,
     isTruthy,
+    makeInstanceFieldsTable,
 }

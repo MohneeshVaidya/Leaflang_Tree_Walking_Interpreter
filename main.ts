@@ -10,7 +10,7 @@ const argv = process.argv.slice(1)
 const argc = argv.length
 
 process.on("uncaughtException", (err) => {
-    console.log(err.message)
+    console.log(err)
     exit(1)
 })
 

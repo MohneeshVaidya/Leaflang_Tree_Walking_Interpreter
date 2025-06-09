@@ -1,4 +1,4 @@
-import { LeafInstance } from "./class"
+import LeafClass, { LeafInstance } from "./class"
 import Environment from "./environment"
 import LeafError from "./error"
 import IExpr from "./expr"
@@ -6,6 +6,11 @@ import Interpreter from "./interpreter"
 import IObj, { ObjNil } from "./object"
 import { BlockStmt } from "./stmt"
 import Token from "./token"
+import utils from "./utils"
+
+export type MethodType = "method" | "constructor"
+
+const constructorOrMethod: MethodType[] = ["constructor", "method"]
 
 export default abstract class Callable {
     protected constructor(
@@ -35,7 +40,7 @@ export default abstract class Callable {
         expr: IExpr
     ) {
         if (args.length !== this.parameters().length) {
-            LeafError.getInstance().throwRunTimeError(
+            throw LeafError.getInstance().makeRuntimeError(
                 interpreter.getCallLine(expr),
                 "number of arguments is not equal to number of parameters"
             )
@@ -101,7 +106,8 @@ export class LeafFunction extends Callable implements IObj {
 
 export class LeafMethod extends Callable implements IObj {
     private _instance: LeafInstance
-    private _type: "method" | "make"
+    private _type: MethodType
+    private _className: LeafClass
 
     private constructor(
         parameters: Token[],
@@ -127,10 +133,58 @@ export class LeafMethod extends Callable implements IObj {
         this._instance = instance
     }
 
-    call(args: IExpr[], interpreter: Interpreter, expr: IExpr): IObj {
-        const prevEnvironment = this.execSharedCallCode(args, interpreter, expr)
+    type() {
+        return this._type
     }
 
+    setType(type: MethodType) {
+        this._type = type
+    }
+
+    className() {
+        return this._className
+    }
+
+    setClassName(className: LeafClass) {
+        this._className = className
+    }
+
+    call(args: IExpr[], interpreter: Interpreter, expr: IExpr): IObj {
+        const prevEnvironment = this.execSharedCallCode(args, interpreter, expr)
+
+        if (this._type === "constructor") {
+            const fields = utils.makeInstanceFieldsTable(
+                this._className.fields()
+            )
+            this._instance = LeafInstance.createInstance(
+                this._className.name(),
+                fields
+            )
+        }
+
+        const prevInstance = interpreter.instance()
+        interpreter.setInstance(this._instance)
+
+        try {
+            interpreter.execute(this._stmts.stmts())
+
+            interpreter.setEnvironment(prevEnvironment)
+            interpreter.setInstance(prevInstance)
+
+            if (this._type === "constructor") {
+                return this._instance
+            }
+            return ObjNil.createInstance()
+        } catch (err) {
+            interpreter.setEnvironment(prevEnvironment)
+            interpreter.setInstance(prevInstance)
+
+            if (err instanceof ReturnValue) {
+                return err.value()
+            }
+            throw err
+        }
+    }
     value() {
         return `func (${this._parameters
             .map((parameter) => parameter.lexeme())
