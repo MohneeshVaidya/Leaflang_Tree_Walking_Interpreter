@@ -1,16 +1,20 @@
 import LeafError from "./error"
-import IObj from "./object"
+import { LeafInstance } from "./class"
+import IObj, { ObjNil } from "./object"
 import Token from "./token"
 
 export type OptionalEnvironment = Environment | null
+export type OptionalLeafInstance = LeafInstance | ObjNil
 
 export default class Environment {
     private _table: Map<string, IObj>
     private _parent: OptionalEnvironment
+    private _instance: OptionalLeafInstance
 
     private constructor(parent: OptionalEnvironment) {
         this._table = new Map()
         this._parent = parent
+        this._instance = ObjNil.createInstance()
     }
 
     static createInstance(parent: OptionalEnvironment = null) {
@@ -30,6 +34,17 @@ export default class Environment {
 
     setParent(parent: Environment) {
         this._parent = parent
+    }
+
+    instance() {
+        if (this._instance instanceof LeafInstance || this._parent === null) {
+            return this._instance
+        }
+        return this._parent.instance()
+    }
+
+    setInstance(instance: LeafInstance) {
+        this._instance = instance
     }
 
     insertLet(identifier: Token, value: IObj) {

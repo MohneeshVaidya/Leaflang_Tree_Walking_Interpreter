@@ -60,8 +60,6 @@ const breakStmt = "breakStmt"
 const continueStmt = "continueStmt"
 
 export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
-    private _instance: LeafInstance
-
     private constructor(
         private _environment = Environment.createInstance(),
         private _blockCtx = BlockCtx.NONE,
@@ -81,11 +79,11 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
     }
 
     instance() {
-        return this._instance
+        return this._environment.instance()
     }
 
     setInstance(instance: LeafInstance) {
-        this._instance = instance
+        this._environment.setInstance(instance)
     }
 
     execute(stmts: IStmt[]): void {
@@ -355,7 +353,6 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
                 return method as IObj
             }
         }
-
         throw LeafError.getInstance().makeRuntimeError(
             this.getCallLine(expr),
             `name '${expr.name().lexeme()}' isn't defined on caller`
@@ -421,7 +418,7 @@ export default class Interpreter implements IExprVisitor<IObj>, IStmtVisitor {
                 "'this' can not be used outside of a function or method"
             )
         }
-        return this._instance
+        return this.instance()
     }
 
     visitGroupingExpr(expr: GroupingExpr): IObj {

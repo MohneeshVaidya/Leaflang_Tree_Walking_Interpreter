@@ -1,55 +1,59 @@
-class User {
-    _fullname,
-    _username,
-    _email,
-    _password,
-    _age,
+class Number {
+    _value,
 
-    constructor(
-        fullname,
-        username,
-        email,
-        password,
-        age,
-    ) {
-        this._fullname = fullname;
-        this._username = username;
-        this._email    = email;
-        this._password = password;
-        this._age      = age;
+    constructor(value) {
+        this._value = value;
+    }
+
+    value() {
+        return this._value;
+    }
+
+    setValue(value) {
+        this._value = value;
+        return this;
     }
 
     getInstance() {
-        const test = () => {
-            println this;
-
-            () => {
-                println this;
-            }();
+        return () => {
+            return this;
         };
-        println this;
-        test();
-        return this;
     }
 }
 
-const user = User(
-    "Mohneesh Vaidya",
-    "coder-mohneesh",
-    "coder.mohneesh.123@gmail.com",
-    "mohneesh-coder-pass",
-    26
-);
+const number = Number(10);
 
-println user.getInstance()._fullname = "mohneesh-the-coder";
-println user;
+const instance = number.getInstance();
 
-println "";
-
-func (msg) {
-    println msg;
-}("Hello world, hope you are fine");
+println instance();
 
 () => {
-    return (msg) => { println msg; };
-}()("heleelel");
+    println instance();
+}();
+
+class String {
+    _value,
+
+    constructor(value) {
+        this._value = value;
+    }
+
+    value() {
+        return this._value;
+    }
+
+    setValue(value) {
+        this._value = value;
+        return this;
+    }
+
+    printInstance(instance) {
+        println instance();
+    }
+}
+
+const string = String("Mohneesh Vaidya");
+
+println string;
+
+string.printInstance(instance);
