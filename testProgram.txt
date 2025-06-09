@@ -1,0 +1,55 @@
+class User {
+    _fullname,
+    _username,
+    _email,
+    _password,
+    _age,
+
+    constructor(
+        fullname,
+        username,
+        email,
+        password,
+        age,
+    ) {
+        this._fullname = fullname;
+        this._username = username;
+        this._email    = email;
+        this._password = password;
+        this._age      = age;
+    }
+
+    getInstance() {
+        const test = () => {
+            println this;
+
+            () => {
+                println this;
+            }();
+        };
+        println this;
+        test();
+        return this;
+    }
+}
+
+const user = User(
+    "Mohneesh Vaidya",
+    "coder-mohneesh",
+    "coder.mohneesh.123@gmail.com",
+    "mohneesh-coder-pass",
+    26
+);
+
+println user.getInstance()._fullname = "mohneesh-the-coder";
+println user;
+
+println "";
+
+func (msg) {
+    println msg;
+}("Hello world, hope you are fine");
+
+() => {
+    return (msg) => { println msg; };
+}()("heleelel");
